@@ -1,0 +1,56 @@
+
+debugApi:
+  citiesPool:
+  - London
+  - Stockholm
+  - Toronto
+  - Moscow
+  - Madrid
+  - Reykjavik
+  - Helsinki
+  - Rome
+  - Venice
+  - Lisbon
+  - Paris
+  - Amsterdam
+  - Chernobyl
+  - Nairobi
+  - Dubai
+  - Bali
+  - Tokyo
+  - Bangkok
+  - Seoul
+  - Buenos Aires
+  - Mexico City
+  - Jakarta
+  - Yakutsk
+  - Oymyakon
+  - Cairo
+  - Luanda
+  - Dakar
+  - Tunis
+  - Owerri
+  - Alexandria
+  - Antananarivo
+  - Santiago
+  - Caracas
+  - Salvador
+  - Quito
+  - Soledad
+  queryConfig:
+    queryAttribute: continent
+    queryRequirement: Europe
+  charts:
+    bubbleChart:
+      separateGraphDisplay: False
+      bubbleColorTheme: brown
+      pngOutput: True
+    pieChart:
+      chartType: Color-Theme
+      pieColorTheme: orange
+      pngOutput: True
+    equatorChart:
+      displayLinearTrend: False
+      displayLogarithmicTrend: True
+      displayActualTrend: False
+      pngOutput: True

@@ -1,0 +1,123 @@
+[
+    {
+        "city": "London",
+        "country": "United Kingdom",
+        "continent": "Europe",
+        "temperatureCelsius": 18.4,
+        "latitude": 51.52,
+        "longitude": -0.11,
+        "timeZoneNotation": "Europe/London",
+        "timeZoneOffset": "UTC+0",
+        "equatorDistance": 51.52
+    },
+    {
+        "city": "Stockholm",
+        "country": "Sweden",
+        "continent": "Europe",
+        "temperatureCelsius": 14.1,
+        "latitude": 59.33,
+        "longitude": 18.05,
+        "timeZoneNotation": "Europe/Stockholm",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 59.33
+    },
+    {
+        "city": "Moscow",
+        "country": "Russia",
+        "continent": "Europe",
+        "temperatureCelsius": 24.2,
+        "latitude": 55.75,
+        "longitude": 37.62,
+        "timeZoneNotation": "Europe/Moscow",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 55.75
+    },
+    {
+        "city": "Madrid",
+        "country": "Spain",
+        "continent": "Europe",
+        "temperatureCelsius": 36.4,
+        "latitude": 40.4,
+        "longitude": -3.68,
+        "timeZoneNotation": "Europe/Madrid",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 40.4
+    },
+    {
+        "city": "Helsinki",
+        "country": "Finland",
+        "continent": "Europe",
+        "temperatureCelsius": 17.4,
+        "latitude": 60.18,
+        "longitude": 24.93,
+        "timeZoneNotation": "Europe/Helsinki",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 60.18
+    },
+    {
+        "city": "Rome",
+        "country": "Italy",
+        "continent": "Europe",
+        "temperatureCelsius": 29.2,
+        "latitude": 41.9,
+        "longitude": 12.48,
+        "timeZoneNotation": "Europe/Rome",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 41.9
+    },
+    {
+        "city": "Venice",
+        "country": "Italy",
+        "continent": "Europe",
+        "temperatureCelsius": 24.1,
+        "latitude": 45.44,
+        "longitude": 12.33,
+        "timeZoneNotation": "Europe/Rome",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 45.44
+    },
+    {
+        "city": "Lisbon",
+        "country": "Portugal",
+        "continent": "Europe",
+        "temperatureCelsius": 30.2,
+        "latitude": 38.72,
+        "longitude": -9.13,
+        "timeZoneNotation": "Europe/Lisbon",
+        "timeZoneOffset": "UTC+0",
+        "equatorDistance": 38.72
+    },
+    {
+        "city": "Paris",
+        "country": "France",
+        "continent": "Europe",
+        "temperatureCelsius": 20.1,
+        "latitude": 48.87,
+        "longitude": 2.33,
+        "timeZoneNotation": "Europe/Paris",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 48.87
+    },
+    {
+        "city": "Amsterdam",
+        "country": "Netherlands",
+        "continent": "Europe",
+        "temperatureCelsius": 17.2,
+        "latitude": 52.37,
+        "longitude": 4.89,
+        "timeZoneNotation": "Europe/Amsterdam",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 52.37
+    },
+    {
+        "city": "Chernobyl",
+        "country": "Ukraine",
+        "continent": "Europe",
+        "temperatureCelsius": 19.0,
+        "latitude": 51.27,
+        "longitude": 30.23,
+        "timeZoneNotation": "Europe/Kyiv",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 51.27
+    }
+]
