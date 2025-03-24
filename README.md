@@ -67,7 +67,7 @@ In the summer of 2024, I decided to pursue practical knowledge of Big Data and d
 - **X <= Y**   -->   If `Y` is greater than `X` no samples are retrieved and null is inserted in PostgreSQL
 - **N = Y/X**    -->   The number of samples retrieved during one batch, or in other words, the number of samples that a database instance is founded upon. The bigger `N` is, the more consistency of the db-instance value can be expected
 
-**IMPORTANT NOTE:** Throughout this project, as a result of the architecture, the 'PieCharts' and 'BubbleCharts' are referred to as `Real-time charts`, and 'EquatorCharts' are denoted as `Equator charts`. Due to the extended branch of the architecture that was necessary to integrate the 'EquatorCharts', I found it important to make this distinction in terminology to avoid confusion. The 'Real-Time charts' got their name because of their remarkable characteristic of being tied to the generating datapiline in `/application` that is predicated on the Big Data and real-time producing and processing technologies (Kafka, Flink, PostgreSQL).
+**IMPORTANT NOTE:** Throughout this project, as a result of the architecture, the *PieCharts* and *BubbleCharts* are referred to as `Real-time charts`, and *EquatorCharts* are denoted as `Equator charts`. Due to the extended branch of the architecture that was necessary to integrate the 'EquatorCharts', I found it important to make this distinction in terminology to avoid confusion. The 'Real-Time charts' got their name because of their remarkable characteristic of being tied to the generating data pipeline in `/application` that is predicated on the Big Data and real-time producing and processing technologies (Kafka, Flink, PostgreSQL).
 
 ## 🌡 Equator Distance Temperature Hypothesis
 
@@ -79,17 +79,13 @@ Clearly, there is some truth to this statement. Spain is generally hotter than S
 
 - *What is the numerical relation between a geographical area's altitude and the equator?*
 
-- In the context of this project, `geographical area` is concerned with cities
-
 - Since the equator is at altitude 0, and the total altitude ranges from -90 to 90, I figured that taking the absolute value would represent a city's direct distance to the equator. Thus, making a city's distance to the equator the X-value in the line graph.
-
-- RESTFUL APIs to retrieve data
 
 - At the time I finished this project I had **20,000+ db instances** in the PostgreSQL database. However, due to the extensive capacities of the technologies used in this project (Kafka, Flink and Docker), this project is able to store way more instances without decreasing in performance.
 
 ## 🚀 Get Started
 
-In many of my prior projects I always found the process of starting and setting up the system tedious and repetitive. That's why I aimed to counteract that productivity-killing and time-consuming aspect in this project, and I used Bash scripting to solve this. Shell scripting is a powerful tool for automating tasks and simplifying the management of systems and applications. In this project, I aspired to simplify it to the point so that all you need to do is to run the docker containers, which will automatically execute the contained scripts in each subdirectory. In other words encapsulating the functionality and permissions to avoid confusion. Just like I learned about encapsulation in Java in [Object Oriented Programming](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/1.%20Object%20Oriented%20Programming?ref_type=heads), it is equally important to only reveal the high-level aspects of a complex topic that the developer doesn't need to be an expert at.
+In many of my prior projects I always found the process of starting and setting up the system tedious and repetitive. That's why I aimed to counteract that productivity-killing and time-consuming aspect in this project, and I used Bash scripting to solve this. Shell scripting is a powerful tool for automating tasks and simplifying the management of systems and applications. In this project, I aspired to simplify it to the point so that all you need to do is to run the docker containers, which will automatically execute the contained scripts in each subdirectory. In other words, encapsulating the functionality and permissions to avoid confusion.
 
 ### Instructions & Executions
 
@@ -103,33 +99,33 @@ It is worth noting that this entire process is automated. Each **i:th** PDF in `
 
 #### 3. Container Debugging
 
-![3. container-debuggin-kafka](readme-videos/3.%20container-debuggin-kafka-producer-desktop-shell-terminal.mp4) 
-![3. container-debugging-logs](readme-videos/3.%20container-debugging-logs.mp4) 
-![3. container-debugging-postgres-sql](readme-videos/3.%20container-debugging-postgres-sql-commands-real-time.mp4) 
-![3. container-debugging-postgres-terminal](readme-videos/3.%20container-debugging-postgres-terminal-shell-queries.mp4) 
-![3. container-debugging-zookeper-flink](readme-videos/3.%20container-debugging-zookeeper-and-flink.mp4)
+1. ![3. container-debuggin-kafka](readme-videos/3.%20container-debuggin-kafka-producer-desktop-shell-terminal.mp4) 
+2. ![3. container-debugging-logs](readme-videos/3.%20container-debugging-logs.mp4) 
+3. ![3. container-debugging-postgres-sql](readme-videos/3.%20container-debugging-postgres-sql-commands-real-time.mp4) 
+4. ![3. container-debugging-postgres-terminal](readme-videos/3.%20container-debugging-postgres-terminal-shell-queries.mp4) 
+5. ![3. container-debugging-zookeper-flink](readme-videos/3.%20container-debugging-zookeeper-and-flink.mp4)
 
 #### 4. Data Visualization
 
-![4. data-visualization-bubble-chart](readme-videos/4.%20data-visualization-bubble-chart.mp4) 
-![4. data-visualization-pie-chart](readme-videos/4.%20data-visualization-pie-chart.mp4) 
-![4. data-visualization-utc+2](readme-videos/4.%20data-visualization-utc+2.mp4)
+1. ![4. data-visualization-bubble-chart](readme-videos/4.%20data-visualization-bubble-chart.mp4) 
+2. ![4. data-visualization-pie-chart](readme-videos/4.%20data-visualization-pie-chart.mp4) 
+3. ![4. data-visualization-utc+2](readme-videos/4.%20data-visualization-utc+2.mp4)
 
 #### 5. Combinatorial Automations
 
 The main script, `instructions-executions/executionary/5. combinatorial-automations.sh`, invokes other refactored Bash modules. It collaborates with the general `utils.sh` to redirect the dataflow into each distinct chart: `bubbleChart-combinations.sh`, `pieChart-combinations.sh` and `equator-combinations.sh`
 
-![5. combination-automation-similar-curve-linear](readme-videos/5.%20combination-automation-similar-curve-linear.mp4) 
-![5. combinations-equator-continents-with-without-logaritmic](readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4) 
-![5. combinations-piecharts](readme-videos/5.%20combinations-piecharts.mp4)
+1. ![5. combination-automation-similar-curve-linear](readme-videos/5.%20combination-automation-similar-curve-linear.mp4) 
+2. ![5. combinations-equator-continents-with-without-logaritmic](readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4) 
+3. ![5. combinations-piecharts](readme-videos/5.%20combinations-piecharts.mp4)
 
 Automation - For each continent, run a query and plot the data:
 
-![5. combinations-equator-continents-with-without-logaritmic](readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4)
+4. ![5. combinations-equator-continents-with-without-logaritmic](readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4)
 
 Automation - For each color provided by [Color API](#color-api), plot a piechart of the data:
 
-![5. combinations-piecharts](readme-videos/5.%20combinations-piecharts.mp4)
+5. ![5. combinations-piecharts](readme-videos/5.%20combinations-piecharts.mp4)
 
 ### Start/Stop application
 
@@ -247,7 +243,7 @@ debugApi:
 
 #### APIs
 
-The first time I was introduced to APIs and started working with them was in a [Web Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/1.%20Web%20Development/bookster-project?ref_type=heads) course in 2023
+The first time I was introduced to APIs and started working with them was in a [Bookster](https://github.com/mrjex/Bookster) course in 2023
 
 ##### Weather API
 
@@ -255,7 +251,7 @@ I decided to connect an API that fetches weather-data in a geographical area. Fo
 
 ##### Geolocation API
 
-**Development Process Background:** As new ideas sparked during the development process and I started working on the [EquatorChart](#equator-chart). This feature ended up being a pivotal change because the architectural changes were more significant that I could initially anticipate for. For instance, as I worked on the equator features, I realized that the data will be misleading unless the cities are queried by timezones. Unfortunately [Weather API](#weather-api) didn't include this in its response body. I also thought the idea of querying by continents was a cool feature, so at this point I wanted two more attributes that my initial API wouldn't return. Thus, I figured I integrate a new specialized API for this single responsibility to maintain the modularity. I researched heavily but couldn't find a free public API providing both a continent and a timezone, making me implementing two distinct ones under the common denotation `Geolocation API`. This design pattern that involves two sub-components as a general composition to enhance modularity, encapsulation and readability is something I learned in a [Software Analysis Construction](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/8.%20Software%20Analysis%20Construction?ref_type=heads) course, which I then applied in my [Burndown Chart Feature](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/7.%20Systems%20Development/WioPlay/seeed-wio-terminal/WioPlay?ref_type=heads) in the [Systems Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/7.%20Systems%20Development/WioPlay?ref_type=heads) course.
+**Development Process Background:** As new ideas sparked during the development process and I started working on the [EquatorChart](#equator-chart). This feature ended up being a pivotal change because the architectural changes were more significant that I could initially anticipate for. For instance, as I worked on the equator features, I realized that the data will be misleading unless the cities are queried by timezones. Unfortunately [Weather API](#weather-api) didn't include this in its response body. I also thought the idea of querying by continents was a cool feature, so at this point I wanted two more attributes that my initial API wouldn't return. Thus, I figured I integrate a new specialized API for this single responsibility to maintain the modularity. I researched heavily but couldn't find a free public API providing both a continent and a timezone, making me implementing two distinct ones under the common denotation `Geolocation API`. This design pattern that involves two sub-components as a general composition to enhance modularity, encapsulation and readability is something I learned in a [Software Design Patterns](https://github.com/mrjex/Software-Design-Patterns) course, which I then applied in my [Burndown Chart Feature](https://github.com/Indomet/WioPlay/tree/main/seeed-wio-terminal/WioPlay) in the [WioPlay](https://github.com/Indomet/WioPlay/tree/main) project.
 
 **Structure:** This API is a composition of two public APIs ([Continent API](https://timeapi.io/swagger/index.html) and [TimeZone API](https://www.geotimezone.com/)) and returns a merged JSON body
 
@@ -294,7 +290,7 @@ As I glanced over the purpose of this project and my own objectives of learning,
 
 #### API Tests
 
-The tests are conducted and automated through shell scripts. I was introduced to this file extension in [Cyber Physical Systems of Systems](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/7.%20Cyber%20Physical%20Systems%20and%20Sytems%20of%20Systems?ref_type=heads) and I appreciated the ease at which the developer can maintain in the development of complex projects with multiple entities, each with their own entrypoint. It's hard to keep track of everything and the order in which sub-components have to be executed to deliver the expected result of one's system. Therefore, I decided to go with these types of tests, as opposed to Postman tests which I worked on in [Web Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/1.%20Web%20Development?ref_type=heads) and [Distributed Systems](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/3.%20Distributed%20Systems/dentanoid-project/2.%20apis/patient-api?ref_type=heads). A few other of my prior experiences in the domain of testing are [Object Oriented Programming](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/1.%20Object%20Oriented%20Programming?ref_type=heads), [Software Quality & Testing](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/6.%20Software%20Quality%20&%20Testing?ref_type=heads) and [Systems Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/7.%20Systems%20Development/WioPlay?ref_type=heads)
+The tests are conducted and automated through shell scripts. I was introduced to this file extension in [Cyber Physical Systems of Systems](https://github.com/mrjex/Cyber-Physical-Systems-and-Sytems-of-Systems) and I appreciated the ease at which the developer can maintain in the development of complex projects with multiple entities, each with their own entrypoint. It's hard to keep track of everything and the order in which sub-components have to be executed to deliver the expected result of one's system. Therefore, I decided to go with these types of tests, as opposed to Postman tests which I worked on in [Bookster](https://github.com/mrjex/Bookster) and [Dentanoid - Distributed Systems](https://github.com/Dentanoid).
 
 **Weather API Tests:**
 
@@ -314,7 +310,7 @@ The tests are conducted and automated through shell scripts. I was introduced to
 
 ![project-logo-2](readme-pictures/global/global-feature-logo-2.png)
 
-In the beginning of this project, my vision was to only analyze 5 pre-defined cities in Europe. This constraint was then challenged as I plotted the `Real-time charts` using Plotly. When I observed the data I realized I needed a larger quantity and more samples to draw accurate conclusions. In one of my previous projects, [Distributed Systems](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/3.%20Distributed%20Systems?ref_type=heads) me and my group of students developing a microservice architecture and had specified requirements for the scalability. I learned that this quality attribute is a significant one, as the usability of your code is correlated with how many users find value in it, and it's hard to value a product that faces performance issues when the workload of customer is higher than anticipated. In that project I made sure that `Dental Clinics` around the world were supported and stored as instances without harming the performance. Similarly, in this project, I saw the need and the potential benefits of implementing this on a global scale. In addition, the configurations of this 'Global Feature' is easily accessible and modifiable for the developer in the central `configuration.yml` file. Furthermore, as I made the project global, I was quick to add 'Venice' as one of the cities to analyze, since I spent 6 months abroad [Exchange Studies Venice](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-3/1.%20Exchange%20Studies%20Venice?ref_type=heads)
+In the beginning of this project, my vision was to only analyze 5 pre-defined cities in Europe. This constraint was then challenged as I plotted the `Real-time charts` using Plotly. When I observed the data I realized I needed a larger quantity and more samples to draw accurate conclusions. In one of my previous projects, [Dentanoid - Distributed Systems](https://github.com/Dentanoid) me and my group of students developing a microservice architecture and had specified requirements for the scalability. I learned that this quality attribute is a significant one, as the usability of your code is correlated with how many users find value in it, and it's hard to value a product that faces performance issues when the workload of customer is higher than anticipated. In that project I made sure that `Dental Clinics` around the world were supported and stored as instances without harming the performance. Similarly, in this project, I saw the need and the potential benefits of implementing this on a global scale. In addition, the configurations of this 'Global Feature' is easily accessible and modifiable for the developer in the central `configuration.yml` file.
 
 ## 📊 Charts
 
@@ -361,8 +357,6 @@ Initially, I only intended to implement one type of pie chart with randomized co
 
 ![pieChart-randomized-colors](readme-pictures/visualization/pieChart-randomized-colors.PNG)
 
-As with my experience using Chartjs in my [Web Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/1.%20Web%20Development?ref_type=heads) project, the sections are interactable, allow you to view the results when discarding the selected ones:
-
 ![pieChart-randomized-discarded-colors](readme-pictures/visualization/pieChart-randomized-disabled-colors.PNG)
 
 #### 4 Coldest Cities
@@ -385,10 +379,8 @@ To view more pie charts, navigate to `/debug-api/generated-artifacts/pngs/pie-ch
 
 ### Equator Chart
 
-Once I finished the features above, I had a few ideas in mind that would give me a harder challenge. As I plotted the data in the bubble chart I noticed the general trend of increased temperature combined with decreased distance to the equator. Now, I could have expanded on the SQL database to account for this (adding one more attribute/field 'equatorDistance' to the relational table 'weather'). However, in the pursuit of a challenge that would in turn assist me in familiarizing in the broad topic of programming, I decided to develop a JSON database in the local file system. I've seen the wide usage of JSON and its contributions to software-component communications and viewed this as a good opportunity to gain proficiency in using it. Note that I was accustomed to this key-value file format due to the following courses:
-- [Data Management](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/6.%20Data%20Management?ref_type=heads)
-- [Systems Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/7.%20Systems%20Development?ref_type=heads)
-- [Distributed Systems](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/3.%20Distributed%20Systems?ref_type=heads)
+Once I finished the features above, I had a few ideas in mind that would give me a harder challenge. As I plotted the data in the bubble chart I noticed the general trend of increased temperature combined with decreased distance to the equator. Now, I could have expanded on the SQL database to account for this (adding one more attribute/field 'equatorDistance' to the relational table 'weather'). However, in the pursuit of a challenge that would in turn assist me in familiarizing in the broad topic of programming, I decided to develop a JSON database in the local file system. I've seen the wide usage of JSON and its contributions to software-component communications and viewed this as a good opportunity to gain proficiency in using it.
+
 
 #### Equator Chart Data Flow
 
@@ -542,7 +534,7 @@ In addition to all the features this project has to offer, there two more notewo
 
 ### Docker Volumes Persistence
 
-As a challenge for me, I added a text file as a docker container volume. In my previous courses [Branno Project](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/2.%20spare-time/1.%20Project%20Branno?ref_type=heads) and [Cyber Physical Systems of Systems](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/7.%20Cyber%20Physical%20Systems%20and%20Sytems%20of%20Systems?ref_type=heads), I familiarized myself with docker-compose and the feature of persisting data such that it remains even when the containers aren't running. What I did in this project was to direct output from the kafka- and flink-containers to `/debug-api/exec-settings.txt`, such that the kafka producer writes the API request intervals and the flink consumer writes the time in sample duration for each instance to be inserted in the database.
+As a challenge for me, I added a text file as a docker container volume. In my previous courses [Project Branno](https://github.com/mrjex/Project-Branno) and [Cyber Physical Systems of Systems](https://github.com/mrjex/Cyber-Physical-Systems-and-Sytems-of-Systems), I familiarized myself with docker-compose and the feature of persisting data such that it remains even when the containers aren't running. What I did in this project was to direct output from the kafka- and flink-containers to `/debug-api/exec-settings.txt`, such that the kafka producer writes the API request intervals and the flink consumer writes the time in sample duration for each instance to be inserted in the database.
 
 ![docker-volume-architecture](readme-pictures/architecture/docker-volumes-project-architecture.PNG)
 
@@ -573,11 +565,6 @@ In this project, I learned...
     - One-dimensional arrays for X and Y values for simplistic graphs
       - I used a lambda function in queryApi.py in getCitiesAttribute(attribute) to perform operations on all elements of arrays of pre-defined lengths. 2 years before the summer of 2024 (which is when I worked on this project) I was learning about algorithms on AlgoExpert. During this period, I became accustomed to lambda operations and to what extent it facilitates the process from the developer realizing the step-by-step the operations the algorithms needs to perform, to actually coding it with respect to multiple metrics. I think these metrics are simplicity and readability. Although lambda functions may be confusing to rookies, once you learn their fundamentals they really do simplify complex snippets of code due to the resulting reduced lines of codes.
 
-- **Debugging & Volumes with Docker Desktop** *(previous knowledge: [Web Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/1.%20Web%20Development?ref_type=heads))*
-
-- **Java** *(previous knowledge: [Object Oriented Programming](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/1.%20Object%20Oriented%20Programming?ref_type=heads), [Software Quality & Testing](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/6.%20Software%20Quality%20&%20Testing?ref_type=heads), [Software Analysis & Construction](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-1/8.%20Software%20Analysis%20Construction/Assignment%204%20-%20Architecture%20Refactoring%20&%20Consistency?ref_type=heads))*
-
-- **APIs** *(previous knowledge: [Web Development](https://gitlab.com/jex-projects/mrjex/-/tree/main/projects/1.%20courses/year-2/1.%20Web%20Development?ref_type=heads))*
 
 ## 🔮 Future Updates
 
