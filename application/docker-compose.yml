@@ -56,7 +56,9 @@ services:
     - bridge
 
   flink-processor:
-    image: flink-processor
+    build:
+      context: ./flink-processor
+      dockerfile: Dockerfile
     volumes:
       - ../debug-api:/mnt
     depends_on:

@@ -1,4 +1,4 @@
 -- -- - EXECUTION SETTINGS - -- -- 
 
 API Request Intervals = 3.5
-Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15
+Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15Time Sampling Duration (seconds) = 15
