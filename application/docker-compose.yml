@@ -5,6 +5,14 @@ networks:
     driver: bridge
 
 services:
+  frontend:
+    build:
+      context: ../frontend
+    ports:
+      - "3001:3000"
+    networks:
+      - bridge
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
