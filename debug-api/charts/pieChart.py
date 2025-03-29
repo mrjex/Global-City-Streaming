@@ -14,13 +14,7 @@ import utils
 configPath = "../../configuration.yml" # The fixed relative path to the central config file
 
 
-cities = [
-    'London', 'Stockholm', 'Toronto', 'Moscow', 'Madrid',
-    'Reykjavik', 'Helsinki', 'Rome', 'Venice', 'Lisbon',
-    'Paris', 'Amsterdam', 'Chernobyl', 'Nairobi', 'Dubai',
-    'Bali', 'Tokyo', 'Bangkok', 'Seoul',
-    'Buenos Aires', 'Mexico City'
-  ]
+cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
 
 chartTypes = ['Random-Colors', '4-Coldest-Cities', 'Color-Theme'] # Available options
 

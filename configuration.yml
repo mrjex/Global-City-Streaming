@@ -1,4 +1,3 @@
-
 debugApi:
   citiesPool:
   - London
@@ -54,3 +53,27 @@ debugApi:
       displayLogarithmicTrend: True
       displayActualTrend: False
       pngOutput: True
+
+realTimeProduction:
+  cities:
+  - London
+  - Stockholm
+  - Toronto
+  - Moscow
+  - Madrid
+  - Reykjavik
+  - Helsinki
+  - Rome
+  - Venice
+  - Lisbon
+  - Paris
+  - Amsterdam
+  - Chernobyl
+  - Nairobi
+  - Dubai
+  - Bali
+  - Tokyo
+  - Bangkok
+  - Seoul
+  - Buenos Aires
+  - Mexico City

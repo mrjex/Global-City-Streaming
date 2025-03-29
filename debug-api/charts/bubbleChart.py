@@ -44,13 +44,7 @@ dataPointOutlizeWidth = 0
 
 
 
-cities = [
-    'London', 'Stockholm', 'Toronto', 'Moscow', 'Madrid',
-    'Reykjavik', 'Helsinki', 'Rome', 'Venice', 'Lisbon',
-    'Paris', 'Amsterdam', 'Chernobyl', 'Nairobi', 'Dubai',
-    'Bali', 'Tokyo', 'Bangkok', 'Seoul',
-    'Buenos Aires', 'Mexico City'
-  ]
+cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
 
 
 

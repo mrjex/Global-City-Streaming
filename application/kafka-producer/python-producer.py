@@ -7,6 +7,7 @@ from json import dumps
 
 from kafka import KafkaProducer
 import glob
+import utils
 
 
 ##  External pipeline configurations  ##
@@ -25,13 +26,7 @@ intervalTime = 3 # Default: 3
 # Note that this array of cities must be identical to the local city array declared
 # in "/debug-api/charts/real-time-multi-samples" in 'bubble-chart.py' and
 # 'pie-chart.py'
-cities = [
-    'London', 'Stockholm', 'Toronto', 'Moscow', 'Madrid',
-    'Reykjavik', 'Helsinki', 'Rome', 'Venice', 'Lisbon',
-    'Paris', 'Amsterdam', 'Chernobyl', 'Nairobi', 'Dubai',
-    'Bali', 'Tokyo', 'Bangkok', 'Seoul',
-    'Buenos Aires', 'Mexico City'
-  ]
+cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
 
 
 def exportSettings():
