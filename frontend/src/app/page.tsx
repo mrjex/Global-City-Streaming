@@ -14,7 +14,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-8">
-      <h1 className="text-4xl font-bold mb-8">Global City Weather Streaming</h1>
+      <h1 className="text-4xl font-bold mb-8">Global City Streaming</h1>
       
       <div className="bg-white rounded-lg shadow-lg p-6">
         <WorldMap onCountrySelect={handleCountrySelect} />

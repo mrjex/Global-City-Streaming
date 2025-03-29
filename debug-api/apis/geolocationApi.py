@@ -13,7 +13,6 @@ apiNotationUrl = "https://timeapi.io/api/Time/current/coordinate"     # API Webs
 apiOffsetUrl = "https://api.geotimezone.com/public/timezone"          # API Website: https://www.geotimezone.com/
 
 
-# TODO: Document this function
 # NOTES:
 
 # Returns a notation-string about the timezone that's easy for humans to read.
