@@ -32,9 +32,12 @@ services:
           - kafka
 
   kafka-producer:
+    build:
+      context: ./kafka-producer
     image: kafka-producer
     volumes:
       - ../debug-api:/mnt
+      - ../:/app
     depends_on:
     - kafka
     environment:

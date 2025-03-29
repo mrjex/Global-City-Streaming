@@ -2,12 +2,20 @@ import datetime
 import time
 import schedule
 import requests
+import sys
+import os
+from pathlib import Path
+
+# Add project root to Python path
+project_root = str(Path(__file__).resolve().parents[2])
+sys.path.append(project_root)
 
 from json import dumps
 
 from kafka import KafkaProducer
 import glob
 import utils
+from dotenv import load_dotenv
 
 
 ##  External pipeline configurations  ##
@@ -16,7 +24,8 @@ myTopic = "weather"
 
 
 ## Weather API configurations  ##
-apiKey = "165bb23217d246afb3e161429241806" # Your generated API key from your private account (https://www.weatherapi.com/my/)
+load_dotenv()  # Load environment variables from .env file
+apiKey = os.getenv('WEATHER_API_KEY')
 apiUrl = "https://api.weatherapi.com/v1/current.json"
 idleTime = 0.5 # Default: 0.5
 intervalTime = 3 # Default: 3
@@ -26,12 +35,15 @@ intervalTime = 3 # Default: 3
 # Note that this array of cities must be identical to the local city array declared
 # in "/debug-api/charts/real-time-multi-samples" in 'bubble-chart.py' and
 # 'pie-chart.py'
-cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
+cities = utils.parseYmlFile(os.path.join(project_root, "configuration.yml"), "realTimeProduction.cities")
 
 
 def exportSettings():
   # print(glob.glob("*")) # For debugging purposes. Prints the files in the current directory in the docker container
 
+  # Create directory if it doesn't exist
+  os.makedirs("./mnt", exist_ok=True)
+  
   file1 = open("./mnt/exec-settings.txt", "w")
 
   apiRequestInterval = idleTime + intervalTime
@@ -48,7 +60,7 @@ def fetch_api_data(city):
   query = {'key': apiKey, 'q': city, 'aqi':'yes'}
   response = requests.get(apiUrl, params=query)
   body_dict = response.json()
-  temperature = body_dict['current']['temp_c'] # Read the temperature in Celsius
+  temperature = body_dict['current']['temp_c']  # Access temperature from the 'current' object
   return temperature
 
 
