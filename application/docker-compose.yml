@@ -20,21 +20,27 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
-      KAFKA_HEAP_OPTS: "-Xmx128m -Xms128m"
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      KAFKA_HEAP_OPTS: "-Xmx128m -Xms64m"
+      ZOOKEEPER_MAX_CLIENT_CNXNS: 60
+      ZOOKEEPER_4LW_COMMANDS_WHITELIST: "*"
     networks:
       - app_network
     restart: unless-stopped
     mem_limit: 256m
     healthcheck:
-      test: echo stat | nc localhost 32181
-      interval: 10s
+      test: echo ruok | nc localhost 32181 || exit 1
+      interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 20s
 
   kafka:
     image: confluentinc/cp-kafka:7.3.2
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     ports:
       - "9092:9092"
     environment:
@@ -50,17 +56,19 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 60000
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 60000
     networks:
       - app_network
     restart: unless-stopped
     mem_limit: 512m
     healthcheck:
-      test: nc -z localhost 9092 || exit 1
-      interval: 5s
-      timeout: 5s
+      test: kafka-topics --bootstrap-server localhost:9092 --list || exit 1
+      interval: 30s
+      timeout: 10s
       retries: 5
-      start_period: 15s
+      start_period: 30s
 
   kafka-producer:
     build:
