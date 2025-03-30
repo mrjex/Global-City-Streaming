@@ -16,3 +16,10 @@ __pycache__/
 dist/
 build/
 *.egg
+
+# Java/Maven
+*.jar
+target/
+.mvn/
+.idea/
+*.iml
