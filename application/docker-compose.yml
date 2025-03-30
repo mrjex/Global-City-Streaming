@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.7"
 
 networks:
   app_network:
@@ -15,7 +15,7 @@ services:
       - app_network
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.3.2
     environment:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
@@ -25,7 +25,7 @@ services:
           - zookeeper
 
   kafka:
-    image: confluentinc/cp-kafka
+    image: confluentinc/cp-kafka:7.3.2
     depends_on:
       - zookeeper
     environment:
@@ -43,18 +43,17 @@ services:
   kafka-producer:
     build:
       context: ./kafka-producer
-    image: kafka-producer
     volumes:
       - ../debug-api:/mnt
       - ../:/app
     depends_on:
-    - kafka
+      - kafka
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:32181"
       PRODUCER_INTERVAL: 100
     networks:
-    - app_network
+      - app_network
 
   flink-processor:
     build:
@@ -63,13 +62,13 @@ services:
     volumes:
       - ../debug-api:/mnt
     depends_on:
-    - kafka
+      - kafka
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:32181"
       PRODUCER_INTERVAL: 100
     networks:
-    - app_network
+      - app_network
 
   postgres:
     build:
@@ -77,18 +76,21 @@ services:
     container_name: postgres
     restart: always
     environment:
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASSWORD=postgres
-        - POSTGRES_DB=postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     logging:
-        options:
-            max-size: 10m
-            max-file: "3"
+      options:
+        max-size: 10m
+        max-file: "3"
     ports:
-    - 5438:5432
+      - 5438:5432
     networks:
       - app_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  postgres_data:
   settings:
   data:
