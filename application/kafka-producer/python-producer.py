@@ -5,6 +5,10 @@ import requests
 import sys
 import os
 from pathlib import Path
+import json
+import random
+from flask import Flask, Response
+from flask_cors import CORS
 
 # Add project root to Python path
 project_root = str(Path(__file__).resolve().parents[2])
@@ -78,11 +82,47 @@ def gen_data():
     prod.flush()
 
 
-if __name__ == "__main__":
-  exportSettings()
-  gen_data()
-  schedule.every(intervalTime).seconds.do(gen_data)
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+logs = []  # Store logs in memory
 
-  while True:
-    schedule.run_pending()
-    time.sleep(idleTime)
+def log_message(msg):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] {msg}"
+    logs.append(log_entry)
+    if len(logs) > 1000:  # Keep last 1000 logs
+        logs.pop(0)
+    print(log_entry)
+
+@app.route('/logs')
+def get_logs():
+    return Response('\n'.join(logs), mimetype='text/plain')
+
+def main():
+    log_message("Connected to Kafka broker")
+    log_message("Starting to generate weather data...")
+
+    while True:
+        for city in cities:
+            temperature = round(random.uniform(-10, 40), 2)
+            data = {
+                "city": city,
+                "temperature": str(temperature)
+            }
+            
+            prod = KafkaProducer(bootstrap_servers=kafka_nodes, value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+            prod.send(topic=myTopic, value=data)
+            log_message(f"Sent data: {json.dumps(data)}")
+            
+        time.sleep(1)
+
+
+if __name__ == "__main__":
+    # Start Flask in a separate thread
+    from threading import Thread
+    flask_thread = Thread(target=lambda: app.run(host='0.0.0.0', port=8000))
+    flask_thread.daemon = True
+    flask_thread.start()
+    
+    # Run the main Kafka producer
+    main()

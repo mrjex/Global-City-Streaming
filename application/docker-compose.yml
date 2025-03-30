@@ -63,7 +63,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_CREATE_TOPICS: "test-topic:1:1"
+      KAFKA_CREATE_TOPICS: "weather:1:1"
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -94,6 +94,8 @@ services:
     build:
       context: ./kafka-producer
     container_name: kafka-producer
+    ports:
+      - "8000:8000"
     volumes:
       - ../debug-api:/mnt:rw
       - ../:/app:rw
