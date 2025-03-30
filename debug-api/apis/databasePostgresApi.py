@@ -23,6 +23,8 @@ import plotly.express as px
 import psycopg2
 import csv
 import sys
+sys.path.append('../..')
+import utils
 
 
 # Connect to the database (note that the container 'postgres' in docker-compose must be up and running first)
@@ -41,15 +43,7 @@ res = "{}"
 
 csvFields = ['id', 'city', 'average_temperature', 'API-Call']
 
-#cities = ['London', 'Stockholm', 'Toronto', 'Moscow', 'Madrid', 'Reykjavik', 'Helsinki', 'Rome', 'Venice']
-# cities = utils.parseYmlFile("../../configuration.yml", "debugApi.citiesPool") # response.json instead??
-cities = [
-    'London', 'Stockholm', 'Toronto', 'Moscow', 'Madrid',
-    'Reykjavik', 'Helsinki', 'Rome', 'Venice', 'Lisbon',
-    'Paris', 'Amsterdam', 'Chernobyl', 'Nairobi', 'Dubai',
-    'Bali', 'Tokyo', 'Bangkok', 'Seoul',
-    'Buenos Aires', 'Mexico City'
-  ]
+cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
 
 # Send a request to the database and print the response (the matched objects that qualified for the query conditions)
 def queryDB(command, city):
