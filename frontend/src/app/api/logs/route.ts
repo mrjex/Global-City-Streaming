@@ -8,27 +8,20 @@ const KAFKA_PRODUCER_URL = process.env.KAFKA_PRODUCER_URL || 'http://kafka-produ
 
 export async function GET() {
   try {
-    const response = await fetch(`${KAFKA_PRODUCER_URL}/logs`, {
+    const response = await fetch('http://kafka-producer:8000/logs', {
       cache: 'no-store',
-      next: { revalidate: 0 },
       headers: {
         'Accept': 'text/plain',
       },
     });
-    
+
     if (!response.ok) {
-      console.error(`Failed to fetch logs: ${response.status} ${response.statusText}`);
-      return new NextResponse('[]', {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/plain',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-      });
+      console.error('Failed to fetch logs:', response.status, response.statusText);
+      return NextResponse.json({ logs: [] }, { status: response.status });
     }
 
-    const logs = await response.text();
-    return new NextResponse(logs, {
+    const text = await response.text();
+    return new NextResponse(text, {
       headers: {
         'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -36,12 +29,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching logs:', error);
-    return new NextResponse('[]', { 
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-      },
-    });
+    return NextResponse.json({ logs: [] }, { status: 500 });
   }
 } 

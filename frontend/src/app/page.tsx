@@ -6,6 +6,7 @@ import WorldMap from '../components/WorldMap';
 import DatabaseCounter from '../components/DatabaseCounter';
 import Terminal from '@/components/Terminal';
 import CitySelector from '@/components/CitySelector';
+import Charts from '@/components/Charts';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -47,6 +48,8 @@ export default function Home(): ReactElement {
       <div className="mt-8">
         <CitySelector onCitiesChange={handleCitiesChange} />
       </div>
+
+      <Charts />
     </main>
   );
 } 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface CitySelectorProps {
   onCitiesChange?: (cities: string[]) => void;
@@ -15,16 +15,26 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitiesChange }) => {
     'Mexico City'
   ];
 
-  const handleCityToggle = (city: string) => {
-    setSelectedCities(prev => {
-      const newSelection = prev.includes(city)
-        ? prev.filter(c => c !== city)
-        : [...prev, city];
-      
-      console.log('Selected cities:', newSelection);
-      onCitiesChange?.(newSelection);
-      return newSelection;
-    });
+  const handleCityToggle = async (city: string) => {
+    const newSelection = selectedCities.includes(city)
+      ? selectedCities.filter(c => c !== city)
+      : [...selectedCities, city];
+    
+    setSelectedCities(newSelection);
+    onCitiesChange?.(newSelection);
+
+    // Update configuration.yml
+    try {
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cities: newSelection }),
+      });
+    } catch (error) {
+      console.error('Failed to update configuration:', error);
+    }
   };
 
   return (
