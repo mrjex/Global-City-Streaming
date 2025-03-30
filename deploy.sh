@@ -22,8 +22,6 @@ echo "Waiting for containers to start..."
 echo "Checking container status..."
 docker ps
 
-# Reload Nginx (in case of any frontend changes)
-echo "Reloading Nginx..."
 sudo systemctl reload nginx
 
 echo "Deployment complete! Check logs with: docker-compose -f application/docker-compose.yml -p global-city-streaming logs -f"
