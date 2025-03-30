@@ -1,7 +1,8 @@
 version: "3.9"
 
 networks:
-  bridge:
+  app_network:
+    name: application_bridge
     driver: bridge
 
 services:
@@ -11,7 +12,7 @@ services:
     ports:
       - "3001:3000"
     networks:
-      - bridge
+      - app_network
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -19,7 +20,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      bridge:
+      app_network:
         aliases:
           - zookeeper
 
@@ -35,7 +36,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       JMX_PORT: 9999
     networks:
-      bridge:
+      app_network:
         aliases:
           - kafka
 
@@ -53,7 +54,7 @@ services:
       ZOOKEEPER_SERVER: "zookeeper:32181"
       PRODUCER_INTERVAL: 100
     networks:
-    - bridge
+    - app_network
 
   flink-processor:
     build:
@@ -68,7 +69,7 @@ services:
       ZOOKEEPER_SERVER: "zookeeper:32181"
       PRODUCER_INTERVAL: 100
     networks:
-    - bridge
+    - app_network
 
   postgres:
     build:
@@ -86,7 +87,7 @@ services:
     ports:
     - 5438:5432
     networks:
-      - bridge
+      - app_network
 
 volumes:
   settings:
