@@ -5,13 +5,19 @@ import type { ReactElement } from 'react';
 import WorldMap from '../components/WorldMap';
 import DatabaseCounter from '../components/DatabaseCounter';
 import Terminal from '@/components/Terminal';
+import CitySelector from '@/components/CitySelector';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
 
   const handleCountrySelect = (countryName: string) => {
     setSelectedCountry(countryName);
     console.log(`Selected country: ${countryName}`);
+  };
+
+  const handleCitiesChange = (cities: string[]) => {
+    setSelectedCities(cities);
   };
 
   return (
@@ -36,6 +42,10 @@ export default function Home(): ReactElement {
           
           <Terminal maxLines={10} />
         </div>
+      </div>
+
+      <div className="mt-8">
+        <CitySelector onCitiesChange={handleCitiesChange} />
       </div>
     </main>
   );
