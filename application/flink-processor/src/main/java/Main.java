@@ -81,7 +81,7 @@ public class Main {
               .withMaxRetries(5)
               .build(),
             new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-              .withUrl("jdbc:postgresql://docker.for.mac.host.internal:5438/postgres")
+              .withUrl("jdbc:postgresql://postgres:5432/postgres")
               .withDriverName("org.postgresql.Driver")
               .withUsername("postgres")
               .withPassword("postgres")
