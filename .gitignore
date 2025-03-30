@@ -3,7 +3,6 @@
 # Dev shell scripts
 dev-rebuild.sh
 droplet-ssh-connect.sh
-dev-update-droplet.sh
 droplet-management.sh
 
 # Python cache files

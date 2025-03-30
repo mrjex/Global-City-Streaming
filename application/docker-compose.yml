@@ -13,15 +13,18 @@ services:
     networks:
       - app_network
     restart: unless-stopped
+    mem_limit: 256m
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     environment:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_HEAP_OPTS: "-Xmx128m -Xms128m"
     networks:
       - app_network
     restart: unless-stopped
+    mem_limit: 256m
     healthcheck:
       test: echo stat | nc localhost 32181
       interval: 10s
@@ -47,9 +50,11 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
     networks:
       - app_network
     restart: unless-stopped
+    mem_limit: 512m
     healthcheck:
       test: nc -z localhost 9092 || exit 1
       interval: 5s
@@ -75,6 +80,7 @@ services:
     networks:
       - app_network
     restart: unless-stopped
+    mem_limit: 256m
 
   flink-processor:
     build:
@@ -94,6 +100,7 @@ services:
     networks:
       - app_network
     restart: unless-stopped
+    mem_limit: 512m
 
   postgres:
     build:
@@ -114,6 +121,7 @@ services:
       - app_network
     volumes:
       - /var/lib/postgresql/data:/var/lib/postgresql/data:rw
+    mem_limit: 256m
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
