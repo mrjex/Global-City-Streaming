@@ -11,6 +11,7 @@ const Terminal: React.FC<TerminalProps> = ({
   maxLines = 15
 }) => {
   const [logs, setLogs] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -18,13 +19,14 @@ const Terminal: React.FC<TerminalProps> = ({
         const response = await fetch('/api/logs');
         const data = await response.text();
         
-        // Only update logs if we got actual data
         if (data && data !== '[]') {
           const allLogs = data.split('\n').filter(line => line.trim());
           setLogs(allLogs.slice(-maxLines));
         }
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching logs:', error);
+        setIsLoading(false);
       }
     };
 
@@ -57,12 +59,15 @@ const Terminal: React.FC<TerminalProps> = ({
 
         {/* Terminal Content */}
         <div
-          className="p-4 h-96 font-mono text-sm overflow-y-auto"
+          className="p-4 h-96 font-mono text-sm"
           style={{
             backgroundColor: '#1a1b1e',
+            overflowY: 'hidden'
           }}
         >
-          {logs.length > 0 ? (
+          {isLoading ? (
+            <div className="text-gray-500 italic">Loading logs...</div>
+          ) : logs.length > 0 ? (
             logs.map((log, index) => (
               <motion.div
                 key={`${index}-${log}`}

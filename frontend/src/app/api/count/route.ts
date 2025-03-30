@@ -1,34 +1,42 @@
 import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
-// Prevent static generation for this route
+// This is a dynamic route that should only be called at runtime
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
+const pool = new Pool({
+  host: process.env.POSTGRES_HOST || 'postgres',
+  port: parseInt(process.env.POSTGRES_PORT || '5432'),
+  user: process.env.POSTGRES_USER || 'postgres',
+  password: process.env.POSTGRES_PASSWORD || 'postgres',
+  database: process.env.POSTGRES_DB || 'postgres',
+});
+
 export async function GET() {
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
-    return NextResponse.json({ count: 0 });
-  }
-
-  const pool = new Pool({
-    user: 'postgres',
-    host: 'postgres',
-    database: 'postgres',
-    password: 'postgres',
-    port: 5432,
-  });
-
   try {
-    const result = await pool.query('SELECT COUNT(*) FROM weather');
-    await pool.end();
-    return NextResponse.json({ count: parseInt(result.rows[0].count) });
+    const client = await pool.connect();
+    try {
+      const result = await client.query('SELECT COUNT(*) FROM weather');
+      const count = result.rows[0].count;
+      
+      return new NextResponse(JSON.stringify({ count }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
+    } finally {
+      client.release();
+    }
   } catch (error) {
     console.error('Error fetching count:', error);
-    try {
-      await pool.end();
-    } catch (e) {
-      console.error('Error closing pool:', e);
-    }
-    return NextResponse.json({ error: 'Failed to fetch count' }, { status: 500 });
+    return new NextResponse(JSON.stringify({ count: 0 }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+      },
+    });
   }
 } 

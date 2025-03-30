@@ -92,35 +92,42 @@ def log_message(msg):
     logs.append(log_entry)
     if len(logs) > 1000:  # Keep last 1000 logs
         logs.pop(0)
-    print(log_entry)
+    print(log_entry)  # Also print to container logs
 
 @app.route('/logs')
 def get_logs():
-    return Response('\n'.join(logs), mimetype='text/plain')
+    print(f"Logs endpoint called, returning {len(logs)} logs")  # Debug print
+    response = Response('\n'.join(logs), mimetype='text/plain')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 def main():
+    log_message("Starting Kafka producer...")
     log_message("Connected to Kafka broker")
-    log_message("Starting to generate weather data...")
 
     while True:
-        for city in cities:
-            temperature = round(random.uniform(-10, 40), 2)
-            data = {
-                "city": city,
-                "temperature": str(temperature)
-            }
+        try:
+            for city in cities:
+                temperature = round(random.uniform(-10, 40), 2)
+                data = {
+                    "city": city,
+                    "temperature": str(temperature)
+                }
+                
+                prod = KafkaProducer(bootstrap_servers=kafka_nodes, value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+                prod.send(topic=myTopic, value=data)
+                log_message(f"Sent data: {json.dumps(data)}")
+                prod.close()
             
-            prod = KafkaProducer(bootstrap_servers=kafka_nodes, value_serializer=lambda x: json.dumps(x).encode('utf-8'))
-            prod.send(topic=myTopic, value=data)
-            log_message(f"Sent data: {json.dumps(data)}")
-            
-        time.sleep(1)
-
+            time.sleep(1)
+        except Exception as e:
+            log_message(f"Error in main loop: {str(e)}")
+            time.sleep(1)
 
 if __name__ == "__main__":
     # Start Flask in a separate thread
     from threading import Thread
-    flask_thread = Thread(target=lambda: app.run(host='0.0.0.0', port=8000))
+    flask_thread = Thread(target=lambda: app.run(host='0.0.0.0', port=8000, debug=False))
     flask_thread.daemon = True
     flask_thread.start()
     
