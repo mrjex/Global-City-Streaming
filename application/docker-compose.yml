@@ -1,8 +1,7 @@
-version: "3.7"
+version: "2.4"
 
 networks:
   app_network:
-    name: application_bridge
     driver: bridge
 
 services:
@@ -20,9 +19,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      app_network:
-        aliases:
-          - zookeeper
+      - app_network
 
   kafka:
     image: confluentinc/cp-kafka:7.3.2
@@ -36,16 +33,14 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       JMX_PORT: 9999
     networks:
-      app_network:
-        aliases:
-          - kafka
+      - app_network
 
   kafka-producer:
     build:
       context: ./kafka-producer
     volumes:
-      - ../debug-api:/mnt
-      - ../:/app
+      - ../debug-api:/mnt:rw
+      - ../:/app:rw
     depends_on:
       - kafka
     environment:
@@ -60,7 +55,7 @@ services:
       context: ./flink-processor
       dockerfile: Dockerfile
     volumes:
-      - ../debug-api:/mnt
+      - ../debug-api:/mnt:rw
     depends_on:
       - kafka
     environment:
@@ -88,9 +83,8 @@ services:
     networks:
       - app_network
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - /var/lib/postgresql/data:/var/lib/postgresql/data:rw
 
 volumes:
-  postgres_data:
   settings:
   data:
