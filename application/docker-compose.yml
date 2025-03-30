@@ -25,10 +25,18 @@ services:
       KAFKA_HEAP_OPTS: "-Xmx128m -Xms64m"
       ZOOKEEPER_MAX_CLIENT_CNXNS: 60
       ZOOKEEPER_4LW_COMMANDS_WHITELIST: "*"
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: localhost
+    ports:
+      - "32181:32181"
     networks:
       - app_network
     restart: unless-stopped
     mem_limit: 256m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     healthcheck:
       test: echo ruok | nc localhost 32181 || exit 1
       interval: 30s
@@ -59,12 +67,21 @@ services:
       KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
       KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 60000
       KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 60000
+      KAFKA_LOG_RETENTION_HOURS: 1
+      KAFKA_LOG_SEGMENT_BYTES: 536870912
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+      KAFKA_JMX_PORT: 9998
+      KAFKA_JMX_HOSTNAME: localhost
     networks:
       - app_network
     restart: unless-stopped
     mem_limit: 512m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     healthcheck:
-      test: kafka-topics --bootstrap-server localhost:9092 --list || exit 1
+      test: nc -z localhost 9092 || exit 1
       interval: 30s
       timeout: 10s
       retries: 5
@@ -89,6 +106,10 @@ services:
       - app_network
     restart: unless-stopped
     mem_limit: 256m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
   flink-processor:
     build:
@@ -109,6 +130,10 @@ services:
       - app_network
     restart: unless-stopped
     mem_limit: 512m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
   postgres:
     build:
