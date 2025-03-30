@@ -12,6 +12,7 @@ services:
       - "3001:3000"
     networks:
       - app_network
+    restart: unless-stopped
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -20,6 +21,12 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     networks:
       - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: echo stat | nc localhost 32181
+      interval: 10s
+      timeout: 10s
+      retries: 3
 
   kafka:
     image: confluentinc/cp-kafka:7.3.2
@@ -27,13 +34,23 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ADVERTISED_HOST_NAME: 0.0.0.0
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       JMX_PORT: 9999
     networks:
       - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   kafka-producer:
     build:
@@ -42,13 +59,17 @@ services:
       - ../debug-api:/mnt:rw
       - ../:/app:rw
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:32181"
       PRODUCER_INTERVAL: 100
     networks:
       - app_network
+    restart: unless-stopped
 
   flink-processor:
     build:
@@ -57,19 +78,23 @@ services:
     volumes:
       - ../debug-api:/mnt:rw
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:32181"
       PRODUCER_INTERVAL: 100
     networks:
       - app_network
+    restart: unless-stopped
 
   postgres:
     build:
       context: ./postgres
     container_name: postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -84,6 +109,11 @@ services:
       - app_network
     volumes:
       - /var/lib/postgresql/data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   settings:
