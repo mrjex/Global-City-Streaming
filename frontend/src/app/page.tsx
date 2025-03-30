@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import WorldMap from '../components/WorldMap';
+import DatabaseCounter from '../components/DatabaseCounter';
 
 export default function Home() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -15,6 +16,8 @@ export default function Home() {
   return (
     <main className="min-h-screen p-8">
       <h1 className="text-4xl font-bold mb-8">Global City Streaming</h1>
+      
+      <DatabaseCounter />
       
       <div className="bg-white rounded-lg shadow-lg p-6">
         <WorldMap onCountrySelect={handleCountrySelect} />
