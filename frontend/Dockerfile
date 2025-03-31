@@ -22,7 +22,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install Python dependencies in virtual environment
 RUN . $VIRTUAL_ENV/bin/activate && \
-    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib
+    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests
 
 WORKDIR /app
 
@@ -34,17 +34,17 @@ RUN npm install --production=false
 COPY frontend/ ./
 
 # Copy debug-api and configuration
-COPY debug-api/ /debug-api/
-COPY configuration.yml /configuration.yml
-COPY utils.py /debug-api/utils.py
+COPY debug-api/ /app/debug-api/
+COPY configuration.yml /app/configuration.yml
+COPY utils.py /app/debug-api/utils.py
 
 # Create necessary directories
-RUN mkdir -p public /debug-api/generated-artifacts/csvs
+RUN mkdir -p public /app/debug-api/generated-artifacts/csvs
 
 # Set environment variables for better performance
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
-ENV PYTHONPATH=/debug-api
+ENV PYTHONPATH=/app/debug-api
 
 # Build the application
 RUN npm run build
@@ -75,24 +75,24 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install Python dependencies in virtual environment
 RUN . $VIRTUAL_ENV/bin/activate && \
-    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib
+    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests
 
 # Create necessary directories
-RUN mkdir -p public /debug-api/generated-artifacts/csvs
+RUN mkdir -p public /app/debug-api/generated-artifacts/csvs
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /debug-api /debug-api/
-COPY --from=builder /configuration.yml /configuration.yml
+COPY --from=builder /app/debug-api /app/debug-api/
+COPY --from=builder /app/configuration.yml /app/configuration.yml
 
 # Set environment variables
 ENV NODE_ENV production
 ENV PORT 3000
 ENV NEXT_TELEMETRY_DISABLED 1
-ENV PYTHONPATH=/debug-api
+ENV PYTHONPATH=/app/debug-api
 
 EXPOSE 3000
 

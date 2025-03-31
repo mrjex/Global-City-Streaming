@@ -134,8 +134,6 @@ def getCitiesAttribute(attribute):
     data = json.load(f)
 
     numInstances = len(data)
-
-    # TODO: Reference lambda learning lessons to AlgoExpert directory --> README.md
     getCityAttribute = lambda data, i, attribute : data[i][f"{attribute}"]
 
     for i in range(numInstances):

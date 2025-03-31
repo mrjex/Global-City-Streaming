@@ -1,16 +1,30 @@
-import { writeFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { NextResponse } from 'next/server';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
+
+// Mark route as dynamic and specify runtime
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+interface ConfigType {
+  realTimeProduction: {
+    cities: string[];
+  };
+}
 
 export async function POST(request: Request) {
   try {
     const { cities } = await request.json();
     
     // Read the current config
-    const configPath = '../../../../configuration.yml';
-    const currentConfig = require(configPath);
+    const configPath = '/app/configuration.yml';
+    const configContent = await readFile(configPath, 'utf8');
+    const currentConfig = yaml.load(configContent) as Partial<ConfigType>;
     
     // Update the cities
+    if (!currentConfig.realTimeProduction) {
+      currentConfig.realTimeProduction = { cities: [] };
+    }
     currentConfig.realTimeProduction.cities = cities;
     
     // Write back to file

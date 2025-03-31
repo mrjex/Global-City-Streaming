@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
-// This is a dynamic route that should only be called at runtime
+// Mark route as dynamic and specify runtime
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const fetchCache = 'force-no-store';
 
 const KAFKA_PRODUCER_URL = process.env.KAFKA_PRODUCER_URL || 'http://kafka-producer:8000';

@@ -23,16 +23,17 @@ import plotly.express as px
 import psycopg2
 import csv
 import sys
-sys.path.append('../..')
+import os
+sys.path.append('/app/debug-api')
 import utils
 
 
 # Connect to the database (note that the container 'postgres' in docker-compose must be up and running first)
 conn = psycopg2.connect(database="postgres",
-                        host="localhost",
+                        host="postgres",
                         user="postgres",
                         password="postgres",
-                        port="5438")
+                        port="5432")
 
 
 
@@ -43,7 +44,7 @@ res = "{}"
 
 csvFields = ['id', 'city', 'average_temperature', 'API-Call']
 
-cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
+cities = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.cities")
 
 # Send a request to the database and print the response (the matched objects that qualified for the query conditions)
 def queryDB(command, city):
@@ -52,8 +53,10 @@ def queryDB(command, city):
     cursor.execute(command)
     res = cursor.fetchall()
 
-    # outputPath = f"../generated-artifacts/csvs/{city}.csv"    # Works when running this script directly from terminal
-    outputPath = f"generated-artifacts/csvs/{city}.csv"         # Works when running this script indirectly from 'realTimeCharts.sh'
+    # Create directories if they don't exist
+    os.makedirs("/app/debug-api/generated-artifacts/csvs", exist_ok=True)
+
+    outputPath = f"/app/debug-api/generated-artifacts/csvs/{city}.csv"
 
     # Write as a csv, the found db-instances of the current city
     with open(outputPath, 'w') as csvfile:

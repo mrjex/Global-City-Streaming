@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
-// This is a dynamic route that should only be called at runtime
+// Mark route as dynamic and specify runtime
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const fetchCache = 'force-no-store';
 
 const pool = new Pool({
