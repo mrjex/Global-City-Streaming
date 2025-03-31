@@ -16,6 +16,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import sys
 import os
+import json
+import numpy as np
+from datetime import datetime, timedelta
+import pandas as pd
 
 
 sys.path.append('/app/debug-api')
@@ -128,22 +132,14 @@ def plotBubbleChart():
     else:
         mergeGraphs()
 
-import sys
-import os
-sys.path.append('/app/debug-api')
-
-import utils
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-
-# Configuration file path
+# Configuration
 configPath = "/app/configuration.yml"
-
-# Get cities from configuration
 cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
 
-# Custom color palette for better visuals
+# Number of latest readings to show in the sliding window
+N_LATEST_READINGS = 20
+
+# Custom color palette
 color_palette = {
     'Bangkok': '#FF6B6B',    # Coral Red
     'Lisbon': '#4ECDC4',     # Turquoise
@@ -155,156 +151,178 @@ color_palette = {
     'Madrid': '#588B8B'      # Teal
 }
 
-# Read data from CSV files and create individual charts
-charts_data = []
-for city in cities:
+# Read and process data
+def get_city_data(city):
     try:
         df = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
-        
-        # Create individual bubble chart for each city
-        fig = go.Figure()
-        
-        # Add scatter plot with enhanced bubble styling
-        fig.add_trace(go.Scatter(
-            x=df['API-Call'],
-            y=df['average_temperature'],
-            mode='markers',
-            name=city,
-            marker=dict(
-                size=15,
-                color=color_palette.get(city, '#FF9F1C'),
-                line=dict(
-                    color='white',
-                    width=1
-                ),
-                opacity=0.7,
-                symbol='circle'
-            ),
-            hovertemplate=
-            '<b>%{text}</b><br>' +
-            'API Call: %{x}<br>' +
-            'Temperature: %{y:.1f}°C<br>' +
-            '<extra></extra>',
-            text=[city] * len(df)
-        ))
-
-        # Update layout for better visualization
-        fig.update_layout(
-            title=dict(
-                text=f'Temperature Trends for {city}',
-                x=0.5,
-                y=0.95,
-                xanchor='center',
-                yanchor='top',
-                font=dict(
-                    size=24,
-                    color='#2B2D42'
-                )
-            ),
-            xaxis=dict(
-                title='API Call Sequence',
-                gridcolor='#EAEAEA',
-                showline=True,
-                linecolor='#2B2D42',
-                linewidth=2,
-                tickfont=dict(size=12)
-            ),
-            yaxis=dict(
-                title='Temperature (°C)',
-                gridcolor='#EAEAEA',
-                showline=True,
-                linecolor='#2B2D42',
-                linewidth=2,
-                tickfont=dict(size=12)
-            ),
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            showlegend=False,
-            hovermode='closest',
-            margin=dict(t=100, b=50, l=50, r=50),
-            shapes=[
-                # Add subtle gradient background
-                dict(
-                    type='rect',
-                    xref='paper',
-                    yref='paper',
-                    x0=0,
-                    y0=0,
-                    x1=1,
-                    y1=1,
-                    fillcolor='#F8F9FA',
-                    opacity=0.3,
-                    layer='below',
-                    line_width=0,
-                )
-            ]
-        )
-
-        # Add hover effects and interactivity
-        fig.update_traces(
-            hoverlabel=dict(
-                bgcolor='white',
-                font_size=14,
-                font_family='Arial'
-            )
-        )
-
-        # Save each chart
-        fig.write_html(f"/app/public/bubble_chart_{city.lower().replace(' ', '_')}.html")
-        charts_data.append({
-            'city': city,
-            'chart_path': f"bubble_chart_{city.lower().replace(' ', '_')}.html"
-        })
-        
+        # Convert timestamp to datetime and sort
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df.sort_values('timestamp').tail(N_LATEST_READINGS)
+        return df
     except Exception as e:
-        print(f"Error processing data for {city}: {e}")
+        print(f"Error reading data for {city}: {e}")
+        return None
 
-# Create an index file that lists all charts
-index_html = """
+# Create traces for each city
+traces = []
+for city in cities:
+    df = get_city_data(city)
+    if df is not None and len(df) > 0:
+        try:
+            # Calculate bubble size based on temperature range
+            min_temp = df['average_temperature'].min()
+            max_temp = df['average_temperature'].max()
+            if min_temp == max_temp:
+                size = [20] * len(df)  # Use constant size if all temperatures are the same
+            else:
+                size = 20 + (df['average_temperature'] - min_temp) / (max_temp - min_temp) * 30
+            
+            trace = go.Scatter(
+                name=city,
+                x=df['timestamp'],
+                y=df['average_temperature'],
+                mode='markers+lines',
+                marker=dict(
+                    size=size if isinstance(size, list) else size.tolist(),
+                    sizemode='area',
+                    sizeref=2.*max(size if isinstance(size, list) else size)/(40.**2),
+                    color=color_palette.get(city, '#FF9F1C'),
+                    line=dict(color='white', width=1)
+                ),
+                line=dict(color=color_palette.get(city, '#FF9F1C')),
+                hovertemplate="<b>%{text}</b><br>" +
+                             "Temperature: %{y:.1f}°C<br>" +
+                             "Time: %{x}<br>" +
+                             "<extra></extra>",
+                text=[city] * len(df)
+            )
+            traces.append(trace)
+        except Exception as e:
+            print(f"Error processing data for {city}: {e}")
+
+if not traces:
+    print("No data available to create chart")
+    sys.exit(1)
+
+# Create the figure
+fig = go.Figure(data=traces)
+
+# Update layout
+fig.update_layout(
+    title=dict(
+        text=f'Real-time Temperature Trends<br><sub>Showing last {N_LATEST_READINGS} readings per city</sub>',
+        x=0.5,
+        y=0.95,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=24, color='#2B2D42')
+    ),
+    xaxis=dict(
+        title='Time',
+        gridcolor='#E5E5E5',
+        showgrid=True,
+        type='date',
+        tickformat='%Y-%m-%d %H:%M:%S'
+    ),
+    yaxis=dict(
+        title='Temperature (°C)',
+        gridcolor='#E5E5E5',
+        showgrid=True
+    ),
+    plot_bgcolor='white',
+    paper_bgcolor='white',
+    hovermode='closest',
+    showlegend=True,
+    legend=dict(
+        yanchor="top",
+        y=0.99,
+        xanchor="left",
+        x=1.05
+    ),
+    margin=dict(t=100, b=50, l=50, r=150)
+)
+
+# Custom JSON encoder for NumPy types
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, np.float32):
+            return float(obj)
+        if isinstance(obj, np.int64):
+            return int(obj)
+        if isinstance(obj, pd.Timestamp):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        return json.JSONEncoder.default(self, obj)
+
+# Create HTML with auto-refresh and animations
+html_content = f"""
 <!DOCTYPE html>
 <html>
 <head>
     <style>
-        .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
-            gap: 20px;
+        body {{
+            margin: 0;
             padding: 20px;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-        .chart-container {
+            min-height: 100vh;
+        }}
+        #chart {{
             background: white;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            padding: 20px;
             transition: transform 0.3s ease;
-        }
-        .chart-container:hover {
+        }}
+        #chart:hover {{
             transform: translateY(-5px);
-        }
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
-        }
+        }}
     </style>
 </head>
 <body>
-    <div class="chart-grid">
-"""
+    <div id="chart"></div>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var chartData = {json.dumps(fig.to_dict(), cls=NumpyEncoder)};
+        
+        function initChart() {{
+            Plotly.newPlot('chart', chartData.data, chartData.layout, {{
+                responsive: true,
+                displayModeBar: true,
+                displaylogo: false
+            }});
+        }}
 
-for chart in charts_data:
-    index_html += f"""
-        <div class="chart-container">
-            <iframe src="{chart['chart_path']}"></iframe>
-        </div>
-    """
-
-index_html += """
-    </div>
+        function updateChart() {{
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {{
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newChartData = JSON.parse(doc.querySelector('script').textContent.match(/var chartData = (.*?);/)[1]);
+                    
+                    // Animate the transition
+                    Plotly.animate('chart', {{
+                        data: newChartData.data,
+                        layout: newChartData.layout
+                    }}, {{
+                        transition: {{
+                            duration: 500,
+                            easing: 'cubic-in-out'
+                        }},
+                        frame: {{
+                            duration: 500
+                        }}
+                    }});
+                }});
+        }}
+        
+        initChart();
+        setInterval(updateChart, 5000);
+    </script>
 </body>
 </html>
 """
 
-with open("/app/public/bubble_charts.html", "w") as f:
-    f.write(index_html)
+with open("/app/public/bubble_chart.html", "w") as f:
+    f.write(html_content)

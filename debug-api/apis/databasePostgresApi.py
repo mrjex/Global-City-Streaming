@@ -24,6 +24,7 @@ import psycopg2
 import csv
 import sys
 import os
+from datetime import datetime
 sys.path.append('/app/debug-api')
 import utils
 
@@ -42,7 +43,7 @@ cursor = conn.cursor()
 res = "{}"
 
 
-csvFields = ['id', 'city', 'average_temperature', 'API-Call']
+csvFields = ['id', 'city', 'average_temperature', 'API-Call', 'timestamp']
 
 cities = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.cities")
 
@@ -72,8 +73,9 @@ def queryDB(command, city):
             currentId = dbInstance[0]
             currentCity = dbInstance[1]
             currentTemperature = dbInstance[2]
+            current_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-            currentRow = [[currentId, currentCity, currentTemperature, rowCount]]
+            currentRow = [[currentId, currentCity, currentTemperature, rowCount, current_timestamp]]
             csvwriter.writerows(currentRow)
 
 

@@ -70,14 +70,15 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-      KAFKA_CFG_NUM_PARTITIONS: 3
-      KAFKA_CFG_DEFAULT_REPLICATION_FACTOR: 1
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_NUM_PARTITIONS=3
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_HEAP_OPTS=-Xmx512m -Xms256m
     networks:
       - app_network
     volumes:
@@ -85,7 +86,7 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -161,7 +162,7 @@ services:
     networks:
       - app_network
     volumes:
-      - /var/lib/postgresql/data:/var/lib/postgresql/data:rw
+      - postgres_data:/var/lib/postgresql/data
     mem_limit: 256m
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -178,4 +179,6 @@ volumes:
   zookeeper_log:
     driver: local
   kafka_data:
+    driver: local
+  postgres_data:
     driver: local

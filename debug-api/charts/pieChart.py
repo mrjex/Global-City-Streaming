@@ -7,6 +7,7 @@ import sys
 import os
 import json
 import numpy as np
+from datetime import datetime
 
 sys.path.append('/app/debug-api')
 
@@ -18,6 +19,9 @@ configPath = "/app/configuration.yml"
 
 # Get cities from configuration
 cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
+
+# Number of latest readings to show
+N_LATEST_READINGS = 10
 
 # Custom color palette for better visuals
 color_palette = {
@@ -34,34 +38,50 @@ color_palette = {
 # Read data from CSV files
 data = []
 city_sums = {}
+latest_timestamps = {}
+
 for city in cities:
     try:
         df = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
+        # Convert timestamp to datetime and sort
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df.sort_values('timestamp').tail(N_LATEST_READINGS)
+        
         avg_temp = df['average_temperature'].mean()
         sum_temp = df['average_temperature'].sum()
+        latest_timestamps[city] = df['timestamp'].max()
+        
         data.append({
             'city': city,
-            'temperature': avg_temp
+            'temperature': avg_temp,
+            'latest_timestamp': latest_timestamps[city]
         })
         city_sums[city] = sum_temp
     except Exception as e:
         print(f"Error reading data for {city}: {e}")
 
+if not data:
+    print("No data available to create charts")
+    sys.exit(1)
+
 # Get the 4 coldest cities
-num_coldest = min(4, len(cities))
+num_coldest = min(4, len(city_sums))
 coldest_cities = dict(sorted(city_sums.items(), key=itemgetter(1))[:num_coldest])
 
 # Create main pie chart
 df = pd.DataFrame(data)
+cities_list = df['city'].values.tolist()
+temperatures_list = df['temperature'].values.tolist()
+
 fig1 = go.Figure(data=[go.Pie(
-    labels=df['city'],
-    values=df['temperature'],
+    labels=cities_list,
+    values=temperatures_list,
     hole=0.3,
     textinfo='label+percent',
     textposition='outside',
-    pull=[0.1 if city in coldest_cities else 0 for city in df['city']],
+    pull=[0.1 if city in coldest_cities else 0 for city in cities_list],
     marker=dict(
-        colors=[color_palette.get(city, '#FF9F1C') for city in df['city']],
+        colors=[color_palette.get(city, '#FF9F1C') for city in cities_list],
         line=dict(color='white', width=2)
     ),
     hovertemplate="<b>%{label}</b><br>" +
@@ -69,9 +89,12 @@ fig1 = go.Figure(data=[go.Pie(
                   "<extra></extra>"
 )])
 
+# Format the latest timestamp for display
+latest_time = max(latest_timestamps.values()).strftime('%Y-%m-%d %H:%M:%S')
+
 fig1.update_layout(
     title=dict(
-        text='Temperature Distribution Across All Cities',
+        text=f'Temperature Distribution Across All Cities<br><sub>Last {N_LATEST_READINGS} readings per city</sub>',
         x=0.5,
         y=0.95,
         xanchor='center',
@@ -81,19 +104,30 @@ fig1.update_layout(
     showlegend=False,
     plot_bgcolor='white',
     paper_bgcolor='white',
-    margin=dict(t=100, b=50, l=50, r=50)
+    margin=dict(t=100, b=50, l=50, r=50),
+    annotations=[
+        dict(
+            text=f"Last updated: {latest_time}",
+            xref="paper",
+            yref="paper",
+            x=0.5,
+            y=-0.1,
+            showarrow=False,
+            font=dict(size=12)
+        )
+    ]
 )
 
 # Create coldest cities pie chart
-df_coldest = pd.DataFrame([
-    {'city': city, 'temperature': temp}
-    for city, temp in coldest_cities.items()
-])
+coldest_data = [{'city': city, 'temperature': temp} for city, temp in coldest_cities.items()]
+df_coldest = pd.DataFrame(coldest_data)
+coldest_cities_list = df_coldest['city'].values.tolist()
+coldest_temps_list = df_coldest['temperature'].values.tolist()
 
 cold_colors = ['#A8E6CF', '#DCEDC1', '#FFD3B6', '#FFAAA5']  # Cool, calming colors
 fig2 = go.Figure(data=[go.Pie(
-    labels=df_coldest['city'],
-    values=df_coldest['temperature'],
+    labels=coldest_cities_list,
+    values=coldest_temps_list,
     hole=0.3,
     textinfo='label+percent',
     textposition='outside',
@@ -111,7 +145,7 @@ fig2 = go.Figure(data=[go.Pie(
 
 fig2.update_layout(
     title=dict(
-        text='4 Coldest Cities Temperature Distribution',
+        text=f'4 Coldest Cities Temperature Distribution<br><sub>Based on last {N_LATEST_READINGS} readings</sub>',
         x=0.5,
         y=0.95,
         xanchor='center',
@@ -121,7 +155,18 @@ fig2.update_layout(
     showlegend=False,
     plot_bgcolor='white',
     paper_bgcolor='white',
-    margin=dict(t=100, b=50, l=50, r=50)
+    margin=dict(t=100, b=50, l=50, r=50),
+    annotations=[
+        dict(
+            text=f"Last updated: {latest_time}",
+            xref="paper",
+            yref="paper",
+            x=0.5,
+            y=-0.1,
+            showarrow=False,
+            font=dict(size=12)
+        )
+    ]
 )
 
 # Custom JSON encoder for NumPy types
@@ -172,8 +217,19 @@ html_content = f"""
     <script>
         var chart1 = {json.dumps(fig1.to_dict(), cls=NumpyEncoder)};
         var chart2 = {json.dumps(fig2.to_dict(), cls=NumpyEncoder)};
-        Plotly.newPlot('chart1', chart1.data, chart1.layout);
-        Plotly.newPlot('chart2', chart2.data, chart2.layout);
+        
+        function initCharts() {{
+            Plotly.newPlot('chart1', chart1.data, chart1.layout, {{responsive: true}});
+            Plotly.newPlot('chart2', chart2.data, chart2.layout, {{responsive: true}});
+        }}
+
+        // Auto-refresh the page every 5 seconds
+        function autoRefresh() {{
+            window.location.reload();
+        }}
+        
+        initCharts();
+        setInterval(autoRefresh, 5000);
     </script>
 </body>
 </html>
