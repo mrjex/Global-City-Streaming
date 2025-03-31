@@ -28,7 +28,8 @@ WORKDIR /app
 
 # Copy frontend package.json
 COPY frontend/package.json ./
-RUN npm install --production=false
+RUN npm install --production=false && \
+    npm install --save-dev @types/node
 
 # Copy frontend source files
 COPY frontend/ ./

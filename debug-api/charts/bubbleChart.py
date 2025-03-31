@@ -143,33 +143,168 @@ configPath = "/app/configuration.yml"
 # Get cities from configuration
 cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
 
-# Read data from CSV files
-data = []
+# Custom color palette for better visuals
+color_palette = {
+    'Bangkok': '#FF6B6B',    # Coral Red
+    'Lisbon': '#4ECDC4',     # Turquoise
+    'Paris': '#45B7D1',      # Ocean Blue
+    'Dubai': '#96CEB4',      # Sage Green
+    'Tokyo': '#FFBE0B',      # Amber
+    'London': '#3D405B',     # Navy Blue
+    'Moscow': '#E63946',     # Imperial Red
+    'Madrid': '#588B8B'      # Teal
+}
+
+# Read data from CSV files and create individual charts
+charts_data = []
 for city in cities:
     try:
         df = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
-        for _, row in df.iterrows():
-            data.append({
-                'city': row['city'],
-                'temperature': row['average_temperature'],
-                'api_call': row['API-Call']
-            })
+        
+        # Create individual bubble chart for each city
+        fig = go.Figure()
+        
+        # Add scatter plot with enhanced bubble styling
+        fig.add_trace(go.Scatter(
+            x=df['API-Call'],
+            y=df['average_temperature'],
+            mode='markers',
+            name=city,
+            marker=dict(
+                size=15,
+                color=color_palette.get(city, '#FF9F1C'),
+                line=dict(
+                    color='white',
+                    width=1
+                ),
+                opacity=0.7,
+                symbol='circle'
+            ),
+            hovertemplate=
+            '<b>%{text}</b><br>' +
+            'API Call: %{x}<br>' +
+            'Temperature: %{y:.1f}°C<br>' +
+            '<extra></extra>',
+            text=[city] * len(df)
+        ))
+
+        # Update layout for better visualization
+        fig.update_layout(
+            title=dict(
+                text=f'Temperature Trends for {city}',
+                x=0.5,
+                y=0.95,
+                xanchor='center',
+                yanchor='top',
+                font=dict(
+                    size=24,
+                    color='#2B2D42'
+                )
+            ),
+            xaxis=dict(
+                title='API Call Sequence',
+                gridcolor='#EAEAEA',
+                showline=True,
+                linecolor='#2B2D42',
+                linewidth=2,
+                tickfont=dict(size=12)
+            ),
+            yaxis=dict(
+                title='Temperature (°C)',
+                gridcolor='#EAEAEA',
+                showline=True,
+                linecolor='#2B2D42',
+                linewidth=2,
+                tickfont=dict(size=12)
+            ),
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            showlegend=False,
+            hovermode='closest',
+            margin=dict(t=100, b=50, l=50, r=50),
+            shapes=[
+                # Add subtle gradient background
+                dict(
+                    type='rect',
+                    xref='paper',
+                    yref='paper',
+                    x0=0,
+                    y0=0,
+                    x1=1,
+                    y1=1,
+                    fillcolor='#F8F9FA',
+                    opacity=0.3,
+                    layer='below',
+                    line_width=0,
+                )
+            ]
+        )
+
+        # Add hover effects and interactivity
+        fig.update_traces(
+            hoverlabel=dict(
+                bgcolor='white',
+                font_size=14,
+                font_family='Arial'
+            )
+        )
+
+        # Save each chart
+        fig.write_html(f"/app/public/bubble_chart_{city.lower().replace(' ', '_')}.html")
+        charts_data.append({
+            'city': city,
+            'chart_path': f"bubble_chart_{city.lower().replace(' ', '_')}.html"
+        })
+        
     except Exception as e:
-        print(f"Error reading data for {city}: {e}")
+        print(f"Error processing data for {city}: {e}")
 
-# Create bubble chart
-df = pd.DataFrame(data)
-fig = px.scatter(df, x='api_call', y='temperature', color='city',
-                 title='Temperature vs API Call by City',
-                 labels={'api_call': 'API Call Number', 'temperature': 'Temperature (°C)'})
+# Create an index file that lists all charts
+index_html = """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .chart-container:hover {
+            transform: translateY(-5px);
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-grid">
+"""
 
-# Update layout
-fig.update_layout(
-    title_x=0.5,
-    plot_bgcolor='white',
-    paper_bgcolor='white',
-    font=dict(size=12)
-)
+for chart in charts_data:
+    index_html += f"""
+        <div class="chart-container">
+            <iframe src="{chart['chart_path']}"></iframe>
+        </div>
+    """
 
-# Save chart as HTML
-fig.write_html("/app/public/bubble_chart.html")
+index_html += """
+    </div>
+</body>
+</html>
+"""
+
+with open("/app/public/bubble_charts.html", "w") as f:
+    f.write(index_html)
