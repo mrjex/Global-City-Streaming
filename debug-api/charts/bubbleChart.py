@@ -15,16 +15,17 @@ from pandas import *
 import plotly.express as px
 import plotly.graph_objects as go
 import sys
+import os
 
 
-sys.path.append('..')
+sys.path.append('/app/debug-api')
 import apis.colorApi as colorApi
 
 sys.path.append('../..')
 import utils
 
 
-configPath = "../../configuration.yml" # The fixed relative path to the central config file
+configPath = "/app/configuration.yml" # The fixed relative path to the central config file
 
 
 pngOutput = utils.parseYmlFile(configPath, "debugApi.charts.bubbleChart.pngOutput")
@@ -44,7 +45,7 @@ dataPointOutlizeWidth = 0
 
 
 
-cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
+cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
 
 
 
@@ -59,7 +60,7 @@ def generateCityGraphs():
     cityColorMapping = colorApi.getCityChartColors(colorTheme)
 
     for city in cities:
-        data = read_csv(f"../generated-artifacts/csvs/{city}.csv")
+        data = read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
         currentColor = cityColorMapping[city]
 
         currentCityFigure = px.scatter(data, x="API-Call", y="average_temperature",
@@ -116,7 +117,7 @@ def displaySeparateGraphs():
 
 
 def exportPng(figure, fileOutputName):
-    figure.write_image(f"../generated-artifacts/pngs/bubble-chart/{fileOutputName}.png")
+    figure.write_image(f"/app/public/bubble-chart/{fileOutputName}.png")
 
 
 def plotBubbleChart():
@@ -126,3 +127,49 @@ def plotBubbleChart():
         displaySeparateGraphs()
     else:
         mergeGraphs()
+
+import sys
+import os
+sys.path.append('/app/debug-api')
+
+import utils
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+# Configuration file path
+configPath = "/app/configuration.yml"
+
+# Get cities from configuration
+cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
+
+# Read data from CSV files
+data = []
+for city in cities:
+    try:
+        df = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
+        for _, row in df.iterrows():
+            data.append({
+                'city': row['city'],
+                'temperature': row['average_temperature'],
+                'api_call': row['API-Call']
+            })
+    except Exception as e:
+        print(f"Error reading data for {city}: {e}")
+
+# Create bubble chart
+df = pd.DataFrame(data)
+fig = px.scatter(df, x='api_call', y='temperature', color='city',
+                 title='Temperature vs API Call by City',
+                 labels={'api_call': 'API Call Number', 'temperature': 'Temperature (°C)'})
+
+# Update layout
+fig.update_layout(
+    title_x=0.5,
+    plot_bgcolor='white',
+    paper_bgcolor='white',
+    font=dict(size=12)
+)
+
+# Save chart as HTML
+fig.write_html("/app/public/bubble_chart.html")

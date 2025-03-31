@@ -4,24 +4,59 @@ import plotly.express as px
 import plotly.graph_objects as go
 from operator import itemgetter 
 import sys
+import os
 
-sys.path.append('..')
+sys.path.append('/app/debug-api')
+
 import apis.colorApi as colorApi
-
-sys.path.append('../..')
 import utils
 
-configPath = "../../configuration.yml" # The fixed relative path to the central config file
+# Configuration file path
+configPath = "/app/configuration.yml"
 
+# Get cities from configuration
+cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
 
-cities = utils.parseYmlFile("../../configuration.yml", "realTimeProduction.cities")
+# Read data from CSV files
+data = []
+for city in cities:
+    try:
+        df = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
+        avg_temp = df['average_temperature'].mean()
+        data.append({
+            'city': city,
+            'temperature': avg_temp
+        })
+    except Exception as e:
+        print(f"Error reading data for {city}: {e}")
+
+# Get chart configuration
+pngOutput = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.pngOutput")
+chartType = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.chartType")
+pieColorTheme = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.pieColorTheme")
+
+# Create pie chart
+df = pd.DataFrame(data)
+fig = px.pie(df, values='temperature', names='city',
+             title='Average Temperature Distribution by City',
+             labels={'temperature': 'Temperature (°C)'})
+
+# Update layout
+fig.update_layout(
+    title_x=0.5,
+    plot_bgcolor='white',
+    paper_bgcolor='white',
+    font=dict(size=12)
+)
+
+# Save chart as HTML
+fig.write_html("/app/public/pie_chart.html")
 
 chartTypes = ['Random-Colors', '4-Coldest-Cities', 'Color-Theme'] # Available options
 
 
 ## PIE CHART CONFIGURATIONS  ##
 
-pngOutput = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.pngOutput")
 selectedChartType = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.chartType")
 colorTheme = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.pieColorTheme")
 
@@ -34,7 +69,7 @@ def getCitySums():
     output = {}
 
     for city in cities:
-        df2 = pd.read_csv(f"../generated-artifacts/csvs/{city}.csv")
+        df2 = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
 
         currentCitySum = df2['average_temperature'].sum()
         output[city] = currentCitySum
@@ -115,7 +150,7 @@ def plotColorThemedChart(cityTemperatureSums):
 
 
 def exportPng(figure, fileOutputName):
-    figure.write_image(f"../generated-artifacts/pngs/pie-chart/{fileOutputName}.png")
+    figure.write_image(f"/app/debug-api/generated-artifacts/pngs/pie-chart/{fileOutputName}.png")
 
 
 
