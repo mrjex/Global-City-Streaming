@@ -277,6 +277,14 @@ html_content = f"""
         #chart:hover {{
             transform: translateY(-5px);
         }}
+        @keyframes pulse {{
+            0% {{ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }}
+            50% {{ box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); }}
+            100% {{ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }}
+        }}
+        .updating {{
+            animation: pulse 1s infinite;
+        }}
     </style>
 </head>
 <body>
@@ -288,8 +296,7 @@ html_content = f"""
         function initChart() {{
             Plotly.newPlot('chart', chartData.data, chartData.layout, {{
                 responsive: true,
-                displayModeBar: true,
-                displaylogo: false
+                displayModeBar: false
             }});
         }}
 
@@ -307,18 +314,26 @@ html_content = f"""
                         layout: newChartData.layout
                     }}, {{
                         transition: {{
-                            duration: 500,
+                            duration: 300,
                             easing: 'cubic-in-out'
                         }},
                         frame: {{
-                            duration: 500
+                            duration: 300,
+                            redraw: true
                         }}
                     }});
+
+                    // Add visual feedback for updates
+                    document.getElementById('chart').classList.add('updating');
+                    setTimeout(() => {{
+                        document.getElementById('chart').classList.remove('updating');
+                    }}, 300);
                 }});
         }}
         
         initChart();
-        setInterval(updateChart, 5000);
+        // Update 4 times per second (every 250ms)
+        setInterval(updateChart, 250);
     </script>
 </body>
 </html>

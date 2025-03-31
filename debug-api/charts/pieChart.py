@@ -206,6 +206,14 @@ html_content = f"""
         .chart:hover {{
             transform: translateY(-5px);
         }}
+        @keyframes pulse {{
+            0% {{ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }}
+            50% {{ box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); }}
+            100% {{ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }}
+        }}
+        .updating {{
+            animation: pulse 1s infinite;
+        }}
     </style>
 </head>
 <body style="margin: 0; padding: 0;">
@@ -219,17 +227,81 @@ html_content = f"""
         var chart2 = {json.dumps(fig2.to_dict(), cls=NumpyEncoder)};
         
         function initCharts() {{
-            Plotly.newPlot('chart1', chart1.data, chart1.layout, {{responsive: true}});
-            Plotly.newPlot('chart2', chart2.data, chart2.layout, {{responsive: true}});
+            Plotly.newPlot('chart1', chart1.data, chart1.layout, {{
+                responsive: true,
+                displayModeBar: false
+            }});
+            Plotly.newPlot('chart2', chart2.data, chart2.layout, {{
+                responsive: true,
+                displayModeBar: false
+            }});
         }}
 
-        // Auto-refresh the page every 5 seconds
-        function autoRefresh() {{
-            window.location.reload();
+        function updateCharts() {{
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {{
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const scripts = doc.querySelectorAll('script');
+                    let newChart1, newChart2;
+                    
+                    for (const script of scripts) {{
+                        if (script.textContent.includes('chart1')) {{
+                            const match = script.textContent.match(/var chart1 = (.*?);/);
+                            if (match) newChart1 = JSON.parse(match[1]);
+                        }}
+                        if (script.textContent.includes('chart2')) {{
+                            const match = script.textContent.match(/var chart2 = (.*?);/);
+                            if (match) newChart2 = JSON.parse(match[1]);
+                        }}
+                    }}
+
+                    if (newChart1 && newChart2) {{
+                        // Add transition animation for chart1
+                        Plotly.animate('chart1', {{
+                            data: newChart1.data,
+                            layout: newChart1.layout
+                        }}, {{
+                            transition: {{
+                                duration: 300,
+                                easing: 'cubic-in-out'
+                            }},
+                            frame: {{
+                                duration: 300,
+                                redraw: true
+                            }}
+                        }});
+
+                        // Add transition animation for chart2
+                        Plotly.animate('chart2', {{
+                            data: newChart2.data,
+                            layout: newChart2.layout
+                        }}, {{
+                            transition: {{
+                                duration: 300,
+                                easing: 'cubic-in-out'
+                            }},
+                            frame: {{
+                                duration: 300,
+                                redraw: true
+                            }}
+                        }});
+
+                        // Add visual feedback for updates
+                        document.getElementById('chart1').classList.add('updating');
+                        document.getElementById('chart2').classList.add('updating');
+                        setTimeout(() => {{
+                            document.getElementById('chart1').classList.remove('updating');
+                            document.getElementById('chart2').classList.remove('updating');
+                        }}, 300);
+                    }}
+                }});
         }}
         
         initCharts();
-        setInterval(autoRefresh, 5000);
+        // Update 4 times per second (every 250ms)
+        setInterval(updateCharts, 250);
     </script>
 </body>
 </html>
