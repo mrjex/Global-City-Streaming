@@ -11,6 +11,11 @@
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)](https://www.docker.com/)
 [![Python](https://img.shields.io/badge/Python-3.8+-green)](https://www.python.org/)
 
+
+
+- FastAPI, React, Nextjs, Typescript, Confluentinc, Bitnami
+
+
 ## 📑 Table of Contents
 - [🌎 Global City Streaming](#-global-city-streaming)
   - [📑 Table of Contents](#-table-of-contents)

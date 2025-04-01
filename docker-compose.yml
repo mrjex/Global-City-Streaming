@@ -8,7 +8,7 @@ networks:
 services:
   frontend:
     build:
-      context: ..
+      context: .
       dockerfile: frontend/Dockerfile
     container_name: frontend
     ports:
@@ -87,13 +87,13 @@ services:
 
   kafka-producer:
     build:
-      context: ./kafka-producer
+      context: ./application/kafka-producer
     container_name: kafka-producer
     ports:
       - "8000:8000"
     volumes:
-      - ../debug-api:/mnt:rw
-      - ../:/app:rw
+      - ./debug-api:/mnt:rw
+      - .:/app:rw
     depends_on:
       - kafka
       - zookeeper
@@ -109,7 +109,7 @@ services:
 
   flink-processor:
     build:
-      context: ./flink-processor
+      context: ./application/flink-processor
       dockerfile: Dockerfile
     container_name: flink-processor
     ports:
@@ -132,7 +132,7 @@ services:
 
   postgres:
     build:
-      context: ./postgres
+      context: ./application/postgres
     container_name: postgres
     restart: unless-stopped
     environment:
@@ -157,4 +157,4 @@ volumes:
   kafka_data:
     driver: local
   postgres_data:
-    driver: local
+    driver: local 
