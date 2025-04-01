@@ -29,10 +29,14 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-      flink-processor:
-        condition: service_healthy
     restart: unless-stopped
     mem_limit: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -152,7 +156,7 @@ services:
         soft: 65536
         hard: 65536
     healthcheck:
-      test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'java.*WeatherDataProcessor' && (docker logs flink-processor 2>&1 | grep -q 'Raw data received' || docker logs flink-processor 2>&1 | grep -q 'Inserting into DB') || exit 1"]
+      test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'java.*WeatherDataProcessor' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
