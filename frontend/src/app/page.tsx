@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import WorldMap from '../components/WorldMap';
 import DatabaseCounter from '../components/DatabaseCounter';
 import Terminal from '@/components/Terminal';
+import FlinkTerminals from '@/components/FlinkTerminals';
 import CitySelector from '@/components/CitySelector';
 import Charts from '@/components/Charts';
 
@@ -48,6 +49,8 @@ export default function Home(): ReactElement {
       <div className="mt-8">
         <CitySelector onCitiesChange={handleCitiesChange} />
       </div>
+
+      <FlinkTerminals maxLines={10} />
 
       <Charts />
     </main>
