@@ -19,6 +19,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Create and set permissions for log directories
+RUN mkdir -p /opt/flink/log && \
+    chmod -R 777 /opt/flink/log
+
 # Copy the log server
 COPY log-server.py /opt/flink/log-server.py
 
@@ -34,7 +38,7 @@ COPY --from=builder /build/target/flink-kafka2postgres-1.0-SNAPSHOT.jar /opt/fli
 
 # Create start script - run Flink in local execution mode
 RUN echo '#!/bin/bash\n\
-python3 /opt/flink/log-server.py & \n\
+python3 /opt/flink/log-server.py > /opt/flink/log/log-server.out 2>&1 & \n\
 /wait-for-it.sh kafka:9092 -t 60 -- \n\
 /wait-for-it.sh zookeeper:2181 -t 60 -- \n\
 /wait-for-it.sh postgres:5432 -t 60 -- \n\
@@ -45,7 +49,7 @@ touch /opt/flink/mnt/exec-settings.txt && \
 java -Dlog4j.configurationFile=file:///opt/flink/conf/log4j2.xml \
 -Dkafka.bootstrap.servers=${KAFKA_SERVER} \
 -Dzookeeper.connect=${ZOOKEEPER_SERVER} \
--cp "/opt/flink/lib/*:/opt/flink/usrlib/*" Main \n\
+-cp "/opt/flink/lib/*:/opt/flink/usrlib/*" Main | tee /opt/flink/log/flink.out \n\
 tail -f /dev/null' > /start.sh && \
 dos2unix /start.sh && \
 chmod +x /start.sh

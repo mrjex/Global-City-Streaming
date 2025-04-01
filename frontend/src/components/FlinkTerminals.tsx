@@ -14,20 +14,24 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
     const fetchLogs = async () => {
       try {
         // Fetch raw data logs
-        const rawResponse = await fetch('/api/logs/flink-raw');
+        const rawResponse = await fetch('/api/flink-logs/raw');
         const rawData = await rawResponse.text();
+        console.log('Raw logs response:', rawData);
         
         // Fetch DB insertion logs
-        const dbResponse = await fetch('/api/logs/flink-db');
+        const dbResponse = await fetch('/api/flink-logs/db');
         const dbData = await dbResponse.text();
+        console.log('DB logs response:', dbData);
         
-        if (rawData && rawData !== '[]') {
+        if (rawData && rawData !== '[]' && rawData !== 'Error fetching logs') {
           const allRawLogs = rawData.split('\n').filter((line: string) => line.trim());
+          console.log('Processed raw logs:', allRawLogs.length, 'lines');
           setRawLogs(allRawLogs.slice(-maxLines));
         }
         
-        if (dbData && dbData !== '[]') {
+        if (dbData && dbData !== '[]' && dbData !== 'Error fetching logs') {
           const allDbLogs = dbData.split('\n').filter((line: string) => line.trim());
+          console.log('Processed DB logs:', allDbLogs.length, 'lines');
           setDbLogs(allDbLogs.slice(-maxLines));
         }
         

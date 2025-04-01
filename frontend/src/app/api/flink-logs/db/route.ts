@@ -9,6 +9,8 @@ const FLINK_PROCESSOR_URL = process.env.FLINK_PROCESSOR_URL || 'http://flink-pro
 
 export async function GET() {
   try {
+    console.log('Fetching DB logs from:', `${FLINK_PROCESSOR_URL}/logs/db`);
+    
     // Fetch the logs from the Flink processor service
     const response = await fetch(`${FLINK_PROCESSOR_URL}/logs/db`, {
       cache: 'no-store'
@@ -19,6 +21,16 @@ export async function GET() {
     }
 
     const logs = await response.text();
+    console.log('DB logs received:', logs ? logs.substring(0, 100) + '...' : 'empty');
+    
+    if (!logs || logs.trim() === '') {
+      return new NextResponse('[]', {
+        headers: {
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+      });
+    }
     
     // Return logs as plain text with appropriate headers
     return new NextResponse(logs, {
@@ -29,8 +41,8 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('Error fetching Flink processor DB logs:', error);
-    return new NextResponse('Error fetching logs: ' + error.message, {
-      status: 500,
+    return new NextResponse('[]', {
+      status: 200, // Return empty array instead of error
       headers: {
         'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache, no-store, must-revalidate'

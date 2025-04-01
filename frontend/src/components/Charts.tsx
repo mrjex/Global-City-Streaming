@@ -1,83 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { useInterval } from '@/hooks/useInterval';
-
-// Dynamically import Plot to avoid SSR issues
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+import styles from '../app/charts/Charts.module.css';
 
 interface ChartData {
-  x: number[];
-  y: number[];
-  labels: string[];
-  values: number[];
-  cities: string[];
+  charts: string[];
 }
 
 const Charts: React.FC = () => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchChartData = async () => {
     try {
+      setLoading(true);
       const response = await fetch('/api/charts');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch charts: ${response.statusText}`);
+      }
       const data = await response.json();
       setChartData(data);
-    } catch (error) {
+      setError(null);
+    } catch (error: any) {
       console.error('Error fetching chart data:', error);
+      setError(error.message || 'Failed to load charts');
+    } finally {
+      setLoading(false);
     }
   };
 
   // Fetch data every 5 seconds
-  useInterval(fetchChartData, 5000);
-
-  // Initial fetch
   useEffect(() => {
+    const interval = setInterval(fetchChartData, 5000);
+    // Initial fetch
     fetchChartData();
+    return () => clearInterval(interval);
   }, []);
 
-  if (!chartData) return <div>Loading charts...</div>;
+  if (loading) return <div className={styles.loading}>Loading charts...</div>;
+  if (error) return <div className={styles.error}>Error: {error}</div>;
+  if (!chartData || !chartData.charts || chartData.charts.length === 0) {
+    return <div className={styles.noCharts}>No charts available</div>;
+  }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Temperature Distribution</h3>
-        <Plot
-          data={[{
-            type: 'pie',
-            labels: chartData.labels,
-            values: chartData.values,
-            textinfo: 'label+percent',
-            insidetextorientation: 'radial'
-          }]}
-          layout={{
-            height: 400,
-            margin: { t: 0, b: 0, l: 0, r: 0 },
-            showlegend: true
-          }}
-          config={{ responsive: true }}
-        />
-      </div>
-
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Temperature Trends</h3>
-        <Plot
-          data={chartData.cities.map((city, index) => ({
-            type: 'scatter',
-            mode: 'markers',
-            name: city,
-            x: chartData.x,
-            y: chartData.y.slice(index * chartData.x.length, (index + 1) * chartData.x.length),
-            marker: { size: 11 }
-          }))}
-          layout={{
-            height: 400,
-            margin: { t: 0, b: 50, l: 50, r: 0 },
-            xaxis: { title: 'API Call Number' },
-            yaxis: { title: 'Temperature' },
-            showlegend: true
-          }}
-          config={{ responsive: true }}
-        />
-      </div>
+    <div className={styles.chartsGrid}>
+      {chartData.charts.map((chartUrl, index) => (
+        <div key={index} className={styles.chartCard}>
+          <img 
+            src={chartUrl} 
+            alt={`Temperature chart ${index + 1}`}
+            className={styles.chartImage}
+          />
+        </div>
+      ))}
     </div>
   );
 };
