@@ -1,28 +1,24 @@
 import { NextResponse } from 'next/server';
-import Docker from 'dockerode';
 
 export async function GET() {
-  const docker = new Docker();
-  
+  // During build time or static generation, return empty array
+  if (process.env.NODE_ENV === 'production' && (process.env.NEXT_PHASE === 'build' || process.env.NEXT_PHASE === 'static')) {
+    return NextResponse.json([]);
+  }
+
   try {
-    const container = await docker.getContainer('global-city-streaming-flink-processor-1');
-    const logs = await container.logs({
-      stdout: true,
-      stderr: true,
-      tail: 50,
-      timestamps: true
-    });
-
-    // Convert logs to string and filter for DB insertion logs
-    const logsStr = logs.toString('utf8');
-    const dbLogs = logsStr
-      .split('\n')
-      .filter((line: string) => line.includes('Inserting into DB:'))
-      .join('\n');
-
-    return new NextResponse(dbLogs);
+    // Use localhost during development, container name in production
+    const host = process.env.NODE_ENV === 'development' ? 'localhost' : 'frontend';
+    const response = await fetch(`http://${host}:8000/flink/logs?type=db`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching Flink DB logs:', error);
-    return new NextResponse('Error fetching logs', { status: 500 });
+    return NextResponse.json([]);
   }
 } 

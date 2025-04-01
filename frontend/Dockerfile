@@ -22,7 +22,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install Python dependencies in virtual environment
 RUN . $VIRTUAL_ENV/bin/activate && \
-    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests
+    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests docker fastapi uvicorn
 
 WORKDIR /app
 
@@ -76,7 +76,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install Python dependencies in virtual environment
 RUN . $VIRTUAL_ENV/bin/activate && \
-    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests
+    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests docker fastapi uvicorn
 
 # Create necessary directories
 RUN mkdir -p public /app/debug-api/generated-artifacts/csvs
@@ -97,5 +97,14 @@ ENV PYTHONPATH=/app/debug-api
 
 EXPOSE 3000
 
-# Use standalone output
-CMD ["node", "server.js"] 
+# Copy start script
+COPY --chmod=755 <<EOF /start.sh
+#!/bin/sh
+# Start FastAPI server in the background
+uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir /app/debug-api &
+# Start Next.js server
+node server.js
+EOF
+
+# Use start script
+CMD ["/start.sh"] 
