@@ -2,8 +2,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
-import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.common.TopicPartition;
@@ -28,6 +27,7 @@ import static java.nio.file.StandardOpenOption.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Properties;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -42,16 +42,20 @@ public class Main {
       StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
       System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Environment created");
-      KafkaSource<Weather> source = KafkaSource.<Weather>builder()
-                                      .setBootstrapServers(BROKERS)
-                                      .setProperty("partition.discovery.interval.ms", "1000")
-                                      .setTopics("weather")
-                                      .setGroupId("groupdId-919292")
-                                      .setStartingOffsets(OffsetsInitializer.earliest())
-                                      .setValueOnlyDeserializer(new WeatherDeserializationSchema())
-                                      .build();
+      
+      // Replace KafkaSource with FlinkKafkaConsumer
+      Properties properties = new Properties();
+      properties.setProperty("bootstrap.servers", BROKERS);
+      properties.setProperty("group.id", "groupdId-919292");
+      properties.setProperty("auto.offset.reset", "earliest");
+      
+      FlinkKafkaConsumer<Weather> consumer = new FlinkKafkaConsumer<>(
+          "weather", 
+          new WeatherDeserializationSchema(), 
+          properties
+      );
 
-      DataStreamSource<Weather> kafka = env.fromSource(source, WatermarkStrategy.noWatermarks(), "kafka");
+      DataStreamSource<Weather> kafka = env.addSource(consumer);
 
       System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Kafka source created");
 
