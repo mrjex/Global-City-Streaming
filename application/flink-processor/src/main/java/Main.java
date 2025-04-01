@@ -15,7 +15,6 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.api.common.functions.MapFunction;
 
-
 import java.io.IOException; 
 import java.net.URI; 
 import java.net.URISyntaxException; 
@@ -27,20 +26,22 @@ import java.nio.channels.FileChannel;
 import java.nio.ByteBuffer;
 import static java.nio.file.StandardOpenOption.*;
 
-
 import java.util.Arrays;
 import java.util.HashSet;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Main {
 
     static final String BROKERS = "kafka:9092";
     static final Integer sampleDuration = 15; // Default: 60
+    static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     public static void main(String[] args) throws Exception {
       appendToMountedFile();
       StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-      System.out.println("Environment created");
+      System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Environment created");
       KafkaSource<Weather> source = KafkaSource.<Weather>builder()
                                       .setBootstrapServers(BROKERS)
                                       .setProperty("partition.discovery.interval.ms", "1000")
@@ -52,7 +53,13 @@ public class Main {
 
       DataStreamSource<Weather> kafka = env.fromSource(source, WatermarkStrategy.noWatermarks(), "kafka");
 
-      System.out.println("Kafka source created");
+      System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Kafka source created");
+
+      // Add logging for raw data from Kafka
+      kafka.map(weather -> {
+        System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Raw data received: " + weather.toString());
+        return weather;
+      });
 
       DataStream<Tuple2<MyAverage, Double>> averageTemperatureStream = kafka.keyBy(myEvent -> myEvent.city)
         .window(TumblingProcessingTimeWindows.of(Time.seconds(sampleDuration)))
@@ -62,16 +69,20 @@ public class Main {
         .map(new MapFunction<Tuple2<MyAverage, Double>, Tuple2<String, Double>>() {
           @Override
           public Tuple2<String, Double> map(Tuple2<MyAverage, Double> input) throws Exception {
+            System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Aggregated data: City=" + input.f0.city + 
+                             ", Count=" + input.f0.count + ", Sum=" + input.f0.sum + ", Average=" + input.f1);
             return new Tuple2<>(input.f0.city, input.f1);
           }
         }); 
 
-      System.out.println("Aggregation created");
+      System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Aggregation created");
       
 
       // cityAndValueStream.print();
       cityAndValueStream.addSink(JdbcSink.sink("insert into weather (city, average_temperature) values (?, ?)",
             (statement, event) -> {
+              System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Inserting into DB: City=" + event.f0 + 
+                               ", Average Temperature=" + event.f1);
               statement.setString(1, event.f0);
               statement.setDouble(2, event.f1);
             },

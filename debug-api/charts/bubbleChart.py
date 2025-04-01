@@ -137,7 +137,7 @@ configPath = "/app/configuration.yml"
 cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
 
 # Number of latest readings to show in the sliding window
-N_LATEST_READINGS = 20
+N_LATEST_READINGS = 10  # Reduced from 20 to 10 for smoother updates
 
 # Custom color palette
 color_palette = {
@@ -272,7 +272,7 @@ html_content = f"""
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }}
         #chart:hover {{
             transform: translateY(-5px);
@@ -283,7 +283,7 @@ html_content = f"""
             100% {{ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }}
         }}
         .updating {{
-            animation: pulse 1s infinite;
+            animation: pulse 0.4s ease-in-out;
         }}
     </style>
 </head>
@@ -292,48 +292,55 @@ html_content = f"""
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
         var chartData = {json.dumps(fig.to_dict(), cls=NumpyEncoder)};
+        let updateCount = 0;
         
         function initChart() {{
             Plotly.newPlot('chart', chartData.data, chartData.layout, {{
                 responsive: true,
-                displayModeBar: false
+                displayModeBar: false,
+                staticPlot: false
             }});
         }}
 
-        function updateChart() {{
-            fetch(window.location.href)
-                .then(response => response.text())
-                .then(html => {{
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newChartData = JSON.parse(doc.querySelector('script').textContent.match(/var chartData = (.*?);/)[1]);
-                    
-                    // Animate the transition
-                    Plotly.animate('chart', {{
-                        data: newChartData.data,
-                        layout: newChartData.layout
-                    }}, {{
-                        transition: {{
-                            duration: 300,
-                            easing: 'cubic-in-out'
-                        }},
-                        frame: {{
-                            duration: 300,
-                            redraw: true
-                        }}
-                    }});
-
-                    // Add visual feedback for updates
-                    document.getElementById('chart').classList.add('updating');
-                    setTimeout(() => {{
-                        document.getElementById('chart').classList.remove('updating');
-                    }}, 300);
+        async function updateChart() {{
+            try {{
+                const response = await fetch(window.location.href);
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newChartData = JSON.parse(doc.querySelector('script').textContent.match(/var chartData = (.*?);/)[1]);
+                
+                updateCount++;
+                const duration = 150; // Faster transitions
+                
+                // Optimize animation
+                await Plotly.animate('chart', {{
+                    data: newChartData.data,
+                    layout: newChartData.layout
+                }}, {{
+                    transition: {{
+                        duration: duration,
+                        easing: 'cubic-in-out'
+                    }},
+                    frame: {{
+                        duration: duration,
+                        redraw: false
+                    }}
                 }});
+
+                // Add subtle visual feedback
+                const chart = document.getElementById('chart');
+                chart.classList.remove('updating');
+                void chart.offsetWidth; // Force reflow
+                chart.classList.add('updating');
+            }} catch (error) {{
+                console.error('Error updating chart:', error);
+            }}
         }}
         
         initChart();
-        // Update 4 times per second (every 250ms)
-        setInterval(updateChart, 250);
+        // Update every 200ms
+        setInterval(updateChart, 200);
     </script>
 </body>
 </html>

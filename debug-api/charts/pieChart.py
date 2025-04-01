@@ -201,7 +201,7 @@ html_content = f"""
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 20px;
             width: 45%;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }}
         .chart:hover {{
             transform: translateY(-5px);
@@ -212,7 +212,7 @@ html_content = f"""
             100% {{ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }}
         }}
         .updating {{
-            animation: pulse 1s infinite;
+            animation: pulse 0.4s ease-in-out;
         }}
     </style>
 </head>
@@ -225,83 +225,93 @@ html_content = f"""
     <script>
         var chart1 = {json.dumps(fig1.to_dict(), cls=NumpyEncoder)};
         var chart2 = {json.dumps(fig2.to_dict(), cls=NumpyEncoder)};
+        let updateCount = 0;
         
         function initCharts() {{
             Plotly.newPlot('chart1', chart1.data, chart1.layout, {{
                 responsive: true,
-                displayModeBar: false
+                displayModeBar: false,
+                staticPlot: false
             }});
             Plotly.newPlot('chart2', chart2.data, chart2.layout, {{
                 responsive: true,
-                displayModeBar: false
+                displayModeBar: false,
+                staticPlot: false
             }});
         }}
 
-        function updateCharts() {{
-            fetch(window.location.href)
-                .then(response => response.text())
-                .then(html => {{
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const scripts = doc.querySelectorAll('script');
-                    let newChart1, newChart2;
+        async function updateCharts() {{
+            try {{
+                const response = await fetch(window.location.href);
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const scripts = doc.querySelectorAll('script');
+                let newChart1, newChart2;
+                
+                for (const script of scripts) {{
+                    if (script.textContent.includes('chart1')) {{
+                        const match = script.textContent.match(/var chart1 = (.*?);/);
+                        if (match) newChart1 = JSON.parse(match[1]);
+                    }}
+                    if (script.textContent.includes('chart2')) {{
+                        const match = script.textContent.match(/var chart2 = (.*?);/);
+                        if (match) newChart2 = JSON.parse(match[1]);
+                    }}
+                }}
+
+                if (newChart1 && newChart2) {{
+                    updateCount++;
                     
-                    for (const script of scripts) {{
-                        if (script.textContent.includes('chart1')) {{
-                            const match = script.textContent.match(/var chart1 = (.*?);/);
-                            if (match) newChart1 = JSON.parse(match[1]);
+                    // Optimize animation based on update count
+                    const duration = 150; // Faster transitions
+                    
+                    // Update chart1 with optimized animation
+                    await Plotly.animate('chart1', {{
+                        data: newChart1.data,
+                        layout: newChart1.layout
+                    }}, {{
+                        transition: {{
+                            duration: duration,
+                            easing: 'cubic-in-out'
+                        }},
+                        frame: {{
+                            duration: duration,
+                            redraw: false
                         }}
-                        if (script.textContent.includes('chart2')) {{
-                            const match = script.textContent.match(/var chart2 = (.*?);/);
-                            if (match) newChart2 = JSON.parse(match[1]);
+                    }});
+
+                    // Update chart2 with optimized animation
+                    await Plotly.animate('chart2', {{
+                        data: newChart2.data,
+                        layout: newChart2.layout
+                    }}, {{
+                        transition: {{
+                            duration: duration,
+                            easing: 'cubic-in-out'
+                        }},
+                        frame: {{
+                            duration: duration,
+                            redraw: false
                         }}
-                    }}
+                    }});
 
-                    if (newChart1 && newChart2) {{
-                        // Add transition animation for chart1
-                        Plotly.animate('chart1', {{
-                            data: newChart1.data,
-                            layout: newChart1.layout
-                        }}, {{
-                            transition: {{
-                                duration: 300,
-                                easing: 'cubic-in-out'
-                            }},
-                            frame: {{
-                                duration: 300,
-                                redraw: true
-                            }}
-                        }});
-
-                        // Add transition animation for chart2
-                        Plotly.animate('chart2', {{
-                            data: newChart2.data,
-                            layout: newChart2.layout
-                        }}, {{
-                            transition: {{
-                                duration: 300,
-                                easing: 'cubic-in-out'
-                            }},
-                            frame: {{
-                                duration: 300,
-                                redraw: true
-                            }}
-                        }});
-
-                        // Add visual feedback for updates
-                        document.getElementById('chart1').classList.add('updating');
-                        document.getElementById('chart2').classList.add('updating');
-                        setTimeout(() => {{
-                            document.getElementById('chart1').classList.remove('updating');
-                            document.getElementById('chart2').classList.remove('updating');
-                        }}, 300);
-                    }}
-                }});
+                    // Add subtle visual feedback
+                    const charts = document.querySelectorAll('.chart');
+                    charts.forEach(chart => {{
+                        chart.classList.remove('updating');
+                        void chart.offsetWidth; // Force reflow
+                        chart.classList.add('updating');
+                    }});
+                }}
+            }} catch (error) {{
+                console.error('Error updating charts:', error);
+            }}
         }}
         
         initCharts();
-        // Update 4 times per second (every 250ms)
-        setInterval(updateCharts, 250);
+        // Update every 200ms
+        setInterval(updateCharts, 200);
     </script>
 </body>
 </html>
