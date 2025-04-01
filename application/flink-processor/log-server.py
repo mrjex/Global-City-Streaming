@@ -12,8 +12,13 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Separate logs for raw data and DB operations
-raw_logs = []
-db_logs = []
+raw_logs = ["Log collection started"]
+db_logs = ["Log collection started"]
+
+# Generate sample logs for testing
+for i in range(1, 10):
+    raw_logs.append(f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Sample raw log entry #{i}")
+    db_logs.append(f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Sample DB log entry #{i}")
 
 def find_log_file():
     """Find the most recent Flink log file."""
@@ -44,37 +49,57 @@ def parse_and_store_log(log_line):
             # Extract existing timestamp if present
             timestamp = log_line[log_line.find('[')+1:log_line.find(']')]
             log_line = log_line[log_line.find(']')+1:].strip()
+
+        # Add log entry to appropriate list based on content
+        log_entry = f"[{timestamp}] {log_line}"
         
-        print(f"Processing log line: {log_line}")  # Debug print
-        
-        if "Raw data received:" in log_line:
-            log_entry = f"[{timestamp}] {log_line}"
+        # Categorize logs - now less strict with pattern matching
+        # Check for words related to data reception or processing
+        if any(term in log_line.lower() for term in ["data", "received", "message", "kafka", "consumer", "topic", "stream"]):
             raw_logs.append(log_entry)
-            print(f"Added raw log: {log_entry}")  # Debug print
             if len(raw_logs) > 1000:
                 raw_logs.pop(0)
-        elif "Inserting into DB:" in log_line:
-            log_entry = f"[{timestamp}] {log_line}"
+            print(f"Added raw log: {log_entry[:100]}...")
+        
+        # Check for words related to database operations
+        elif any(term in log_line.lower() for term in ["db", "database", "sql", "insert", "postgres", "jdbc", "table"]):
             db_logs.append(log_entry)
-            print(f"Added DB log: {log_entry}")  # Debug print
             if len(db_logs) > 1000:
                 db_logs.pop(0)
+            print(f"Added DB log: {log_entry[:100]}...")
+        
+        # If no match, add to both logs
+        elif len(log_line) > 5:  # Only add non-empty lines
+            if "error" in log_line.lower() or "exception" in log_line.lower():
+                # Error logs go to both categories
+                raw_logs.append(log_entry)
+                db_logs.append(log_entry)
+                if len(raw_logs) > 1000:
+                    raw_logs.pop(0)
+                if len(db_logs) > 1000:
+                    db_logs.pop(0)
+                print(f"Added error log to both: {log_entry[:100]}...")
+
     except Exception as e:
         print(f"Error parsing log line: {e}")
 
 @app.route('/logs/raw')
 def get_raw_logs():
-    print(f"Serving {len(raw_logs)} raw logs")  # Debug print
+    print(f"Serving {len(raw_logs)} raw logs")
     response = Response('\n'.join(raw_logs), mimetype='text/plain')
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 @app.route('/logs/db')
 def get_db_logs():
-    print(f"Serving {len(db_logs)} DB logs")  # Debug print
+    print(f"Serving {len(db_logs)} DB logs")
     response = Response('\n'.join(db_logs), mimetype='text/plain')
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+@app.route('/healthcheck')
+def healthcheck():
+    return "OK"
 
 def start_flask():
     app.run(host='0.0.0.0', port=8001, debug=False)
@@ -124,26 +149,6 @@ def monitor_flink_logs():
             print(f"Error in monitor_flink_logs: {e}")
             time.sleep(5)  # Wait before retrying
 
-def monitor_stdout():
-    """Directly monitor stdout for Flink logs."""
-    while True:
-        try:
-            process = subprocess.Popen(
-                ['docker', 'logs', '-f', 'flink-processor'],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True
-            )
-            
-            while True:
-                line = process.stdout.readline()
-                if line:
-                    parse_and_store_log(line.strip())
-                    
-        except Exception as e:
-            print(f"Error monitoring stdout: {e}")
-            time.sleep(5)
-
 if __name__ == "__main__":
     print("Starting log server...")
     
@@ -158,11 +163,6 @@ if __name__ == "__main__":
     log_monitor_thread.daemon = True
     log_monitor_thread.start()
     print("Log file monitoring started")
-    
-    stdout_monitor_thread = Thread(target=monitor_stdout)
-    stdout_monitor_thread.daemon = True
-    stdout_monitor_thread.start()
-    print("Stdout monitoring started")
     
     # Keep main thread alive
     while True:

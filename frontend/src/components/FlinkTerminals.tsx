@@ -9,35 +9,35 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
   const [rawLogs, setRawLogs] = useState<string[]>([]);
   const [dbLogs, setDbLogs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [testResults, setTestResults] = useState<any>(null);
+  const [isTesting, setIsTesting] = useState(false);
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        // Fetch raw data logs
+        // Use the existing /flink/logs endpoint with Query parameters
         const rawResponse = await fetch('/api/flink-logs/raw');
-        const rawData = await rawResponse.text();
-        console.log('Raw logs response:', rawData);
-        
-        // Fetch DB insertion logs
         const dbResponse = await fetch('/api/flink-logs/db');
-        const dbData = await dbResponse.text();
-        console.log('DB logs response:', dbData);
         
-        if (rawData && rawData !== '[]' && rawData !== 'Error fetching logs') {
-          const allRawLogs = rawData.split('\n').filter((line: string) => line.trim());
-          console.log('Processed raw logs:', allRawLogs.length, 'lines');
+        const rawText = await rawResponse.text();
+        const dbText = await dbResponse.text();
+        
+        if (rawText && rawText !== '[]') {
+          const allRawLogs = rawText.split('\n').filter((line: string) => line.trim());
           setRawLogs(allRawLogs.slice(-maxLines));
         }
         
-        if (dbData && dbData !== '[]' && dbData !== 'Error fetching logs') {
-          const allDbLogs = dbData.split('\n').filter((line: string) => line.trim());
-          console.log('Processed DB logs:', allDbLogs.length, 'lines');
+        if (dbText && dbText !== '[]') {
+          const allDbLogs = dbText.split('\n').filter((line: string) => line.trim());
           setDbLogs(allDbLogs.slice(-maxLines));
         }
         
         setIsLoading(false);
+        setError(null);
       } catch (error) {
         console.error('Error fetching logs:', error);
+        setError('Failed to connect to log server. Please check container status.');
         setIsLoading(false);
       }
     };
@@ -50,6 +50,25 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
 
     return () => clearInterval(interval);
   }, [maxLines]);
+
+  const runConnectionTest = async () => {
+    setIsTesting(true);
+    try {
+      const response = await fetch('/api/test-connectivity');
+      if (response.ok) {
+        const results = await response.json();
+        setTestResults(results);
+        console.log('Connection test results:', results);
+      } else {
+        setTestResults({ error: `Request failed with status ${response.status}` });
+      }
+    } catch (error) {
+      console.error('Error running connection test:', error);
+      setTestResults({ error: error.message });
+    } finally {
+      setIsTesting(false);
+    }
+  };
 
   const Terminal = ({ title, logs }: { title: string; logs: string[] }) => (
     <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl w-1/2">
@@ -73,10 +92,12 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
       >
         {isLoading ? (
           <div className="text-gray-500 italic">Loading logs...</div>
+        ) : error ? (
+          <div className="text-red-400 italic">{error}</div>
         ) : logs.length > 0 ? (
           logs.map((log, index) => (
             <motion.div
-              key={`${index}-${log}`}
+              key={`${index}-${log.slice(0, 20)}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
@@ -102,6 +123,26 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
       <h2 className="text-2xl font-bold text-gray-200 mb-4 text-center">
         Flink Processor / Aggregate / Insert Data
       </h2>
+      
+      <div className="text-center mb-4">
+        <button 
+          onClick={runConnectionTest}
+          disabled={isTesting}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        >
+          {isTesting ? 'Testing Connection...' : 'Run Connection Test'}
+        </button>
+      </div>
+      
+      {testResults && (
+        <div className="mb-4 p-4 bg-gray-800 rounded text-white text-sm">
+          <h3 className="font-bold mb-2">Connection Test Results:</h3>
+          <pre className="overflow-auto max-h-40">
+            {JSON.stringify(testResults, null, 2)}
+          </pre>
+        </div>
+      )}
+      
       <div className="flex space-x-4">
         <Terminal title="Raw Data Reception" logs={rawLogs} />
         <Terminal title="Database Insertion" logs={dbLogs} />

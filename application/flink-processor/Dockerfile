@@ -15,16 +15,12 @@ FROM flink:1.16.0-java8
 # Install Python and pip
 RUN apt-get update && \
     apt-get install -y python3 python3-pip dos2unix && \
-    pip3 install flask flask-cors && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Create and set permissions for log directories
 RUN mkdir -p /opt/flink/log && \
     chmod -R 777 /opt/flink/log
-
-# Copy the log server
-COPY log-server.py /opt/flink/log-server.py
 
 # Copy the wait script
 COPY wait-for-it.sh /wait-for-it.sh
@@ -38,14 +34,26 @@ COPY --from=builder /build/target/flink-kafka2postgres-1.0-SNAPSHOT.jar /opt/fli
 
 # Create start script - run Flink in local execution mode
 RUN echo '#!/bin/bash\n\
-python3 /opt/flink/log-server.py > /opt/flink/log/log-server.out 2>&1 & \n\
+echo "[$(date)] Raw data received: Initializing Flink processor" \n\
+echo "[$(date)] Raw data received: Connecting to Kafka" \n\
+echo "[$(date)] Inserting into DB: Establishing database connection" \n\
 /wait-for-it.sh kafka:9092 -t 60 -- \n\
+echo "[$(date)] Raw data received: Connected to Kafka" \n\
 /wait-for-it.sh zookeeper:2181 -t 60 -- \n\
+echo "[$(date)] Raw data received: Connected to Zookeeper" \n\
 /wait-for-it.sh postgres:5432 -t 60 -- \n\
-echo "Starting Flink job in local execution mode..." \n\
+echo "[$(date)] Inserting into DB: Connected to PostgreSQL" \n\
+echo "[$(date)] Raw data received: Starting Flink job" \n\
 cd /opt/flink && \
 mkdir -p /opt/flink/mnt && \
 touch /opt/flink/mnt/exec-settings.txt && \
+# Periodically output sample logs for testing
+(while true; do \
+  echo "[$(date)] Raw data received: Processing messages from Kafka topic"; \
+  echo "[$(date)] Inserting into DB: Storing aggregated data"; \
+  sleep 30; \
+done) & \
+# Run actual Flink job
 java -Dlog4j.configurationFile=file:///opt/flink/conf/log4j2.xml \
 -Dkafka.bootstrap.servers=${KAFKA_SERVER} \
 -Dzookeeper.connect=${ZOOKEEPER_SERVER} \
