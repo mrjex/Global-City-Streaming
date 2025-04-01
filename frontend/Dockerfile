@@ -76,6 +76,9 @@ RUN apk add --no-cache \
     libjpeg \
     curl
 
+# Install Docker CLI
+RUN apk add --no-cache docker-cli
+
 # Set up Python virtual environment
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
