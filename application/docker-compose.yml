@@ -25,18 +25,10 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     depends_on:
-      kafka-producer:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      - kafka-producer
+      - postgres
     restart: unless-stopped
     mem_limit: 256m
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -62,19 +54,12 @@ services:
       - zookeeper_log:/var/lib/zookeeper/log
     restart: unless-stopped
     mem_limit: 768m
-    healthcheck:
-      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
 
   kafka:
     image: bitnami/kafka:3.5
     container_name: kafka
     depends_on:
-      zookeeper:
-        condition: service_healthy
+      - zookeeper
     ports:
       - "9092:9092"
     environment:
@@ -93,12 +78,6 @@ services:
       - kafka_data:/bitnami/kafka
     restart: unless-stopped
     mem_limit: 1g
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
   kafka-producer:
     build:
@@ -110,12 +89,9 @@ services:
       - ../debug-api:/mnt:rw
       - ../:/app:rw
     depends_on:
-      kafka:
-        condition: service_healthy
-      zookeeper:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      - kafka
+      - zookeeper
+      - postgres
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:2181"
@@ -124,12 +100,6 @@ services:
       - app_network
     restart: unless-stopped
     mem_limit: 256m
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/logs || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
 
   flink-processor:
     build:
@@ -139,10 +109,8 @@ services:
     volumes:
       - ../debug-api:/mnt:rw
     depends_on:
-      kafka:
-        condition: service_healthy
-      zookeeper:
-        condition: service_healthy
+      - kafka
+      - zookeeper
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:2181"
@@ -155,12 +123,6 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    healthcheck:
-      test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'java.*WeatherDataProcessor' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
 
   postgres:
     build:
@@ -178,12 +140,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     mem_limit: 256m
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
 volumes:
   settings:

@@ -27,12 +27,12 @@ RUN . $VIRTUAL_ENV/bin/activate && \
 WORKDIR /app
 
 # Copy frontend package.json
-COPY frontend/package.json ./
+COPY package.json ./
 RUN npm install --production=false && \
     npm install --save-dev @types/node
 
 # Copy frontend source files
-COPY frontend/ ./
+COPY . ./
 
 # Copy debug-api and configuration
 COPY debug-api/ /app/debug-api/
@@ -97,10 +97,6 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV PYTHONPATH=/app/debug-api
 
 EXPOSE 3000
-
-# Create FastAPI app if it doesn't exist
-RUN mkdir -p /app/debug-api && \
-    echo 'from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nimport os\nimport json\n\napp = FastAPI()\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=["*"],\n    allow_credentials=True,\n    allow_methods=["*"],\n    allow_headers=["*"],\n)\n\n@app.get("/flink/logs")\nasync def get_logs(type: str = "raw"):\n    try:\n        import docker\n        client = docker.from_env()\n        container = client.containers.get("flink-processor")\n        logs = container.logs().decode("utf-8").split("\\n")\n        filtered_logs = [log for log in logs if (type == "raw" and "Raw data received" in log) or (type == "db" and "Inserting into DB" in log)]\n        return filtered_logs[-100:] if filtered_logs else []\n    except Exception as e:\n        print(f"Error fetching logs: {str(e)}")\n        return []' > /app/debug-api/main.py
 
 # Create start script with debug output and health check
 RUN echo '#!/bin/sh' > /start.sh && \
