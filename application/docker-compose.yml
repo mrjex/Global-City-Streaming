@@ -152,7 +152,7 @@ services:
         soft: 65536
         hard: 65536
     healthcheck:
-      test: ["CMD", "pgrep", "-f", "WeatherDataProcessor"]
+      test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'java.*WeatherDataProcessor' && (docker logs flink-processor 2>&1 | grep -q 'Raw data received' || docker logs flink-processor 2>&1 | grep -q 'Inserting into DB') || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5

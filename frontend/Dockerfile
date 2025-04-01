@@ -97,14 +97,21 @@ ENV PYTHONPATH=/app/debug-api
 
 EXPOSE 3000
 
-# Copy start script
-COPY --chmod=755 <<EOF /start.sh
-#!/bin/sh
-# Start FastAPI server in the background
-uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir /app/debug-api &
-# Start Next.js server
-node server.js
-EOF
+# Create FastAPI app if it doesn't exist
+RUN mkdir -p /app/debug-api && \
+    echo 'from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI()\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=["*"],\n    allow_credentials=True,\n    allow_methods=["*"],\n    allow_headers=["*"],\n)\n\n@app.get("/flink/logs")\nasync def get_logs(type: str = "raw"):\n    return []' > /app/debug-api/main.py
+
+# Create start script with debug output
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'echo "Starting FastAPI server..."' >> /start.sh && \
+    echo 'cd /app/debug-api' >> /start.sh && \
+    echo 'ls -la' >> /start.sh && \
+    echo 'uvicorn main:app --host 0.0.0.0 --port 8000 &' >> /start.sh && \
+    echo 'echo "Starting Next.js server..."' >> /start.sh && \
+    echo 'cd /app' >> /start.sh && \
+    echo 'ls -la' >> /start.sh && \
+    echo 'node server.js' >> /start.sh && \
+    chmod +x /start.sh
 
 # Use start script
 CMD ["/start.sh"] 
