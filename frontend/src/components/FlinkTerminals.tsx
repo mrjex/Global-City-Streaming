@@ -13,6 +13,11 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
   const [testResults, setTestResults] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
 
+  // Function to clean log messages by removing prefixes
+  const cleanLogs = (logs: string[], prefix: string): string[] => {
+    return logs.map(log => log.replace(prefix, '').trim());
+  };
+
   useEffect(() => {
     const fetchLogs = async () => {
       try {
@@ -25,12 +30,16 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
         
         if (rawText && rawText !== '[]') {
           const allRawLogs = rawText.split('\n').filter((line: string) => line.trim());
-          setRawLogs(allRawLogs.slice(-maxLines));
+          // Clean logs by removing "Raw data received: " prefix
+          const cleanedRawLogs = cleanLogs(allRawLogs, "Raw data received:");
+          setRawLogs(cleanedRawLogs.slice(-maxLines));
         }
         
         if (dbText && dbText !== '[]') {
           const allDbLogs = dbText.split('\n').filter((line: string) => line.trim());
-          setDbLogs(allDbLogs.slice(-maxLines));
+          // Clean logs by removing "Inserting into DB: " prefix
+          const cleanedDbLogs = cleanLogs(allDbLogs, "Inserting into DB:");
+          setDbLogs(cleanedDbLogs.slice(-maxLines));
         }
         
         setIsLoading(false);
