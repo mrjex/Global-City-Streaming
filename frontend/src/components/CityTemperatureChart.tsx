@@ -44,17 +44,20 @@ interface CityTemperatureChartProps {
 }
 
 // Only display these 3 default cities
-const DEFAULT_CITIES = ['London', 'Stockholm', 'Moscow'];
+const DEFAULT_CITIES = ['London', 'Stockholm', 'Venice'];
 
 // Colors for each city
 const CITY_COLORS: Record<string, string> = {
   'London': 'rgb(75, 192, 192)',
   'Stockholm': 'rgb(153, 102, 255)',
-  'Moscow': 'rgb(255, 99, 132)'
+  'Venice': 'rgb(255, 99, 132)'
 };
 
-// Window size in seconds
-const TIME_WINDOW = 10;
+// Window size in seconds - reduced to show less data points
+const TIME_WINDOW = 5;
+
+// Maximum number of data points per city
+const MAX_DATA_POINTS = 10;
 
 // Y-axis limits for better visualization
 const MIN_TEMP = -15;
@@ -103,9 +106,10 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
               if (jsonMatch) {
                 try {
                   const jsonData = JSON.parse(jsonMatch[1]);
+                  const cityName = jsonData.city === 'Moscow' ? 'Venice' : jsonData.city;
                   
-                  if (jsonData.city && jsonData.temperature && DEFAULT_CITIES.includes(jsonData.city)) {
-                    const city = jsonData.city;
+                  if (jsonData.city && jsonData.temperature && DEFAULT_CITIES.includes(cityName)) {
+                    const city = cityName;
                     const temperature = parseFloat(jsonData.temperature);
                     
                     if (!isNaN(temperature)) {
@@ -117,20 +121,25 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
                         };
                       }
                       
-                      // Add new data point with the current time
-                      newCityData[city].timestamps.push(currentTimeRef.current);
-                      newCityData[city].temperatures.push(temperature);
-                      
-                      // Remove data points outside the time window
-                      const cutoffTime = currentTimeRef.current - TIME_WINDOW;
-                      let i = 0;
-                      while (i < newCityData[city].timestamps.length && newCityData[city].timestamps[i] < cutoffTime) {
-                        i++;
-                      }
-                      
-                      if (i > 0) {
-                        newCityData[city].timestamps = newCityData[city].timestamps.slice(i);
-                        newCityData[city].temperatures = newCityData[city].temperatures.slice(i);
+                      // Only add a new data point if there's a significant change in time
+                      // or it's the first data point for this city
+                      const lastTimestamp = newCityData[city].timestamps.length > 0 
+                        ? newCityData[city].timestamps[newCityData[city].timestamps.length - 1] 
+                        : 0;
+                        
+                      // Add data point if it's the first one or at least 0.5 second has passed
+                      if (newCityData[city].timestamps.length === 0 || 
+                          (currentTimeRef.current - lastTimestamp) >= 0.5) {
+                        
+                        // Add new data point with the current time
+                        newCityData[city].timestamps.push(currentTimeRef.current);
+                        newCityData[city].temperatures.push(temperature);
+                        
+                        // Limit number of data points
+                        if (newCityData[city].timestamps.length > MAX_DATA_POINTS) {
+                          newCityData[city].timestamps = newCityData[city].timestamps.slice(-MAX_DATA_POINTS);
+                          newCityData[city].temperatures = newCityData[city].temperatures.slice(-MAX_DATA_POINTS);
+                        }
                       }
                     }
                   }
@@ -153,8 +162,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     // Initial fetch
     fetchAndProcessLogs();
 
-    // Poll for updates every 250ms
-    const interval = setInterval(fetchAndProcessLogs, 250);
+    // Poll for updates every 100ms (increased from 250ms)
+    const interval = setInterval(fetchAndProcessLogs, 100);
 
     return () => clearInterval(interval);
   }, []);
@@ -165,7 +174,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
   // Prepare data for Chart.js
   const chartData = {
-    datasets: Object.entries(cityData).map(([cityName, city]) => {
+    datasets: Object.entries(cityData).map(([cityName, data]) => {
+      const city = data as CityTemperatureData;
       return {
         label: cityName,
         data: city.temperatures.map((temp, idx) => ({
@@ -174,9 +184,9 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         })),
         borderColor: CITY_COLORS[cityName] || 'rgb(200, 200, 200)',
         backgroundColor: 'rgba(0, 0, 0, 0)', // Transparent background
-        borderWidth: 2,
-        pointRadius: 2,
-        tension: 0.3, // Add curve for smoothing line
+        borderWidth: 3,
+        pointRadius: 0, // Hide points for a cleaner look
+        tension: 0.4, // Increased smoothing for better curves
         fill: false
       };
     })
@@ -187,7 +197,12 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 100 // Fast animations for smoothness
+      duration: 0 // Disable animations for smoother real-time updates
+    },
+    elements: {
+      line: {
+        tension: 0.4 // Smooth out the lines
+      }
     },
     scales: {
       x: {
@@ -201,11 +216,12 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         max: maxTime,
         ticks: {
           color: '#ddd',
-          stepSize: 1,
-          callback: (value: number) => value.toFixed(1)
+          maxTicksLimit: 5, // Limit number of ticks for cleaner x-axis
+          callback: (value: number) => value.toFixed(0)
         },
         grid: {
-          color: '#444'
+          color: '#444',
+          drawOnChartArea: false // Only show grid at axes
         }
       },
       y: {
@@ -218,21 +234,25 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         max: MAX_TEMP,
         ticks: {
           color: '#ddd',
-          stepSize: 5
+          stepSize: 10 // Larger steps for cleaner y-axis
         },
         grid: {
-          color: '#444'
+          color: '#444',
+          drawOnChartArea: false // Only show grid at axes
         }
       }
     },
     plugins: {
       legend: {
         labels: {
-          color: '#ddd'
+          color: '#ddd',
+          font: {
+            size: 14
+          }
         }
       },
       tooltip: {
-        mode: 'index',
+        mode: 'nearest',
         intersect: false,
         callbacks: {
           label: function(context: any) {
