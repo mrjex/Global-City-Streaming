@@ -9,6 +9,7 @@ import FlinkTerminals from '@/components/FlinkTerminals';
 import CitySelector from '@/components/CitySelector';
 import Charts from '@/components/Charts';
 import CityTemperatureChart from '@/components/CityTemperatureChart';
+import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -51,6 +52,10 @@ export default function Home(): ReactElement {
 
       <div className="mt-8">
         <CitySelector onCitiesChange={handleCitiesChange} />
+      </div>
+
+      <div className="mt-8">
+        <EquatorChartQueryPanel />
       </div>
 
       <FlinkTerminals maxLines={10} />

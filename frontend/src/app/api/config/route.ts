@@ -1,39 +1,69 @@
-import { readFile, writeFile } from 'fs/promises';
 import { NextResponse } from 'next/server';
-import * as yaml from 'js-yaml';
+import fs from 'fs';
+import path from 'path';
+import yaml from 'js-yaml';
 
-// Mark route as dynamic and specify runtime
+// Mark route as dynamic
 export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 
-interface ConfigType {
-  realTimeProduction: {
-    cities: string[];
-  };
+// Config file path - adjust based on project structure
+const configPath = path.resolve(process.cwd(), '../configuration.yml');
+
+// Helper function to update a nested property using a dot path
+const updateNestedProperty = (obj: any, path: string, value: any) => {
+  const keys = path.split('.');
+  let current = obj;
+  
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (!current[key]) {
+      current[key] = {};
+    }
+    current = current[key];
+  }
+  
+  current[keys[keys.length - 1]] = value;
+  return obj;
+};
+
+// GET - Retrieve current configuration
+export async function GET() {
+  try {
+    // Read the configuration file
+    const configFile = fs.readFileSync(configPath, 'utf8');
+    const config = yaml.load(configFile);
+    
+    return NextResponse.json(config);
+  } catch (error) {
+    console.error('Error reading configuration:', error);
+    return NextResponse.json({ error: 'Failed to read configuration' }, { status: 500 });
+  }
 }
 
+// POST - Update configuration
 export async function POST(request: Request) {
   try {
-    const { cities } = await request.json();
+    const { path: configPath, config: configUpdate } = await request.json();
     
-    // Read the current config
-    const configPath = '/app/configuration.yml';
-    const configContent = await readFile(configPath, 'utf8');
-    const currentConfig = yaml.load(configContent) as Partial<ConfigType>;
+    // Read existing configuration
+    const configFile = fs.readFileSync(path.resolve(process.cwd(), '../configuration.yml'), 'utf8');
+    const existingConfig = yaml.load(configFile) as Record<string, any>;
     
-    // Update the cities
-    if (!currentConfig.realTimeProduction) {
-      currentConfig.realTimeProduction = { cities: [] };
-    }
-    currentConfig.realTimeProduction.cities = cities;
+    // Update configuration
+    const updatedConfig = updateNestedProperty(existingConfig, configPath, configUpdate);
     
-    // Write back to file
-    const yamlStr = yaml.dump(currentConfig);
-    await writeFile(configPath, yamlStr, 'utf8');
+    // Write the updated configuration back
+    const yamlStr = yaml.dump(updatedConfig, { 
+      lineWidth: -1,
+      noRefs: true,
+      indent: 2
+    });
+    
+    fs.writeFileSync(path.resolve(process.cwd(), '../configuration.yml'), yamlStr);
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error updating config:', error);
+    console.error('Error updating configuration:', error);
     return NextResponse.json({ error: 'Failed to update configuration' }, { status: 500 });
   }
 } 
