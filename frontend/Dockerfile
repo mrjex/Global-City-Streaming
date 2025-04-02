@@ -29,7 +29,8 @@ WORKDIR /app
 # Copy frontend package.json
 COPY frontend/package.json ./
 RUN npm install --production=false && \
-    npm install --save-dev @types/node @types/js-yaml @types/fs-extra
+    npm install --save-dev @types/node @types/js-yaml @types/fs-extra && \
+    npm install chart.js@^4.0.0 react-chartjs-2@^5.0.0
 
 # Copy frontend source files
 COPY frontend/ ./
