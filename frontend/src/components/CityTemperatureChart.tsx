@@ -19,6 +19,9 @@ interface CityTemperatureChartProps {
   title?: string;
 }
 
+// Only display these 3 default cities
+const DEFAULT_CITIES = ['London', 'Stockholm', 'Moscow'];
+
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   title = 'City Temperatures'
 }) => {
@@ -46,7 +49,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
               try {
                 const jsonData = JSON.parse(jsonMatch[1]);
                 
-                if (jsonData.city && jsonData.temperature) {
+                if (jsonData.city && jsonData.temperature && DEFAULT_CITIES.includes(jsonData.city)) {
                   const city = jsonData.city;
                   const temperature = parseFloat(jsonData.temperature);
                   const timestamp = new Date();
@@ -88,8 +91,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     // Initial fetch
     fetchAndProcessLogs();
 
-    // Poll for updates every second
-    const interval = setInterval(fetchAndProcessLogs, 1000);
+    // Poll for updates every 100ms (increased from 1000ms)
+    const interval = setInterval(fetchAndProcessLogs, 100);
 
     return () => clearInterval(interval);
   }, []);
@@ -104,7 +107,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   }));
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
+    <div className="w-full max-w-6xl mx-auto p-4">
       <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
         <div className="bg-gray-800 px-4 py-2">
           <div className="text-gray-400 text-sm text-center">{title}</div>
@@ -135,7 +138,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
                   font: { color: '#ddd' }
                 },
                 autosize: true,
-                height: 350
+                height: 400,
+                width: 900
               }}
               config={{ responsive: true }}
               style={{ width: '100%', height: '100%' }}
