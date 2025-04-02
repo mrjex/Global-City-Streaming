@@ -127,7 +127,7 @@ EXPOSE 8000
 EXPOSE 3001
 
 # Create start script
-COPY start.sh /start.sh
+COPY frontend/start.sh /start.sh
 RUN chmod +x /start.sh
 
 CMD ["/start.sh"] 
