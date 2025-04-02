@@ -8,6 +8,7 @@ import Terminal from '@/components/Terminal';
 import FlinkTerminals from '@/components/FlinkTerminals';
 import CitySelector from '@/components/CitySelector';
 import Charts from '@/components/Charts';
+import CityTemperatureChart from '@/components/CityTemperatureChart';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -43,6 +44,8 @@ export default function Home(): ReactElement {
           </div>
           
           <Terminal maxLines={10} />
+          
+          <CityTemperatureChart title="City Temperature Trends" />
         </div>
       </div>
 

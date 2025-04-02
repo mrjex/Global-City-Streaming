@@ -74,7 +74,8 @@ RUN apk add --no-cache \
     jpeg-dev \
     zlib-dev \
     libjpeg \
-    curl
+    curl \
+    dos2unix
 
 # Install Docker CLI
 RUN apk add --no-cache docker-cli
@@ -126,8 +127,12 @@ ENV PYTHONPATH=/app/debug-api
 EXPOSE 8000
 EXPOSE 3001
 
-# Create start script
-COPY frontend/start.sh /start.sh
-RUN chmod +x /start.sh
+# Copy the start.sh file directly and fix line endings
+COPY frontend/start.sh /app/start.sh
+RUN dos2unix /app/start.sh
+RUN chmod +x /app/start.sh
 
-CMD ["/start.sh"] 
+# Verify the script exists and is executable
+RUN ls -la /app/start.sh
+
+CMD ["/app/start.sh"] 
