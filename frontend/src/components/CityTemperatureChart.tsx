@@ -56,13 +56,17 @@ const CITY_COLORS: Record<string, string> = {
 // Window size in seconds
 const TIME_WINDOW = 10;
 
+// Y-axis limits for better visualization
+const MIN_TEMP = -15;
+const MAX_TEMP = 45;
+
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   title = 'City Temperatures'
 }) => {
   const [cityData, setCityData] = useState<Record<string, CityTemperatureData>>({});
   const [isLoading, setIsLoading] = useState(true);
   const startTimeRef = useRef<number>(Date.now());
-  const chartRef = useRef<any>(null);
+  const currentTimeRef = useRef<number>(0);
 
   useEffect(() => {
     // Initialize with empty data for each city
@@ -81,59 +85,63 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         const response = await fetch('/api/logs');
         const data = await response.text();
         
+        // Update current time
+        currentTimeRef.current = (Date.now() - startTimeRef.current) / 1000;
+        
         if (data && data !== '[]') {
           const allLogs = data.split('\n').filter(line => line.trim());
           
           // Process logs to extract city temperature data
-          const newCityData = { ...cityData };
-          const currentTime = (Date.now() - startTimeRef.current) / 1000; // Convert to seconds
-          
-          allLogs.forEach(log => {
-            // Match the specific log format from python-producer.py:
-            // [timestamp] Sent data: {"city": "CityName", "temperature": "23.45"}
-            const jsonMatch = log.match(/Sent data: (\{.*\})/);
+          setCityData(prevData => {
+            const newCityData = { ...prevData };
             
-            if (jsonMatch) {
-              try {
-                const jsonData = JSON.parse(jsonMatch[1]);
-                
-                if (jsonData.city && jsonData.temperature && DEFAULT_CITIES.includes(jsonData.city)) {
-                  const city = jsonData.city;
-                  const temperature = parseFloat(jsonData.temperature);
+            allLogs.forEach(log => {
+              // Match the specific log format from python-producer.py:
+              // [timestamp] Sent data: {"city": "CityName", "temperature": "23.45"}
+              const jsonMatch = log.match(/Sent data: (\{.*\})/);
+              
+              if (jsonMatch) {
+                try {
+                  const jsonData = JSON.parse(jsonMatch[1]);
                   
-                  if (!isNaN(temperature)) {
-                    if (!newCityData[city]) {
-                      newCityData[city] = {
-                        city,
-                        timestamps: [],
-                        temperatures: []
-                      };
-                    }
+                  if (jsonData.city && jsonData.temperature && DEFAULT_CITIES.includes(jsonData.city)) {
+                    const city = jsonData.city;
+                    const temperature = parseFloat(jsonData.temperature);
                     
-                    // Add new data point
-                    newCityData[city].timestamps.push(currentTime);
-                    newCityData[city].temperatures.push(temperature);
-                    
-                    // Remove data points outside the time window
-                    const cutoffTime = currentTime - TIME_WINDOW;
-                    let i = 0;
-                    while (i < newCityData[city].timestamps.length && newCityData[city].timestamps[i] < cutoffTime) {
-                      i++;
-                    }
-                    
-                    if (i > 0) {
-                      newCityData[city].timestamps = newCityData[city].timestamps.slice(i);
-                      newCityData[city].temperatures = newCityData[city].temperatures.slice(i);
+                    if (!isNaN(temperature)) {
+                      if (!newCityData[city]) {
+                        newCityData[city] = {
+                          city,
+                          timestamps: [],
+                          temperatures: []
+                        };
+                      }
+                      
+                      // Add new data point with the current time
+                      newCityData[city].timestamps.push(currentTimeRef.current);
+                      newCityData[city].temperatures.push(temperature);
+                      
+                      // Remove data points outside the time window
+                      const cutoffTime = currentTimeRef.current - TIME_WINDOW;
+                      let i = 0;
+                      while (i < newCityData[city].timestamps.length && newCityData[city].timestamps[i] < cutoffTime) {
+                        i++;
+                      }
+                      
+                      if (i > 0) {
+                        newCityData[city].timestamps = newCityData[city].timestamps.slice(i);
+                        newCityData[city].temperatures = newCityData[city].temperatures.slice(i);
+                      }
                     }
                   }
+                } catch (error) {
+                  console.error('Error parsing JSON from logs:', error);
                 }
-              } catch (error) {
-                console.error('Error parsing JSON from logs:', error);
               }
-            }
+            });
+            
+            return newCityData;
           });
-          
-          setCityData(newCityData);
         }
         setIsLoading(false);
       } catch (error) {
@@ -151,23 +159,23 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Prepare Chart.js data structure
+  // Calculate time window bounds
+  const maxTime = currentTimeRef.current;
+  const minTime = Math.max(0, maxTime - TIME_WINDOW);
+
+  // Prepare data for Chart.js
   const chartData = {
-    labels: Array.from({ length: 100 }, (_, i) => i / 10), // Generate 0, 0.1, 0.2, ... 9.9 for x-axis
-    datasets: Object.values(cityData).map((city: CityTemperatureData) => {
-      // Create pairs of x,y values
-      const dataPoints = city.temperatures.map((temp, idx) => ({
-        x: city.timestamps[idx],
-        y: temp
-      }));
-      
+    datasets: Object.entries(cityData).map(([cityName, city]) => {
       return {
-        label: city.city,
-        data: dataPoints,
-        borderColor: CITY_COLORS[city.city] || 'rgb(200, 200, 200)',
+        label: cityName,
+        data: city.temperatures.map((temp, idx) => ({
+          x: city.timestamps[idx],
+          y: temp
+        })),
+        borderColor: CITY_COLORS[cityName] || 'rgb(200, 200, 200)',
         backgroundColor: 'rgba(0, 0, 0, 0)', // Transparent background
         borderWidth: 2,
-        pointRadius: 3,
+        pointRadius: 2,
         tension: 0.3, // Add curve for smoothing line
         fill: false
       };
@@ -183,15 +191,18 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     },
     scales: {
       x: {
+        type: 'linear' as const,
         title: {
           display: true,
           text: 'Time (seconds)',
           color: '#ddd'
         },
-        min: Math.max(0, ((Date.now() - startTimeRef.current) / 1000) - TIME_WINDOW),
-        max: (Date.now() - startTimeRef.current) / 1000,
+        min: minTime,
+        max: maxTime,
         ticks: {
-          color: '#ddd'
+          color: '#ddd',
+          stepSize: 1,
+          callback: (value: number) => value.toFixed(1)
         },
         grid: {
           color: '#444'
@@ -203,8 +214,11 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
           text: 'Temperature (°C)',
           color: '#ddd'
         },
+        min: MIN_TEMP,
+        max: MAX_TEMP,
         ticks: {
-          color: '#ddd'
+          color: '#ddd',
+          stepSize: 5
         },
         grid: {
           color: '#444'
@@ -219,7 +233,19 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
       },
       tooltip: {
         mode: 'index',
-        intersect: false
+        intersect: false,
+        callbacks: {
+          label: function(context: any) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y.toFixed(1) + '°C';
+            }
+            return label;
+          }
+        }
       }
     }
   };
@@ -237,6 +263,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
             <Line 
               data={chartData} 
               options={chartOptions}
+              redraw={false}
             />
           )}
         </div>
