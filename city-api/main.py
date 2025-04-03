@@ -333,4 +333,4 @@ async def get_chart_image(filename: str):
         return JSONResponse(
             content={"error": str(e)},
             status_code=500
-        ) 
+        )

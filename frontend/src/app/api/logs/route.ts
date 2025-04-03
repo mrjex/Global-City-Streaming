@@ -5,11 +5,11 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const fetchCache = 'force-no-store';
 
-const KAFKA_PRODUCER_URL = process.env.KAFKA_PRODUCER_URL || 'http://kafka-producer:8000';
+const CITY_API_URL = process.env.CITY_API_URL || 'http://city-api:8003';
 
 export async function GET() {
   try {
-    const response = await fetch('http://kafka-producer:8000/logs', {
+    const response = await fetch(`${CITY_API_URL}/api/kafka-logs`, {
       cache: 'no-store',
       headers: {
         'Accept': 'text/plain',
@@ -21,8 +21,8 @@ export async function GET() {
       return NextResponse.json({ logs: [] }, { status: response.status });
     }
 
-    const text = await response.text();
-    return new NextResponse(text, {
+    const data = await response.json();
+    return new NextResponse(data.logs, {
       headers: {
         'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
