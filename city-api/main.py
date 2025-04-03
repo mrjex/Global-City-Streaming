@@ -4,8 +4,13 @@ import os
 import json
 import requests
 import docker
-from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi.responses import PlainTextResponse, JSONResponse, FileResponse
 import time
+import yaml
+import pandas as pd
+from datetime import datetime
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 app = FastAPI()
 
@@ -280,4 +285,67 @@ async def api_flink_db_logs():
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"} 
+    return {"status": "healthy"}
+
+# Add new endpoints for charts
+@app.get("/api/charts")
+async def get_charts():
+    try:
+        # Ensure directories exist
+        output_dir = Path('city-api/generated-artifacts')
+        csv_dir = output_dir / 'csvs'
+        chart_dir = output_dir / 'charts'
+        os.makedirs(chart_dir, exist_ok=True)
+        os.makedirs(csv_dir, exist_ok=True)
+
+        # Get cities from configuration
+        config_path = Path('configuration.yml')
+        if not config_path.exists():
+            return JSONResponse(
+                content={"error": "Configuration file not found"},
+                status_code=500
+            )
+
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+
+        cities = config.get('debugApi', {}).get('citiesPool', [])
+        if not cities:
+            return JSONResponse(
+                content={"error": "No cities configured"},
+                status_code=500
+            )
+
+        # Process data and generate charts
+        charts = []
+        chart_files = chart_dir.glob('*.png')
+        for chart_file in chart_files:
+            charts.append(f"/api/chart-images/{chart_file.name}")
+
+        return JSONResponse(content={"charts": charts})
+    except Exception as e:
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        )
+
+@app.get("/api/chart-images/{filename}")
+async def get_chart_image(filename: str):
+    try:
+        chart_path = Path('city-api/generated-artifacts/charts') / filename
+        if not chart_path.exists():
+            return JSONResponse(
+                content={"error": "Chart not found"},
+                status_code=404
+            )
+
+        return FileResponse(
+            str(chart_path),
+            media_type="image/png",
+            headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        ) 

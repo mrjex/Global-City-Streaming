@@ -1,50 +1,35 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs';
 
+// Mark route as dynamic and specify runtime
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const fetchCache = 'force-no-store';
 
-interface RouteParams {
-  params: {
-    filename: string;
-  };
-}
+const CITY_API_URL = process.env.CITY_API_URL || 'http://city-api:8000';
 
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(
+  request: Request,
+  { params }: { params: { filename: string } }
+) {
   try {
-    const filename = params.filename;
-
-    if (!filename) {
-      return NextResponse.json({ error: 'No chart name provided' }, { status: 400 });
+    const { filename } = params;
+    
+    // Forward request to city-api
+    const response = await fetch(`${CITY_API_URL}/api/chart-images/${filename}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch chart image: ${response.statusText}`);
     }
-
-    // Build the path to the chart file
-    const chartPath = path.resolve(process.cwd(), `city-api/generated-artifacts/charts/${filename}`);
-
-    // Check if the file exists
-    if (!fs.existsSync(chartPath)) {
-      return NextResponse.json({ error: 'Chart not found' }, { status: 404 });
-    }
-
-    // Read the file
-    const imageBuffer = fs.readFileSync(chartPath);
-
-    // Determine mime type based on file extension
-    let mimeType = 'image/png';
-    if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) {
-      mimeType = 'image/jpeg';
-    }
-
-    // Return the image
-    return new NextResponse(imageBuffer, {
+    
+    // Forward the image response
+    const imageData = await response.blob();
+    return new NextResponse(imageData, {
       headers: {
-        'Content-Type': mimeType,
-        'Cache-Control': 'no-cache, no-store, must-revalidate'
+        'Content-Type': response.headers.get('Content-Type') || 'image/png'
       }
     });
   } catch (error: any) {
-    console.error('Error serving chart image:', error);
+    console.error('Error in GET request:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 } 

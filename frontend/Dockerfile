@@ -1,30 +1,14 @@
 # Stage 1: Building the Next.js application
 FROM node:18-alpine AS builder
 
-# Add build dependencies including Python
+# Add build dependencies
 RUN apk add --no-cache \
-    libc6-compat \
-    python3 \
-    py3-pip \
-    gcc \
-    musl-dev \
-    python3-dev \
-    postgresql-dev \
-    freetype-dev \
-    jpeg-dev \
-    zlib-dev \
-    libjpeg
-
-# Set up Python virtual environment
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Install Python dependencies in virtual environment
-RUN . $VIRTUAL_ENV/bin/activate && \
-    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests docker fastapi uvicorn
+    libc6-compat
 
 WORKDIR /app
+
+# Create public directory
+RUN mkdir -p public
 
 # Copy frontend package.json
 COPY frontend/package.json ./
@@ -38,18 +22,12 @@ COPY frontend/ ./
 # Copy environment files
 COPY frontend/.env.production ./.env.production
 
-# Copy city-api and configuration
-COPY city-api/ /app/city-api/
+# Copy configuration
 COPY configuration.yml /app/configuration.yml
-COPY utils.py /app/city-api/utils.py
-
-# Create necessary directories
-RUN mkdir -p public /app/city-api/generated-artifacts/csvs /app/city-api/chart-helpers
 
 # Set environment variables for better performance
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ENV PYTHONPATH=/app/city-api
 ENV NEXT_IGNORE_TYPESCRIPT_ERRORS=true
 ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
@@ -62,43 +40,17 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-# Add runtime dependencies including Python
+# Add runtime dependencies
 RUN apk add --no-cache \
     libc6-compat \
-    python3 \
-    py3-pip \
-    gcc \
-    musl-dev \
-    python3-dev \
-    postgresql-dev \
-    freetype-dev \
-    jpeg-dev \
-    zlib-dev \
-    libjpeg \
     curl \
     dos2unix
-
-# Install Docker CLI
-RUN apk add --no-cache docker-cli
-
-# Set up Python virtual environment
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Install Python dependencies in virtual environment
-RUN . $VIRTUAL_ENV/bin/activate && \
-    pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests docker fastapi uvicorn
-
-# Create necessary directories
-RUN mkdir -p public /app/city-api/generated-artifacts/csvs /app/city-api/chart-helpers
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/city-api /app/city-api/
 COPY --from=builder /app/configuration.yml /app/configuration.yml
 
 # Create a valid configuration file
@@ -110,22 +62,14 @@ RUN echo 'debugApi:' > /app/configuration.yml && \
     echo '  - Moscow' >> /app/configuration.yml && \
     echo '  - Madrid' >> /app/configuration.yml
 
-# Create FastAPI app
-RUN mkdir -p /app/city-api
-COPY city-api/main.py /app/city-api/main.py
-
-# Create data processor script
-COPY city-api/chart-helpers/data_processor.py /app/city-api/chart-helpers/data_processor.py
-
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PYTHONPATH=/app/city-api
+ENV CITY_API_URL=http://city-api:8003
 
-# Expose both FastAPI and Next.js ports
-EXPOSE 8000
+# Expose Next.js port
 EXPOSE 3001
 
 # Copy the start.sh file directly and fix line endings

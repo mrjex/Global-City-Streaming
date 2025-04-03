@@ -1,3 +1,5 @@
+version: '3.8'
+
 networks:
   app_network:
     driver: bridge
@@ -25,12 +27,14 @@ services:
       - NODE_ENV=production
       - PORT=3001
       - HOSTNAME=0.0.0.0
+      - CITY_API_URL=http://city-api:8000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - kafka-producer
       - flink-processor
       - postgres
+      - city-api
     restart: unless-stopped
     mem_limit: 256m
 
@@ -145,6 +149,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     mem_limit: 256m
+
+  city-api:
+    build:
+      context: .
+      dockerfile: city-api/Dockerfile
+    container_name: city-api
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./city-api/generated-artifacts:/app/city-api/generated-artifacts
+    environment:
+      - PYTHONPATH=/app/city-api
+    networks:
+      - app_network
 
 volumes:
   settings:
