@@ -1,7 +1,5 @@
 #####     UTILS     #####
 
-import yaml
-import os
 
 # Function:
 #   - This function parses a key-value structured file, by traversing the nested
@@ -23,20 +21,3 @@ import os
 #                   - "debugApi.charts.bubbleChart.bubbleColorTheme"
 #                   - "debugApi.charts.equatorChart.displayLogarithmicTrend"
 #
-def parseYmlFile(pathToConfigFile, commands):
-    try:
-        with open(pathToConfigFile, 'r') as f:
-            config = yaml.safe_load(f)
-            
-        # Split the path into parts
-        path_parts = commands.split('.')
-        
-        # Navigate through the nested structure
-        current = config
-        for part in path_parts:
-            current = current[part]
-            
-        return current
-    except Exception as e:
-        print(f"Error parsing YAML file: {e}")
-        return []
