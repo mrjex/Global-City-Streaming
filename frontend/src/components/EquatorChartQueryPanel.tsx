@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import EquatorChart from './EquatorChart';
 
 interface EquatorChartQueryPanelProps {
   title?: string;
@@ -14,6 +15,7 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
   const [queryRequirement, setQueryRequirement] = useState<string>('Europe');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [figureData, setFigureData] = useState<string | null>(null);
 
   // Requirement options based on attribute selection
   const requirementOptions = {
@@ -53,6 +55,7 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
   const handleSubmit = async () => {
     setIsLoading(true);
     setMessage('');
+    setFigureData(null);
     
     try {
       const response = await fetch('/api/config', {
@@ -69,8 +72,13 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
         }),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
         setMessage('Configuration updated successfully!');
+        if (data.figure) {
+          setFigureData(data.figure);
+        }
       } else {
         setMessage('Failed to update configuration.');
       }
@@ -83,71 +91,76 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-4xl mx-auto p-4"
-    >
-      <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
-        {/* Panel Header */}
-        <div className="bg-gray-800 px-4 py-2">
-          <div className="text-gray-400 text-lg font-semibold mx-auto text-center">{title}</div>
-        </div>
-
-        {/* Panel Content */}
-        <div className="p-6" style={{ backgroundColor: '#1a1b1e' }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Query Attribute Selection */}
-            <div>
-              <label className="block text-gray-300 mb-2">Query Attribute</label>
-              <select
-                value={queryAttribute}
-                onChange={(e) => setQueryAttribute(e.target.value)}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="continent">Continent</option>
-                <option value="timeZoneOffset">Time Zone Offset</option>
-              </select>
-            </div>
-
-            {/* Query Requirement Selection */}
-            <div>
-              <label className="block text-gray-300 mb-2">Query Requirement</label>
-              <select
-                value={queryRequirement}
-                onChange={(e) => setQueryRequirement(e.target.value)}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {queryAttribute === 'continent' && requirementOptions.continent.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-                {queryAttribute === 'timeZoneOffset' && requirementOptions.timeZoneOffset.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-4xl mx-auto p-4"
+      >
+        <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
+          {/* Panel Header */}
+          <div className="bg-gray-800 px-4 py-2">
+            <div className="text-gray-400 text-lg font-semibold mx-auto text-center">{title}</div>
           </div>
 
-          {/* Submit Button */}
-          <div className="mt-6 text-center">
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {isLoading ? 'Updating...' : 'Update Configuration'}
-            </button>
-            
-            {message && (
-              <p className={`mt-3 ${message.includes('successfully') ? 'text-green-400' : 'text-red-400'}`}>
-                {message}
-              </p>
-            )}
+          {/* Panel Content */}
+          <div className="p-6" style={{ backgroundColor: '#1a1b1e' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Query Attribute Selection */}
+              <div>
+                <label className="block text-gray-300 mb-2">Query Attribute</label>
+                <select
+                  value={queryAttribute}
+                  onChange={(e) => setQueryAttribute(e.target.value)}
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="continent">Continent</option>
+                  <option value="timeZoneOffset">Time Zone Offset</option>
+                </select>
+              </div>
+
+              {/* Query Requirement Selection */}
+              <div>
+                <label className="block text-gray-300 mb-2">Query Requirement</label>
+                <select
+                  value={queryRequirement}
+                  onChange={(e) => setQueryRequirement(e.target.value)}
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {queryAttribute === 'continent' && requirementOptions.continent.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                  {queryAttribute === 'timeZoneOffset' && requirementOptions.timeZoneOffset.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="mt-6 text-center">
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {isLoading ? 'Updating...' : 'Update Configuration'}
+              </button>
+              
+              {message && (
+                <p className={`mt-3 ${message.includes('successfully') ? 'text-green-400' : 'text-red-400'}`}>
+                  {message}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+      
+      {/* Render the chart below the query panel */}
+      <EquatorChart figureData={figureData} />
+    </>
   );
 };
 

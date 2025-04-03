@@ -31,6 +31,9 @@ export async function POST(request: Request) {
     });
     
     const data = await response.json();
+    console.log("########################       PLOTLY JSON DATA RECEIVED         ###################");
+    console.log(data);
+    console.log("##############################################################################");
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error updating configuration:', error);
