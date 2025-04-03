@@ -337,7 +337,6 @@ async def get_chart_image(filename: str):
 
 @app.get("/api/config")
 async def get_config():
-    print("#############################        CONFIG ENDPOINT RECEIVED (GET)           #############################")
     try:
         config_path = Path('configuration.yml')
         if not config_path.exists():
@@ -358,7 +357,6 @@ async def get_config():
 
 @app.post("/api/config")
 async def update_config(request: Request):
-    print("#############################        CONFIG ENDPOINT RECEIVED (POST)          #############################")
     try:
         body = await request.json()
         config_path = Path('configuration.yml')

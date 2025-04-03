@@ -16,6 +16,11 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [figureData, setFigureData] = useState<string | null>(null);
+  
+  // Chart display options
+  const [displayLinearTrend, setDisplayLinearTrend] = useState(false);
+  const [displayLogarithmicTrend, setDisplayLogarithmicTrend] = useState(true);
+  const [displayActualTrend, setDisplayActualTrend] = useState(false);
 
   // Requirement options based on attribute selection
   const requirementOptions = {
@@ -46,6 +51,12 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
           setQueryAttribute(config.debugApi.queryConfig.queryAttribute || 'continent');
           setQueryRequirement(config.debugApi.queryConfig.queryRequirement || 'Europe');
         }
+        if (config.debugApi?.charts?.equatorChart) {
+          const chartConfig = config.debugApi.charts.equatorChart;
+          setDisplayLinearTrend(chartConfig.displayLinearTrend || false);
+          setDisplayLogarithmicTrend(chartConfig.displayLogarithmicTrend || true);
+          setDisplayActualTrend(chartConfig.displayActualTrend || false);
+        }
       }
     } catch (error) {
       console.error('Error fetching configuration:', error);
@@ -64,10 +75,20 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          path: 'debugApi.queryConfig',
+          path: 'debugApi',
           config: {
-            queryAttribute,
-            queryRequirement
+            queryConfig: {
+              queryAttribute,
+              queryRequirement
+            },
+            charts: {
+              equatorChart: {
+                displayLinearTrend,
+                displayLogarithmicTrend,
+                displayActualTrend,
+                pngOutput: false
+              }
+            }
           }
         }),
       });
@@ -90,6 +111,22 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
     }
   };
 
+  // Toggle switch component
+  const ToggleSwitch = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) => (
+    <div className="flex items-center justify-between">
+      <span className="text-gray-300">{label}</span>
+      <button
+        type="button"
+        className={`${checked ? 'bg-blue-600' : 'bg-gray-700'} relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+        onClick={() => onChange(!checked)}
+      >
+        <span
+          className={`${checked ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+        />
+      </button>
+    </div>
+  );
+
   return (
     <>
       <motion.div
@@ -106,7 +143,8 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
 
           {/* Panel Content */}
           <div className="p-6" style={{ backgroundColor: '#1a1b1e' }}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Query Options */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Query Attribute Selection */}
               <div>
                 <label className="block text-gray-300 mb-2">Query Attribute</label>
@@ -138,6 +176,28 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
               </div>
             </div>
 
+            {/* Chart Display Options */}
+            <div className="border-t border-gray-700 pt-6 mb-6">
+              <h3 className="text-gray-300 mb-4">Chart Display Options</h3>
+              <div className="grid grid-cols-1 gap-4">
+                <ToggleSwitch
+                  label="Display Linear Trend"
+                  checked={displayLinearTrend}
+                  onChange={setDisplayLinearTrend}
+                />
+                <ToggleSwitch
+                  label="Display Logarithmic Trend"
+                  checked={displayLogarithmicTrend}
+                  onChange={setDisplayLogarithmicTrend}
+                />
+                <ToggleSwitch
+                  label="Display Actual Trend"
+                  checked={displayActualTrend}
+                  onChange={setDisplayActualTrend}
+                />
+              </div>
+            </div>
+
             {/* Submit Button */}
             <div className="mt-6 text-center">
               <button
@@ -145,7 +205,7 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
                 disabled={isLoading}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                {isLoading ? 'Updating...' : 'Update Configuration'}
+                {isLoading ? 'Updating...' : 'Update Configuration & Generate Chart'}
               </button>
               
               {message && (
