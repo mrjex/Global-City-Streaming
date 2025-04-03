@@ -38,18 +38,18 @@ COPY frontend/ ./
 # Copy environment files
 COPY frontend/.env.production ./.env.production
 
-# Copy debug-api and configuration
-COPY debug-api/ /app/debug-api/
+# Copy city-api and configuration
+COPY city-api/ /app/city-api/
 COPY configuration.yml /app/configuration.yml
-COPY utils.py /app/debug-api/utils.py
+COPY utils.py /app/city-api/utils.py
 
 # Create necessary directories
-RUN mkdir -p public /app/debug-api/generated-artifacts/csvs /app/debug-api/chart-helpers
+RUN mkdir -p public /app/city-api/generated-artifacts/csvs /app/city-api/chart-helpers
 
 # Set environment variables for better performance
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ENV PYTHONPATH=/app/debug-api
+ENV PYTHONPATH=/app/city-api
 ENV NEXT_IGNORE_TYPESCRIPT_ERRORS=true
 ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
@@ -91,14 +91,14 @@ RUN . $VIRTUAL_ENV/bin/activate && \
     pip3 install --no-cache-dir pandas plotly psycopg2-binary pyyaml matplotlib requests docker fastapi uvicorn
 
 # Create necessary directories
-RUN mkdir -p public /app/debug-api/generated-artifacts/csvs /app/debug-api/chart-helpers
+RUN mkdir -p public /app/city-api/generated-artifacts/csvs /app/city-api/chart-helpers
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/debug-api /app/debug-api/
+COPY --from=builder /app/city-api /app/city-api/
 COPY --from=builder /app/configuration.yml /app/configuration.yml
 
 # Create a valid configuration file
@@ -111,18 +111,18 @@ RUN echo 'debugApi:' > /app/configuration.yml && \
     echo '  - Madrid' >> /app/configuration.yml
 
 # Create FastAPI app
-RUN mkdir -p /app/debug-api
-COPY debug-api/main.py /app/debug-api/main.py
+RUN mkdir -p /app/city-api
+COPY city-api/main.py /app/city-api/main.py
 
 # Create data processor script
-COPY debug-api/chart-helpers/data_processor.py /app/debug-api/chart-helpers/data_processor.py
+COPY city-api/chart-helpers/data_processor.py /app/city-api/chart-helpers/data_processor.py
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PYTHONPATH=/app/debug-api
+ENV PYTHONPATH=/app/city-api
 
 # Expose both FastAPI and Next.js ports
 EXPOSE 8000

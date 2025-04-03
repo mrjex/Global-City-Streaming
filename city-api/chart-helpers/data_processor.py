@@ -24,7 +24,7 @@ def load_city_data(city):
     """Load data for a city with robust error handling"""
     try:
         # Attempt to read CSV file for city
-        csv_path = f"/app/debug-api/generated-artifacts/csvs/{city}.csv"
+        csv_path = f"/app/city-api/generated-artifacts/csvs/{city}.csv"
         if not os.path.exists(csv_path):
             # If file doesn't exist, create a sample entry
             df = pd.DataFrame({

@@ -72,8 +72,8 @@ const getCitiesFromConfig = (): string[] => {
 // Ensure the data and output directories exist
 const ensureDirectories = (): void => {
   const dirs = [
-    path.resolve(process.cwd(), 'debug-api/generated-artifacts/csvs'),
-    path.resolve(process.cwd(), 'debug-api/generated-artifacts/charts')
+    path.resolve(process.cwd(), 'city-api/generated-artifacts/csvs'),
+    path.resolve(process.cwd(), 'city-api/generated-artifacts/charts')
   ];
   
   dirs.forEach(dir => {
@@ -97,7 +97,7 @@ export async function GET() {
     console.log('Reading CSV data...');
     // Sample data generation for cities that might be missing
     for (const city of cities) {
-      const csvPath = path.resolve(process.cwd(), `debug-api/generated-artifacts/csvs/${city}.csv`);
+      const csvPath = path.resolve(process.cwd(), `city-api/generated-artifacts/csvs/${city}.csv`);
       if (!fs.existsSync(csvPath)) {
         const sampleData = `city,temperature,timestamp\n${city},20.0,${new Date().toISOString()}`;
         fs.writeFileSync(csvPath, sampleData);
@@ -113,7 +113,7 @@ from datetime import datetime
 
 # Create sample data for cities
 cities = ${JSON.stringify(cities)}
-output_dir = os.path.join(os.getcwd(), 'debug-api/generated-artifacts/csvs')
+output_dir = os.path.join(os.getcwd(), 'city-api/generated-artifacts/csvs')
 os.makedirs(output_dir, exist_ok=True)
 
 for city in cities:
@@ -145,7 +145,7 @@ from datetime import datetime
 import sys
 
 # Set up paths
-output_dir = os.path.join(os.getcwd(), 'debug-api/generated-artifacts')
+output_dir = os.path.join(os.getcwd(), 'city-api/generated-artifacts')
 csv_dir = os.path.join(output_dir, 'csvs')
 chart_dir = os.path.join(output_dir, 'charts')
 os.makedirs(chart_dir, exist_ok=True)
@@ -204,7 +204,7 @@ else:
     }
     
     // Return the list of charts as a response
-    const chartDir = path.resolve(process.cwd(), 'debug-api/generated-artifacts/charts');
+    const chartDir = path.resolve(process.cwd(), 'city-api/generated-artifacts/charts');
     let charts: string[] = [];
     
     if (fs.existsSync(chartDir)) {

@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     // Build the path to the chart file
-    const chartPath = path.resolve(process.cwd(), `debug-api/generated-artifacts/charts/${filename}`);
+    const chartPath = path.resolve(process.cwd(), `city-api/generated-artifacts/charts/${filename}`);
 
     // Check if the file exists
     if (!fs.existsSync(chartPath)) {

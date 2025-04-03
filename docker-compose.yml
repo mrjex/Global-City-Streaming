@@ -90,7 +90,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./debug-api:/mnt:rw
+      - ./city-api:/mnt:rw
       - .:/app:rw
     depends_on:
       - kafka

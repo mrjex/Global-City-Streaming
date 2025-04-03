@@ -73,7 +73,7 @@ YELLOW='\033[1;33m'
 
 ##  FORWARDING SECTION  ##
 
-#   - Runs the corresponding shell scripts in /debug-api where the essential .py scripts
+#   - Runs the corresponding shell scripts in /city-api where the essential .py scripts
 #     are located. This forwarding is necessary to preserve simplistic file paths
 
 
@@ -92,7 +92,7 @@ forwardRequestEquator() {
 ## MAIN SECTION  ##
 
 configurePassedArgs "$@"
-cd ../../debug-api
+cd ../../city-api
 
 
 

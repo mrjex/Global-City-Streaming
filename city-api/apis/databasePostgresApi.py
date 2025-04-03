@@ -25,7 +25,7 @@ import csv
 import sys
 import os
 from datetime import datetime
-sys.path.append('/app/debug-api')
+sys.path.append('/app/city-api')
 import utils
 
 
@@ -55,9 +55,9 @@ def queryDB(command, city):
     res = cursor.fetchall()
 
     # Create directories if they don't exist
-    os.makedirs("/app/debug-api/generated-artifacts/csvs", exist_ok=True)
+    os.makedirs("/app/city-api/generated-artifacts/csvs", exist_ok=True)
 
-    outputPath = f"/app/debug-api/generated-artifacts/csvs/{city}.csv"
+    outputPath = f"/app/city-api/generated-artifacts/csvs/{city}.csv"
 
     # Write as a csv, the found db-instances of the current city
     with open(outputPath, 'w') as csvfile:

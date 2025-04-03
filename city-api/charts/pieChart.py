@@ -9,7 +9,7 @@ import json
 import numpy as np
 from datetime import datetime
 
-sys.path.append('/app/debug-api')
+sys.path.append('/app/city-api')
 
 import apis.colorApi as colorApi
 import utils
@@ -42,7 +42,7 @@ latest_timestamps = {}
 
 for city in cities:
     try:
-        df = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
+        df = pd.read_csv(f"/app/city-api/generated-artifacts/csvs/{city}.csv")
         # Convert timestamp to datetime and sort
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df = df.sort_values('timestamp').tail(N_LATEST_READINGS)
@@ -329,7 +329,7 @@ colorTheme = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.pieColorTh
 def getCitySums():
     output = {}
     for city in cities:
-        df2 = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
+        df2 = pd.read_csv(f"/app/city-api/generated-artifacts/csvs/{city}.csv")
         currentCitySum = df2['average_temperature'].sum()
         output[city] = currentCitySum
     return output
@@ -378,7 +378,7 @@ def plotColorThemedChart(cityTemperatureSums):
         exportPng(fig, f"color-theme/all-cities [{colorTheme.upper()} THEME]")
 
 def exportPng(figure, fileOutputName):
-    figure.write_image(f"/app/debug-api/generated-artifacts/pngs/pie-chart/{fileOutputName}.png")
+    figure.write_image(f"/app/city-api/generated-artifacts/pngs/pie-chart/{fileOutputName}.png")
 
 def plotPieChart():
     cityTemperatureSums = getCitySums()

@@ -1,21 +1,21 @@
 #!/bin/sh
 
 # Initialize data directories
-mkdir -p /app/debug-api/generated-artifacts/csvs
-mkdir -p /app/debug-api/generated-artifacts/charts
+mkdir -p /app/city-api/generated-artifacts/csvs
+mkdir -p /app/city-api/generated-artifacts/charts
 
 # Create sample data for cities if they don't exist
 for CITY in London Stockholm Toronto Moscow Madrid; do
-  if [ ! -f /app/debug-api/generated-artifacts/csvs/$CITY.csv ]; then
-    echo "city,temperature,timestamp" > /app/debug-api/generated-artifacts/csvs/$CITY.csv
-    echo "$CITY,20.0,$(date -Iseconds)" >> /app/debug-api/generated-artifacts/csvs/$CITY.csv
+  if [ ! -f /app/city-api/generated-artifacts/csvs/$CITY.csv ]; then
+    echo "city,temperature,timestamp" > /app/city-api/generated-artifacts/csvs/$CITY.csv
+    echo "$CITY,20.0,$(date -Iseconds)" >> /app/city-api/generated-artifacts/csvs/$CITY.csv
   fi
 done
 
 # Start the FastAPI server in the background
 cd /app
 echo "Starting FastAPI server..."
-python -m uvicorn debug-api.main:app --host 0.0.0.0 --port 8000 &
+python -m uvicorn city-api.main:app --host 0.0.0.0 --port 8000 &
 FASTAPI_PID=$!
 
 # Start Next.js server in the background
@@ -75,7 +75,7 @@ while true; do
     if ! kill -0 $FASTAPI_PID 2>/dev/null; then
       echo "Restarting FastAPI server..."
       cd /app
-      python -m uvicorn debug-api.main:app --host 0.0.0.0 --port 8000 &
+      python -m uvicorn city-api.main:app --host 0.0.0.0 --port 8000 &
       FASTAPI_PID=$!
     fi
     

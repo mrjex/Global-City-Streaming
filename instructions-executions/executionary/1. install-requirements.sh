@@ -47,7 +47,7 @@ setupFlinkProcessor() {
 
 
 setupSqlDebugging() {
-    pip install -r ../../debug-api/apis/requirements.txt
+    pip install -r ../../city-api/apis/requirements.txt
 }
 
 

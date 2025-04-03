@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 
-sys.path.append('/app/debug-api')
+sys.path.append('/app/city-api')
 import apis.colorApi as colorApi
 
 sys.path.append('../..')
@@ -64,7 +64,7 @@ def generateCityGraphs():
     cityColorMapping = colorApi.getCityChartColors(colorTheme)
 
     for city in cities:
-        data = read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
+        data = read_csv(f"/app/city-api/generated-artifacts/csvs/{city}.csv")
         currentColor = cityColorMapping[city]
 
         currentCityFigure = px.scatter(data, x="API-Call", y="average_temperature",
@@ -154,7 +154,7 @@ color_palette = {
 # Read and process data
 def get_city_data(city):
     try:
-        df = pd.read_csv(f"/app/debug-api/generated-artifacts/csvs/{city}.csv")
+        df = pd.read_csv(f"/app/city-api/generated-artifacts/csvs/{city}.csv")
         # Convert timestamp to datetime and sort
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df = df.sort_values('timestamp').tail(N_LATEST_READINGS)

@@ -130,7 +130,7 @@ def getCitiesAttribute(attribute):
 
     output = []
 
-    f = open(f"{pathFromShellScript}/database/response.json") # Path is "debug-api\charts", since it's called from 'equator-chart.py'
+    f = open(f"{pathFromShellScript}/database/response.json") # Path is "city-api\charts", since it's called from 'equator-chart.py'
     data = json.load(f)
 
     numInstances = len(data)
