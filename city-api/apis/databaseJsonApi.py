@@ -7,33 +7,27 @@
 
 import sys
 
-sys.path.append('..')
+# Add necessary paths for imports
+sys.path.extend(['/app/city-api', '/app/city-api/apis'])
 
 import apis.geolocationApi as geolocationApi
 import apis.weatherApi as weatherApi
-
 import json
-
-sys.path.append('..')
-sys.path.append('../..')
 import utils
-sys.path.pop()
 
-
-configPath = "../../configuration.yml"
+configPath = "/app/configuration.yml"
 
 # In shell scripts where this script is combined with other scripts to create a bigger sequence of automation,
 # the path below is used from the invoking point to this file
-pathFromShellScript = "../apis"
-databasePath = f"{pathFromShellScript}/database/db.json"
+databasePath = "/app/city-api/apis/database/db.json"
 
 
 # The query-file paths for "/logs" directory
 #   - Key: The attribute to query
 #   - Value: The path to the query's associated json-log file
 databaseLogPaths = {
-    "continent": f"{pathFromShellScript}/database/logs/query-continents.json",
-    "timeZoneOffset": f"{pathFromShellScript}/database/logs/query-timezones.json"
+    "continent": "/app/city-api/apis/database/logs/query-continents.json",
+    "timeZoneOffset": "/app/city-api/apis/database/logs/query-timezones.json"
 }
 
 
@@ -93,7 +87,7 @@ def queryByAttribute(attributeToQuery, queryRequirement):
 
     # Define the 'log' output file that keeps track of the most recently performed query for a specific type
     outputJsonFile = databaseLogPaths[attributeToQuery]
-    f = open(f"{pathFromShellScript}/database/db.json")
+    f = open(f"{databasePath}")
 
     jsonDB = json.load(f)
 
@@ -109,7 +103,7 @@ def queryByAttribute(attributeToQuery, queryRequirement):
         json.dump(matchedObjects, outfile, indent=4)
     
     # Always update 'response.json'
-    with open(f"{pathFromShellScript}/database/response.json", "w") as outfile: 
+    with open("/app/city-api/apis/database/response.json", "w") as outfile: 
         json.dump(matchedObjects, outfile, indent=4)
 
 
@@ -130,7 +124,7 @@ def getCitiesAttribute(attribute):
 
     output = []
 
-    f = open(f"{pathFromShellScript}/database/response.json") # Path is "city-api\charts", since it's called from 'equator-chart.py'
+    f = open("/app/city-api/apis/database/response.json") # Path is "city-api\charts", since it's called from 'equator-chart.py'
     data = json.load(f)
 
     numInstances = len(data)
@@ -147,7 +141,7 @@ def getCitiesAttribute(attribute):
 
 # Returns the JSON object that obtains the inputted city name
 def getCityObject(targetCity):
-    f = open(f"{pathFromShellScript}/db.json")
+    f = open(f"{databasePath}")
     data = json.load(f)
 
     citiesPoolNum = len(data)
@@ -168,10 +162,10 @@ def getCityObject(targetCity):
 # Essentially, what this function does is to transfer the content from 'db.json' to
 # 'respone.json'
 def getAllCities():
-    f = open(f"{pathFromShellScript}/database/db.json")
+    f = open(f"{databasePath}")
     jsonDB = json.load(f)
 
-    with open(f"{pathFromShellScript}/database/response.json", "w") as outfile: 
+    with open("/app/city-api/apis/database/response.json", "w") as outfile: 
         json.dump(jsonDB, outfile, indent=4)
 
 

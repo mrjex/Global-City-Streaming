@@ -382,6 +382,26 @@ async def update_config(request: Request):
         # Write updated config
         with open(config_path, 'w') as f:
             yaml.dump(config, f, default_flow_style=False)
+
+        # Execute the equator chart script after successful config update
+        script_path = Path('city-api/equatorChart.sh')
+        if script_path.exists():
+            print("Executing equator chart script...")
+            # Change to the script's directory to ensure relative paths work
+            original_dir = os.getcwd()
+            os.chdir('city-api')
+            try:
+                # Make script executable
+                os.chmod('equatorChart.sh', 0o755)
+                # Execute script
+                result = os.system('./equatorChart.sh')
+                if result != 0:
+                    print(f"Warning: equatorChart.sh exited with code {result}")
+            finally:
+                # Always return to original directory
+                os.chdir(original_dir)
+        else:
+            print(f"Warning: Script not found at {script_path}")
             
         return JSONResponse(content={"success": True})
     except Exception as e:

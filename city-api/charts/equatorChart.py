@@ -12,22 +12,18 @@
 from pandas import *
 import plotly.express as px
 import plotly.graph_objects as go
-
 import json
 import sys
 
-sys.path.append('..')
-
+# Add necessary paths for imports
+sys.path.extend(['/app/city-api', '/app/city-api/apis'])
 
 import apis.databaseJsonApi as databaseJsonApi
 # import apis.databaseApi as databaseApi
 import apis.mathCurveApi as mathCurveApi
-
-sys.path.append('../..')
 import utils
 
-
-configPath = "../../configuration.yml" # The fixed relative path to the central config file
+configPath = "/app/configuration.yml" # The fixed absolute path to the central config file
 
 
 # DEVELOPER CONFIGURATIONS
@@ -77,7 +73,7 @@ def defineTrendline():
 
 
 def plotEquatorChart():
-    f = open('../apis/database/response.json')
+    f = open('/app/city-api/apis/database/response.json')
     jsonData = json.load(f)
 
     xArr = databaseJsonApi.getAllAttributeInstances("equatorDistance")
@@ -141,7 +137,7 @@ def getexpectedLogarithmicTrend():
 
 
 def exportPng(figure, typeOfQuery, fileOutputName):
-    figure.write_image(f"../generated-artifacts/pngs/equator-chart/{typeOfQuery}/{fileOutputName}.png")
+    figure.write_image(f"/app/city-api/generated-artifacts/pngs/equator-chart/{typeOfQuery}/{fileOutputName}.png")
 
 
 

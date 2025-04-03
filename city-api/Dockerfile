@@ -34,7 +34,12 @@ COPY utils.py ./utils.py
 RUN mkdir -p \
     city-api/generated-artifacts/csvs \
     city-api/generated-artifacts/charts \
-    city-api/chart-helpers
+    city-api/chart-helpers \
+    city-api/apis/database \
+    city-api/apis/database/logs
+
+# Make shell scripts executable
+RUN chmod +x city-api/equatorChart.sh
 
 # Set environment variables
 ENV PYTHONPATH=/app/city-api

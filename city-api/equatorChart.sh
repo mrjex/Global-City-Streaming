@@ -1,3 +1,10 @@
+#!/bin/sh
+
+echo "Starting equator chart script..."
+echo "Current directory: $(pwd)"
+echo "Python version: $(python --version)"
+echo "Python path: $(which python)"
+
 #####     EQUATOR CHART     #####
 
 
@@ -25,16 +32,20 @@ VISUALIZE_EQUATOR_CHART="True"
 
 RECREATE_DATABASE="False"
 
+echo "Step 1 - Query DB"
+cd /app/city-api/apis
+echo "Changed directory to: $(pwd)"
+echo "Checking if directory exists..."
+ls -la
 
-
-##  Step 1 - Query DB  ##
-
-cd apis
+echo "Running databaseJsonApi.py..."
 python databaseJsonApi.py ${RECREATE_DATABASE}
 
+echo "Step 2 - Visualize data"
+cd /app/city-api/charts
+echo "Changed directory to: $(pwd)"
+echo "Checking if directory exists..."
+ls -la
 
-
-##  Step 2 - Visualize data  ##
-
-cd .. && cd charts
+echo "Running main.py..."
 python main.py "False" "False" ${VISUALIZE_EQUATOR_CHART}

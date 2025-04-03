@@ -3,8 +3,8 @@ import sys
 #sys.path.append('..')
 #import charts.bubbleChart as bubbleChart
 
-import bubbleChart
-import pieChart
+# import bubbleChart    # TEMPORARY COMMENTED OUT
+# import pieChart       # TEMPORARY COMMENTED OUT
 import equatorChart
 
 
@@ -19,11 +19,12 @@ numInputArguments = len(sys.argv)
 
 
 def visualizeBubbleCharts():
-    bubbleChart.plotBubbleChart()
+    # bubbleChart.plotBubbleChart()
+    print("TEMPORARY COMMENTED OUT")
 
 def visualizePieCharts():
-    pieChart.plotPieChart()
-
+    # pieChart.plotPieChart()
+    print("TEMPORARY COMMENTED OUT")
 def visualizeEquatorChart():
     equatorChart.plotEquatorChart()
 
