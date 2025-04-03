@@ -9,7 +9,7 @@ RUN set -ex; \
     pip install --no-cache-dir -r requirements.txt
 
 # Set up working directory first
-WORKDIR /app/application/kafka-producer
+WORKDIR /app/kafka-producer
 
 # Copy files to specific locations
 COPY wait-for-it.sh /usr/local/bin/

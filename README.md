@@ -136,9 +136,9 @@ Automation - For each color provided by [Color API](#color-api), plot a piechart
 
 Once all dependencies are solved, there are two scripts that you need to be aware of:
 
-- `application/start.sh` is the executionary for a new compilation of the updated code and runs the system. The developer has the options to exclude any of the following functions if he only wants to compile a certain module: Flink & Maven docker image and Kafka Producer docker image
+- `start.sh` is the executionary for a new compilation of the updated code and runs the system. The developer has the options to exclude any of the following functions if he only wants to compile a certain module: Flink & Maven docker image and Kafka Producer docker image
 
-- `application/stop.sh` is the executionary for ceasing the activity of the docker containers. It's up to the developer on which of the 2 functions inside of this shell script that is enabled. By default, the function to stop the application and save the stored PostgreSQL instances is enabled. Furthermore, if the developer wishes to remove all instances in conjunction with the termination of the application, then he has to manually change it in this file. This mode is useful when working with BigData where a vast amount of datapoints are turning the database into a mess, or when you want to override all instances with to-be produced ones in the next execution instead of inserting new ones on top of the existing ones.
+- `stop.sh` is the executionary for ceasing the activity of the docker containers. It's up to the developer on which of the 2 functions inside of this shell script that is enabled. By default, the function to stop the application and save the stored PostgreSQL instances is enabled. Furthermore, if the developer wishes to remove all instances in conjunction with the termination of the application, then he has to manually change it in this file. This mode is useful when working with BigData where a vast amount of datapoints are turning the database into a mess, or when you want to override all instances with to-be produced ones in the next execution instead of inserting new ones on top of the existing ones.
 
 ## 🏗 Architecture
 

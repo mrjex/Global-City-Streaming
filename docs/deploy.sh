@@ -4,7 +4,7 @@
 
 # Stop and remove existing containers
 echo "Stopping existing containers..."
-docker-compose -f application/docker-compose.yml -p global-city-streaming down
+docker-compose -f docker-compose.yml -p global-city-streaming down
 
 # Pull latest changes from git (assuming you're using git)
 echo "Pulling latest changes..."
@@ -12,7 +12,7 @@ git pull origin main  # or your branch name
 
 # Rebuild and start containers
 echo "Rebuilding and starting containers..."
-docker-compose -f application/docker-compose.yml -p global-city-streaming up --build -d
+docker-compose -f docker-compose.yml -p global-city-streaming up --build -d
 
 # Wait for containers to start
 echo "Waiting for containers to start..."
@@ -24,4 +24,4 @@ docker ps
 
 sudo systemctl reload nginx
 
-echo "Deployment complete! Check logs with: docker-compose -f application/docker-compose.yml -p global-city-streaming logs -f"
+echo "Deployment complete! Check logs with: docker-compose -f docker-compose.yml -p global-city-streaming logs -f"

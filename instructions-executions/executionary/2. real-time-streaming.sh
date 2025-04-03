@@ -30,7 +30,7 @@ initiateStreaming() {
     UPTIME=${1}
 
     echo -e "${YELLOW} Starting containers... ${NO_COLOR}"
-    docker-compose -f ../../application/docker-compose.yml -p streaming-city-project up -d
+    docker-compose -f ../../docker-compose.yml -p streaming-city-project up -d
 
     if [ "${INFINITE_TIME}" == "False" ]; then
         sleep ${UPTIME} # Induce delay so that the running containers generates the PostgresSQL instances
@@ -48,13 +48,13 @@ initiateStreaming() {
 
 # Reset entire database: Remove all containers
 stopAndClearDatabase() {
-    docker-compose -f ../../application/docker-compose.yml -p streaming-city-project down
+    docker-compose -f ../../docker-compose.yml -p streaming-city-project down
 }
 
 
 # Stop the containers and save the data instances in the SQL database until the next execution
 stopAndSaveDatabase() {
-    docker-compose -f ../../application/docker-compose.yml -p streaming-city-project stop
+    docker-compose -f ../../docker-compose.yml -p streaming-city-project stop
 }
 
 

@@ -11,7 +11,7 @@ from flask import Flask, Response
 from flask_cors import CORS
 
 # Add project root to Python path
-project_root = str(Path(__file__).resolve().parents[2])
+project_root = str(Path(__file__).resolve().parents[1])
 sys.path.append(project_root)
 
 from json import dumps
@@ -39,7 +39,7 @@ intervalTime = 3 # Default: 3
 # Note that this array of cities must be identical to the local city array declared
 # in "/debug-api/charts/real-time-multi-samples" in 'bubble-chart.py' and
 # 'pie-chart.py'
-cities = utils.parseYmlFile(os.path.join(project_root, "configuration.yml"), "realTimeProduction.cities")
+cities = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.cities")
 
 
 def exportSettings():

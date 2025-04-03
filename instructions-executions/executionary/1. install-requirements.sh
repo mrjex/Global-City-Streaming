@@ -14,7 +14,7 @@ SETUP_AND_RUN_CONTAINERS="True"
 
 setupKafkaProducer() {
 
-    cd ../../application/kafka-producer
+    cd ../../kafka-producer
 
     # Create image without running it
     if [ "${SETUP_AND_RUN_CONTAINERS}" == "True" ]; then
@@ -22,7 +22,7 @@ setupKafkaProducer() {
     
     # Create image and run container
     else
-        docker-compose -f ../../application/docker-compose.yml -p streaming-city-project up -d
+        docker-compose -f ../../docker-compose.yml -p streaming-city-project up -d
     fi
 
     cd ../../instructions-executions/executionary
@@ -30,7 +30,7 @@ setupKafkaProducer() {
 
 
 setupFlinkProcessor() {
-    cd ../../application/flink-processor
+    cd ../../flink-processor
     ./mvn-cmd.sh # Refresh the maven-dependencies
 
     # Create image without running it
@@ -39,7 +39,7 @@ setupFlinkProcessor() {
     
     # Create image and run container
     else
-        docker-compose -f ../../application/docker-compose.yml -p streaming-city-project up -d
+        docker-compose -f ../../docker-compose.yml -p streaming-city-project up -d
     fi
 
     cd ../../instructions-executions/executionary
