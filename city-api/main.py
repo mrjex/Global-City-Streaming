@@ -162,14 +162,14 @@ async def test_flink_connection():
     
     return result
 
-@app.get("/proxy/flink/logs/raw", response_class=PlainTextResponse)
+@app.get("/proxy/flink/logs/raw")
 async def proxy_flink_raw_logs():
     """
     Proxy endpoint for raw logs from flink processor
     """
     print("GET /proxy/flink/logs/raw called")
     
-    # First try Docker client method
+    # Try Docker client method
     client = get_docker_client()
     if client:
         try:
@@ -177,43 +177,36 @@ async def proxy_flink_raw_logs():
             logs = container.logs(tail=2000).decode("utf-8")
             print(f"Retrieved {len(logs)} bytes of logs directly from container")
             
-            # Filter logs - only include lines with "Raw data received"
+            # Filter logs - include lines with various raw data patterns
             raw_logs = []
             for line in logs.split('\n'):
-                if "Raw data received" in line:
+                if any(pattern in line for pattern in [
+                    "Raw data received",
+                    "Processing messages",
+                    "Connected to Kafka",
+                    "Connected to Zookeeper",
+                    "Starting Flink job"
+                ]):
                     raw_logs.append(line)
             
             filtered_logs = '\n'.join(raw_logs)
             print(f"Filtered to {len(filtered_logs)} bytes of raw logs")
-            return filtered_logs if filtered_logs else "No raw logs found"
+            return {"logs": filtered_logs if filtered_logs else ""}
         except Exception as e:
-            error_msg = f"Error accessing flink processor container: {str(e)}"
-            print(error_msg)
-            # Try fallback HTTP method
+            print(f"Error accessing flink processor container: {str(e)}")
+            return {"logs": ""}
     
-    # Fallback to HTTP method if Docker client failed
-    try:
-        print("Falling back to HTTP request for raw logs")
-        response = requests.get("http://flink-processor:8001/logs/raw", timeout=2)
-        if response.status_code == 200:
-            return response.text
-        else:
-            error_msg = f"HTTP fallback failed with status {response.status_code}"
-            print(error_msg)
-            return error_msg
-    except Exception as e:
-        error_msg = f"All methods to retrieve flink raw logs failed: {str(e)}"
-        print(error_msg)
-        return error_msg
+    print("Docker client not available")
+    return {"logs": ""}
 
-@app.get("/proxy/flink/logs/db", response_class=PlainTextResponse)
+@app.get("/proxy/flink/logs/db")
 async def proxy_flink_db_logs():
     """
     Proxy endpoint for DB logs from flink processor
     """
     print("GET /proxy/flink/logs/db called")
     
-    # First try Docker client method
+    # Try Docker client method
     client = get_docker_client()
     if client:
         try:
@@ -221,34 +214,26 @@ async def proxy_flink_db_logs():
             logs = container.logs(tail=2000).decode("utf-8")
             print(f"Retrieved {len(logs)} bytes of logs directly from container")
             
-            # Filter logs - only include lines with "Inserting into DB"
+            # Filter logs - include lines with various DB-related patterns
             db_logs = []
             for line in logs.split('\n'):
-                if "Inserting into DB" in line:
+                if any(pattern in line for pattern in [
+                    "Inserting into DB",
+                    "Storing aggregated data",
+                    "Connected to PostgreSQL",
+                    "database connection"
+                ]):
                     db_logs.append(line)
             
             filtered_logs = '\n'.join(db_logs)
             print(f"Filtered to {len(filtered_logs)} bytes of DB logs")
-            return filtered_logs if filtered_logs else "No DB logs found"
+            return {"logs": filtered_logs if filtered_logs else ""}
         except Exception as e:
-            error_msg = f"Error accessing flink processor container: {str(e)}"
-            print(error_msg)
-            # Try fallback HTTP method
+            print(f"Error accessing flink processor container: {str(e)}")
+            return {"logs": ""}
     
-    # Fallback to HTTP method if Docker client failed
-    try:
-        print("Falling back to HTTP request for DB logs")
-        response = requests.get("http://flink-processor:8001/logs/db", timeout=2)
-        if response.status_code == 200:
-            return response.text
-        else:
-            error_msg = f"HTTP fallback failed with status {response.status_code}"
-            print(error_msg)
-            return error_msg
-    except Exception as e:
-        error_msg = f"All methods to retrieve flink DB logs failed: {str(e)}"
-        print(error_msg)
-        return error_msg
+    print("Docker client not available")
+    return {"logs": ""}
 
 @app.get("/api/kafka-logs")
 async def get_kafka_logs():

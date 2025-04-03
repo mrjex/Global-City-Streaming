@@ -13,7 +13,6 @@ services:
     container_name: frontend
     ports:
       - "3001:3001"
-      - "8002:8000"
     networks:
       - app_network
     environment:
@@ -27,7 +26,7 @@ services:
       - NODE_ENV=production
       - PORT=3001
       - HOSTNAME=0.0.0.0
-      - CITY_API_URL=http://city-api:8000
+      - CITY_API_URL=http://city-api:8003
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -159,6 +158,7 @@ services:
       - "8003:8003"
     volumes:
       - ./city-api/generated-artifacts:/app/city-api/generated-artifacts
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PYTHONPATH=/app/city-api
     networks:

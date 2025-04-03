@@ -20,12 +20,20 @@ const FlinkLogViewer: React.FC<FlinkLogViewerProps> = ({ logType }) => {
       }
       
       const logText = await response.text();
-      setLogs(logText || 'No logs available.');
-      setError(null);
+      
+      // Handle the "No logs available" response without showing an error
+      if (logText === 'No logs available' || logText === 'No raw logs found' || logText === 'No DB logs found') {
+        setLogs('Waiting for logs from Flink processor...');
+        setError(null);
+      } else {
+        setLogs(logText || 'No logs available.');
+        setError(null);
+      }
     } catch (err: any) {
       console.error('Error fetching Flink logs:', err);
-      setError(`Failed to fetch logs: ${err.message}`);
-      setLogs('Error loading logs. Please try again.');
+      // Don't show error message in UI, just set waiting message
+      setLogs('Waiting for logs from Flink processor...');
+      setError(null);
     } finally {
       setIsLoading(false);
     }
