@@ -34,18 +34,15 @@ RECREATE_DATABASE="False"
 
 echo "Step 1 - Query DB"
 cd /app/city-api/apis
-echo "Changed directory to: $(pwd)"
-echo "Checking if directory exists..."
-ls -la
 
 echo "Running databaseJsonApi.py..."
 python databaseJsonApi.py ${RECREATE_DATABASE}
 
 echo "Step 2 - Visualize data"
 cd /app/city-api/charts
-echo "Changed directory to: $(pwd)"
-echo "Checking if directory exists..."
-ls -la
 
 echo "Running main.py..."
-python main.py "False" "False" ${VISUALIZE_EQUATOR_CHART}
+# Capture and forward the output from main.py
+python main.py "False" "False" ${VISUALIZE_EQUATOR_CHART} | while IFS= read -r line; do
+    echo "$line"
+done

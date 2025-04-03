@@ -52,7 +52,7 @@ debugApi:
       displayLinearTrend: False
       displayLogarithmicTrend: True
       displayActualTrend: False
-      pngOutput: True
+      pngOutput: False
 
 realTimeProduction:
   cities:

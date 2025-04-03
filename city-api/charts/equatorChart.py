@@ -79,11 +79,11 @@ def plotEquatorChart():
     xArr = databaseJsonApi.getAllAttributeInstances("equatorDistance")
     yArr = databaseJsonApi.getAllAttributeInstances("temperatureCelsius")
 
-    # Don't plot the chart if no cities matchec the developer's specified query parameters
+    # Don't plot the chart if no cities matched the developer's specified query parameters
     if len(xArr) == 0:
         print(f"No cities matches the current query filters. Change the parameters 'queryAttribute' or/and 'queryRequirement' in 'configuration.yml'")
         f.close()
-        return
+        return None
 
     temperatureColorScale = ['rgb(0, 255, 255)', 'rgb(255, 0, 0)']
 
@@ -109,23 +109,22 @@ def plotEquatorChart():
                         selector=dict(mode='markers')
                     )
 
-
-    # If developer wants to plot the logarithmic trend, its line is then merged with the equator-bubble-chart into one plot
+    # If developer wants to plot the logarithmic trend, merge it with the main figure
     if displayLogarithmicTrend == True:
         logTrendFig = getexpectedLogarithmicTrend()
-        finalFig = go.Figure(data=fig.data + logTrendFig.data)        
-        finalFig.show()
-
+        finalFig = go.Figure(data=fig.data + logTrendFig.data)
+        
         if pngOutput == True:
             exportPng(finalFig, getTypeOfQueryString(), getPngOutputString())
-
+            
+        f.close()
+        return finalFig.to_json()
     else:
-        fig.show()
-
         if pngOutput == True:
             exportPng(fig, getTypeOfQueryString(), getPngOutputString())
-
-    f.close()
+            
+        f.close()
+        return fig.to_json()
 
 
 # Fetches the data from the API and plots it on a graph

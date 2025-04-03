@@ -25,11 +25,13 @@ def visualizeBubbleCharts():
 def visualizePieCharts():
     # pieChart.plotPieChart()
     print("TEMPORARY COMMENTED OUT")
+
 def visualizeEquatorChart():
-    equatorChart.plotEquatorChart()
+    return equatorChart.plotEquatorChart()
 
 
 def main():
+    figure_json = None
 
     # If the developer by mistake inputs the wrong number of arguments,
     # then default to plotting all charts and printing a warning
@@ -38,7 +40,7 @@ def main():
 
         visualizeBubbleCharts()
         visualizePieCharts()
-        visualizeEquatorChart()
+        figure_json = visualizeEquatorChart()
 
     # Only visualize the specified charts, that the developer specified through the passed arguments in the execution of this file
     else:
@@ -50,7 +52,15 @@ def main():
 
             # If the current element, at the i:th position is true, then call the corresponding function to visualize the specified chart
             if currentArg == 'True':
-                chartVisualizationFunctions[i - 1]()
-    
+                result = chartVisualizationFunctions[i - 1]()
+                if i == 3:  # This is the equator chart
+                    figure_json = result
 
-main()
+    return figure_json
+
+if __name__ == "__main__":
+    figure_json = main()
+    if figure_json:
+        print("FIGURE_JSON_START")
+        print(figure_json)
+        print("FIGURE_JSON_END")

@@ -383,8 +383,9 @@ async def update_config(request: Request):
         with open(config_path, 'w') as f:
             yaml.dump(config, f, default_flow_style=False)
 
-        # Execute the equator chart script after successful config update
+        # Execute the equator chart script and capture its output
         script_path = Path('city-api/equatorChart.sh')
+        figure_json = None
         if script_path.exists():
             print("Executing equator chart script...")
             # Change to the script's directory to ensure relative paths work
@@ -393,17 +394,32 @@ async def update_config(request: Request):
             try:
                 # Make script executable
                 os.chmod('equatorChart.sh', 0o755)
-                # Execute script
-                result = os.system('./equatorChart.sh')
-                if result != 0:
-                    print(f"Warning: equatorChart.sh exited with code {result}")
+                # Execute script and capture output
+                import subprocess
+                result = subprocess.run(['./equatorChart.sh'], capture_output=True, text=True)
+                
+                # Extract figure JSON from output
+                output = result.stdout
+                if "FIGURE_JSON_START" in output and "FIGURE_JSON_END" in output:
+                    json_str = output[output.find("FIGURE_JSON_START") + len("FIGURE_JSON_START"):output.find("FIGURE_JSON_END")].strip()
+                    figure_json = json_str
+                    print("Successfully captured figure JSON")
+                else:
+                    print("Could not find figure JSON in output")
+                
+                if result.returncode != 0:
+                    print(f"Warning: equatorChart.sh exited with code {result.returncode}")
+                    print(f"Script stderr: {result.stderr}")
             finally:
                 # Always return to original directory
                 os.chdir(original_dir)
         else:
             print(f"Warning: Script not found at {script_path}")
             
-        return JSONResponse(content={"success": True})
+        return JSONResponse(content={
+            "success": True,
+            "figure": figure_json
+        })
     except Exception as e:
         print(f"Error updating configuration: {str(e)}")
         return JSONResponse(
