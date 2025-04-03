@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-# from flink_logs import get_flink_logs  # No longer needed
 import os
 import json
 import requests
@@ -65,12 +64,6 @@ def get_docker_client():
         print(f"Error setting up Docker client: {str(e)}")
         return None
 
-# @app.get("/flink/logs")
-# async def flink_logs(type: str = Query('raw', enum=['raw', 'db'])):
-#     print(f"GET /flink/logs called with type={type}")
-#     logs = get_flink_logs(type)
-#     print(f"get_flink_logs returned {len(logs)} logs")
-#     return logs
 
 @app.get("/test-flink-connection")
 async def test_flink_connection():
