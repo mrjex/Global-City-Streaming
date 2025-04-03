@@ -3,7 +3,7 @@
 > Real-time global temperature analysis through modern streaming architecture
 
 
-![project-logo-3](readme-pictures/global/global-feature-logo-3.png)
+![project-logo-3](docs/readme-pictures/global/global-feature-logo-3.png)
 
 [![Kafka](https://img.shields.io/badge/Kafka-Streaming-red)](https://kafka.apache.org/)
 [![Flink](https://img.shields.io/badge/Flink-Processing-blue)](https://flink.apache.org/)
@@ -104,33 +104,33 @@ It is worth noting that this entire process is automated. Each **i:th** PDF in `
 
 #### 3. Container Debugging
 
-1. ![3. container-debuggin-kafka](readme-videos/3.%20container-debuggin-kafka-producer-desktop-shell-terminal.mp4) 
-2. ![3. container-debugging-logs](readme-videos/3.%20container-debugging-logs.mp4) 
-3. ![3. container-debugging-postgres-sql](readme-videos/3.%20container-debugging-postgres-sql-commands-real-time.mp4) 
-4. ![3. container-debugging-postgres-terminal](readme-videos/3.%20container-debugging-postgres-terminal-shell-queries.mp4) 
-5. ![3. container-debugging-zookeper-flink](readme-videos/3.%20container-debugging-zookeeper-and-flink.mp4)
+1. ![3. container-debuggin-kafka](docs/readme-videos/3.%20container-debuggin-kafka-producer-desktop-shell-terminal.mp4) 
+2. ![3. container-debugging-logs](docs/readme-videos/3.%20container-debugging-logs.mp4) 
+3. ![3. container-debugging-postgres-sql](docs/readme-videos/3.%20container-debugging-postgres-sql-commands-real-time.mp4) 
+4. ![3. container-debugging-postgres-terminal](docs/readme-videos/3.%20container-debugging-postgres-terminal-shell-queries.mp4) 
+5. ![3. container-debugging-zookeper-flink](docs/readme-videos/3.%20container-debugging-zookeeper-and-flink.mp4)
 
 #### 4. Data Visualization
 
-1. ![4. data-visualization-bubble-chart](readme-videos/4.%20data-visualization-bubble-chart.mp4) 
-2. ![4. data-visualization-pie-chart](readme-videos/4.%20data-visualization-pie-chart.mp4) 
-3. ![4. data-visualization-utc+2](readme-videos/4.%20data-visualization-utc+2.mp4)
+1. ![4. data-visualization-bubble-chart](docs/readme-videos/4.%20data-visualization-bubble-chart.mp4) 
+2. ![4. data-visualization-pie-chart](docs/readme-videos/4.%20data-visualization-pie-chart.mp4) 
+3. ![4. data-visualization-utc+2](docs/readme-videos/4.%20data-visualization-utc+2.mp4)
 
 #### 5. Combinatorial Automations
 
 The main script, `instructions-executions/executionary/5. combinatorial-automations.sh`, invokes other refactored Bash modules. It collaborates with the general `utils.sh` to redirect the dataflow into each distinct chart: `bubbleChart-combinations.sh`, `pieChart-combinations.sh` and `equator-combinations.sh`
 
-1. ![5. combination-automation-similar-curve-linear](readme-videos/5.%20combination-automation-similar-curve-linear.mp4) 
-2. ![5. combinations-equator-continents-with-without-logaritmic](readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4) 
-3. ![5. combinations-piecharts](readme-videos/5.%20combinations-piecharts.mp4)
+1. ![5. combination-automation-similar-curve-linear](docs/readme-videos/5.%20combination-automation-similar-curve-linear.mp4) 
+2. ![5. combinations-equator-continents-with-without-logaritmic](docs/readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4) 
+3. ![5. combinations-piecharts](docs/readme-videos/5.%20combinations-piecharts.mp4)
 
 Automation - For each continent, run a query and plot the data:
 
-4. ![5. combinations-equator-continents-with-without-logaritmic](readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4)
+4. ![5. combinations-equator-continents-with-without-logaritmic](docs/readme-videos/5.%20combinations-equator-continents-with-without-logaritmic.mp4)
 
 Automation - For each color provided by [Color API](#color-api), plot a piechart of the data:
 
-5. ![5. combinations-piecharts](readme-videos/5.%20combinations-piecharts.mp4)
+5. ![5. combinations-piecharts](docs/readme-videos/5.%20combinations-piecharts.mp4)
 
 ### Start/Stop application
 
@@ -154,17 +154,17 @@ This project involves three main modules. Two of which are directly contributing
 
 - *Developer Inquiries & Entrypoints* is supporting automation of regular flows of executions of the system that is needed to generate output or test the system's reliability. This module is described in detail in the [Developer Entrypoints - Debug API for Developers](#developer-entrypoints---debug-api-for-developers) section
 
-![architecture-1](readme-pictures/architecture/entire-architecture-1.PNG)
+![architecture-1](docs/readme-pictures/architecture/entire-architecture-1.PNG)
 
 ### Developer Entrypoints - Debug API for Developers
 
 - Debug API, the interactive endpoint for developers to debug the system by providing commands and retrieving the outputs and artifacts
 
-![architecture-2](readme-pictures/architecture/entire-architecture-2.PNG)
+![architecture-2](docs/readme-pictures/architecture/entire-architecture-2.PNG)
 
 `4. data-visualization.sh` is a central automation script
 
-![shell-script-exec-flags](readme-pictures/general-debugging/4.%20data-visualization-sh-execution-flags-instructions.png)
+![shell-script-exec-flags](docs/readme-pictures/general-debugging/4.%20data-visualization-sh-execution-flags-instructions.png)
 
 Why `4. data-visualization.sh` is important:
 
@@ -172,11 +172,11 @@ Why `4. data-visualization.sh` is important:
 
 Since I invested a lot of time in developing this Debug API, its architecture and data flows were dramatically altered. My goal was always to make this API as automated as possible, to the point where the interacting developer only has to specify a high-level option and everything else is taken care of chained shell-scripts:
 
-![shell-script-flow-1](readme-pictures/architecture/4-shell-script-flow.PNG)
+![shell-script-flow-1](docs/readme-pictures/architecture/4-shell-script-flow.PNG)
 
 Although the architecture displayed in the picture above satisfies all my initial objectives, I didn't feel done with this task yet. As I was debugging the project I always ended up in repetitive tasks of executing the sub-automated tasks of `4. data-visualization.sh`. Hence, I opted for automating this process as well. However, it wasn't as simple as I had anticipated for, as it soon was apparent that a multitude of sub-shell-modules were needed to maintain the modularity and sustainability of the code. As a project expands, the harder it gets to reverse changes, and therefore it's crucial that the code is sustainable in the sense that variable-changes and passed attributes are synced across the entire system, for every conceivable combination. Finally, I extended my previous architecture to the one below:
 
-![shell-script-flow-2](readme-pictures/architecture/5-shell-script-flow.PNG)
+![shell-script-flow-2](docs/readme-pictures/architecture/5-shell-script-flow.PNG)
 
 ### Real-time Data Streaming & Processing
 
@@ -190,7 +190,7 @@ Once all containers are up and running, they are creating a repetitive cycle of 
 
 4. The database instances are stored in the database
 
-![architecture-3](readme-pictures/architecture/entire-architecture-3.PNG)
+![architecture-3](docs/readme-pictures/architecture/entire-architecture-3.PNG)
 
 ### Debugging Output - Backend functionality
 
@@ -202,7 +202,7 @@ This is the `Debugging Output` module with the backend `.py` scripts for charts 
 
 3. The `.png` and `.csv` files representative of the system's execution are generated in `/generated-artifacts`. Note that the `.csv` files are only stored to facilitate and demonstrate the ease of a potential extension of the system's architecture, since it highlights the possibility of storing vast amounts of distinguishable data in a formatted way. As for the `.png` files, they constitute the visualized [Charts](#charts) in a static non-interactable format to provide a quick overview of the status and implications of the data.
 
-![architecture-4](readme-pictures/architecture/entire-architecture-4.PNG)
+![architecture-4](docs/readme-pictures/architecture/entire-architecture-4.PNG)
 
 ### Configurations
 
@@ -299,21 +299,21 @@ The tests are conducted and automated through shell scripts. I was introduced to
 
 **Weather API Tests:**
 
-![api-weather-tests](readme-videos/api-tests-weather.mp4)
+![api-weather-tests](docs/readme-videos/api-tests-weather.mp4)
 
 **Geolocation API Tests:**
 
-![api-geolocation-tests](readme-videos/api-tests-geolocation.mp4)
+![api-geolocation-tests](docs/readme-videos/api-tests-geolocation.mp4)
 
 **Color API Tests:**
 
-![api-geolocation-tests](readme-videos/api-tests-color-theme.mp4)
+![api-geolocation-tests](docs/readme-videos/api-tests-color-theme.mp4)
 
 ## 🌎 Global Feature
 
-![rotating-earth](readme-pictures/videos/rotating-earth.gif)
+![rotating-earth](docs/readme-pictures/videos/rotating-earth.gif)
 
-![project-logo-2](readme-pictures/global/global-feature-logo-2.png)
+![project-logo-2](docs/readme-pictures/global/global-feature-logo-2.png)
 
 In the beginning of this project, my vision was to only analyze 5 pre-defined cities in Europe. This constraint was then challenged as I plotted the `Real-time charts` using Plotly. When I observed the data I realized I needed a larger quantity and more samples to draw accurate conclusions. In one of my previous projects, [Dentanoid - Distributed Systems](https://github.com/Dentanoid) me and my group of students developing a microservice architecture and had specified requirements for the scalability. I learned that this quality attribute is a significant one, as the usability of your code is correlated with how many users find value in it, and it's hard to value a product that faces performance issues when the workload of customer is higher than anticipated. In that project I made sure that `Dental Clinics` around the world were supported and stored as instances without harming the performance. Similarly, in this project, I saw the need and the potential benefits of implementing this on a global scale. In addition, the configurations of this 'Global Feature' is easily accessible and modifiable for the developer in the central `configuration.yml` file.
 
@@ -321,36 +321,36 @@ In the beginning of this project, my vision was to only analyze 5 pre-defined ci
 
 All charts are generated as output by the aforementioned [APIs](#apis). There are 3 different charts, each one with its unique ways of highlighting characteristics of data:
 
-![charts-presentation](readme-pictures/visualization/charts-presentation.png)
+![charts-presentation](docs/readme-pictures/visualization/charts-presentation.png)
 
 ### Bubble Chart
 
 Once I made the decision that this project would cover data visualization, I thought a bubble chart was the most effective way of comparing the cities and their deviating temperatures, as it comes with a X and Y axis.
 
-![data-visualization-bubble-chart](readme-videos/4.%20data-visualization-bubble-chart.mp4)
+![data-visualization-bubble-chart](docs/readme-videos/4.%20data-visualization-bubble-chart.mp4)
 
 Note that the combinations of all available colors that [Color API](#color-api) provides for this chart is automated, such that bubble charts of all colors are generated all at one command in your browser at [5. Combinatorial Combinations](#5-combinatorial-automations)
 
 *First successful plot with matplotlib:*
-![first-successful](readme-pictures/visualization/first-successful-plot.png)
+![first-successful](docs/readme-pictures/visualization/first-successful-plot.png)
 
 Eventually, I switched to *Plotly* because it offers a wider range of UI customization features.
 
 *First Plotly chart:*
-![first-plotly-chart](readme-pictures/visualization/first-color-chart.PNG)
+![first-plotly-chart](docs/readme-pictures/visualization/first-color-chart.PNG)
 
 I thought the colors looked too random and applied my [Color API](#color-api) and commanded it to return purple-themed colors:
 
-![color-api-integrated-purple-colors](readme-pictures/visualization/color-api-integrated-purple-colors.PNG)
+![color-api-integrated-purple-colors](docs/readme-pictures/visualization/color-api-integrated-purple-colors.PNG)
 
 I experimented with the UI further:
 ![only-london-debug-api-artifact](debug-api/generated-artifacts/pngs/bubble-chart/London,%20[YELLOW%20THEME].png)
 
 Now, towards the end of the project, about 20,000 instances were stored in the *PostgresSQL* database. I set the theme to blue and plotted it:
-![bubble-chart-no-outline](readme-pictures/visualization/bubble-chart-20000-instances-outline-setting.PNG)
+![bubble-chart-no-outline](docs/readme-pictures/visualization/bubble-chart-20000-instances-outline-setting.PNG)
 
 I quickly realized that the thickness of the outlines, when plotting larger volumes of data, conceals important visual information that the graph reveals. Therefore, I added a variable for their thickness and set it to *0*:
-![bubble-chart-no-outline](readme-pictures/visualization/bubble-chart-20000-instances-no-outline-setting.PNG)
+![bubble-chart-no-outline](docs/readme-pictures/visualization/bubble-chart-20000-instances-no-outline-setting.PNG)
 
 To view more bubble charts, navigate to `/debug-api/generated-artifacts/pngs/bubble-chart`
 
@@ -360,25 +360,25 @@ Initially, I only intended to implement one type of pie chart with randomized co
 
 #### Randomized Colors
 
-![pieChart-randomized-colors](readme-pictures/visualization/pieChart-randomized-colors.PNG)
+![pieChart-randomized-colors](docs/readme-pictures/visualization/pieChart-randomized-colors.PNG)
 
-![pieChart-randomized-discarded-colors](readme-pictures/visualization/pieChart-randomized-disabled-colors.PNG)
+![pieChart-randomized-discarded-colors](docs/readme-pictures/visualization/pieChart-randomized-disabled-colors.PNG)
 
 #### 4 Coldest Cities
 
 Displays the proportional difference of the 4 coldest cities with pattern-based colored sections:
 
-![pieChart-randomized-discarded-colors](readme-pictures/visualization/pieChart-4-coldest-cities.PNG)
+![pieChart-randomized-discarded-colors](docs/readme-pictures/visualization/pieChart-4-coldest-cities.PNG)
 
 #### Color Theme
 
 Capitalizes upon the functionality of [Color API](#color-api) to display a coherent theme of colors in the sections:
 
 *Red Color:*
-![pieChart-red-color](readme-pictures/visualization/pieChart-red-colorThemed.PNG)
+![pieChart-red-color](docs/readme-pictures/visualization/pieChart-red-colorThemed.PNG)
 
 *Brown Color:*
-![pieChart-brown-color](readme-pictures/visualization/piechart-brown-theme.PNG)
+![pieChart-brown-color](docs/readme-pictures/visualization/piechart-brown-theme.PNG)
 
 To view more pie charts, navigate to `/debug-api/generated-artifacts/pngs/pie-chart/*`
 
@@ -391,23 +391,23 @@ Once I finished the features above, I had a few ideas in mind that would give me
 
 To fully understand the complexity of the equator chart, an insight of the dataflow between the involved entities is necessary. In the picture below, the developer has changed `configuration.yml` to remote the query filter by setting `queryAttribute` to none. Keeping this in mind, all database instances that are retrieved by `cityApi.py` or `databaseJsonApi.py` will be stored in `db.json`. Ultimately, the content of `response.json` is overridden to what the API generated in this most recent execution:
 
-![json-db-flow](readme-pictures/architecture/json-database-flow.PNG)
+![json-db-flow](docs/readme-pictures/architecture/json-database-flow.PNG)
 
 If we expand on the semantics of the picture above, the only thing that changed is that the value of `queryAttribute` is 'Continent' instead of 'none'. With that said, `queryApi.py` or `databaseJsonApi.py` takes the requirement of 'Continent = Europe' and queries the result. And lastly `db.json` and `response.json` stores the result of the query and the chart is visualized:
 
-![json-db-equatorChart-continent-flow](readme-pictures/architecture/json-db-equatorChart-flow-continent.PNG)
+![json-db-equatorChart-continent-flow](docs/readme-pictures/architecture/json-db-equatorChart-flow-continent.PNG)
 
 Conversely, if you change `queryAttribute` to 'timeZoneOffset' you can query cities by timezones:
 
-![json-db-equatorChart-timeZoneOffset-flow](readme-pictures/architecture/json-db-equatorChart-flow-timeZoneOffset.PNG)
+![json-db-equatorChart-timeZoneOffset-flow](docs/readme-pictures/architecture/json-db-equatorChart-flow-timeZoneOffset.PNG)
 
 #### Equator Chart - Conceptual idea to Implementation
 
 This is an extensive feature that required a lot of analysis on my part. The idea of this feature was born out of the quality attribute *Scalability*. At first, I only accounted for 5 pre-defined cities in the world, and realized how inaccurate my conclusions of the data retrieved would be with this insignificant sample. As I extended my system and prepared it for higher loads, the next question that arose was what kind of theories or conclusions I would want to prove, refute or validate. The first thing that came to my mind when observing my previously implemented [Charts](#charts) was how a city's geographical position on Earth affects its temperature. And that's marked the start of my equator-theory venture and articulated my [Equator Distance Temperature Hypothesis](#equator-distance-temperature-hypothesis).
 
-![lat-long-earth](readme-pictures/equator/1.%20latitude-longitude-earth.gif)
+![lat-long-earth](docs/readme-pictures/equator/1.%20latitude-longitude-earth.gif)
 
-![equator-distance-analysis](readme-pictures/equator/equator-distance-solution-analysis.JPG)
+![equator-distance-analysis](docs/readme-pictures/equator/equator-distance-solution-analysis.JPG)
 
 ### Equator Maths
 
@@ -423,11 +423,11 @@ The reason for my expectation on a logarithmic trend is founded on one profound 
 
 - **General Real-World Application:** Being able to understand this from a fundamental perspective and recognize patterns helps us connect this with another well-known statistical theory. Recall the equation in *Mathematical Reasoning* and how *returnOnInvestment* decreases in parallel with your improvements over time: If humans don't see an immediate return on investment and get some form of instant gratification or confirmation that our actions yield result, our brains are wired to repel that activity, leaving us solely with our internal will-power and motivation as a driver for continued action. I believe *Standard Deviation* supports this statement, as it represents an even distribution of all involved entities or objects. As people get better and better, they have to work harder and harder to see visible results. Thus, they have to put in more and more hours to get the satisfaction and dopamine of immediate gratification that our brain needs. This explains the bell-shaped curve as more and more people switch activity to something that provides them with more endorphins:
 
-![standard-deviation](readme-pictures/architecture/bell-curve-standard-deviation.jpg)
+![standard-deviation](docs/readme-pictures/architecture/bell-curve-standard-deviation.jpg)
 
 - To generalize my statement: 
     - Gym progress: Newbies get visible results after weeks, fit people get visible results after months
-    - Knowledge Acquisition: Learning the basics of a subject opens a lot of doors of opportunity, whereas you have to spend significantly more time to become truly good at something and experience the same reward/time ratio: ![learning-curve](readme-pictures/equator/learning-curve.png)
+    - Knowledge Acquisition: Learning the basics of a subject opens a lot of doors of opportunity, whereas you have to spend significantly more time to become truly good at something and experience the same reward/time ratio: ![learning-curve](docs/readme-pictures/equator/learning-curve.png)
 
 Now, after a comprehensive session of reflection about my hypothesis, I feel confident in entering the *Experimentation Phase*.
 
@@ -443,29 +443,29 @@ To come up with a mathematical formula that most accurately represents a relatio
 
 Keeping these 3 properties in mind, I started experimenting with graphs and slopes in *Geogebra* to find a compatible mathematical formula:
 
-![calculate-x0-value](readme-pictures/equator-maths/calculate-x-0-value.PNG)
+![calculate-x0-value](docs/readme-pictures/equator-maths/calculate-x-0-value.PNG)
 
-![final-formula-3-variants](readme-pictures/equator-maths/final-formula-3-variants.PNG)
+![final-formula-3-variants](docs/readme-pictures/equator-maths/final-formula-3-variants.PNG)
 
-![geogebra-experiment-log-bases](readme-pictures/equator-maths/geogebra-experiment-with-log-bases.PNG)
+![geogebra-experiment-log-bases](docs/readme-pictures/equator-maths/geogebra-experiment-with-log-bases.PNG)
 
-![geogebra-experiment-eliciation-of-formula](readme-pictures/equator-maths/geogebra-experimentation-elicitation-of-formula.PNG)
+![geogebra-experiment-eliciation-of-formula](docs/readme-pictures/equator-maths/geogebra-experimentation-elicitation-of-formula.PNG)
 
-![geogebra-m-value](readme-pictures/equator-maths/geogebra-m-value.PNG)
+![geogebra-m-value](docs/readme-pictures/equator-maths/geogebra-m-value.PNG)
 
-![m-value-experiment-1](readme-pictures/equator-maths/m-value-experiment-1.PNG)
+![m-value-experiment-1](docs/readme-pictures/equator-maths/m-value-experiment-1.PNG)
 
-![m-value-experiment-2](readme-pictures/equator-maths/m-value-experiment-2.PNG)
+![m-value-experiment-2](docs/readme-pictures/equator-maths/m-value-experiment-2.PNG)
 
-![m-value-experiment-3](readme-pictures/equator-maths/m-value-experiment-3.PNG)
+![m-value-experiment-3](docs/readme-pictures/equator-maths/m-value-experiment-3.PNG)
 
-![test-marker](readme-pictures/equator-maths/test-marker.PNG)
+![test-marker](docs/readme-pictures/equator-maths/test-marker.PNG)
 
 #### Paper Sketches
 
 The variable `highestCityTemperature` represents the max Y-value that always is obtained when X=0:
 
-![my-paper-sketch](readme-pictures/equator-maths/my-paper-sketch.PNG)
+![my-paper-sketch](docs/readme-pictures/equator-maths/my-paper-sketch.PNG)
 
 Finally, when having experimented, I came up with the formula:
 
@@ -473,33 +473,33 @@ Finally, when having experimented, I came up with the formula:
 
 As my paper sketch illustrates below, I explain each component and factor of the formula:
 
-![my-paper-sketch-2](readme-pictures/equator-maths/my-paper-sketch-2.PNG)
+![my-paper-sketch-2](docs/readme-pictures/equator-maths/my-paper-sketch-2.PNG)
 
 Now, we test the validity of the formula and input values to compare them to the expected output:
 
-![my-paper-sketch-equator-proof](readme-pictures/equator-maths/my-paper-sketch-equation-proof.PNG)
+![my-paper-sketch-equator-proof](docs/readme-pictures/equator-maths/my-paper-sketch-equation-proof.PNG)
 
 The next step was to actually implement this. Instead of integrating this directly to the system I simply plotted the logarithmic solution as a single line using Plotly and set the `highestCityTemperature` to 50:
 
-![separate-formula-plot](readme-pictures/equator-maths/plot-my-formula-separately.PNG)
+![separate-formula-plot](docs/readme-pictures/equator-maths/plot-my-formula-separately.PNG)
 
 #### Final adjustments
 
 At this point, I had concrete evidence that the formula worked as intended. The last part was plotting it along with the cities. At my first attempt, I set `highestCityTemperature` to 10:
 
-![result-max-10](readme-pictures/equator-maths/result1-max-10.PNG)
+![result-max-10](docs/readme-pictures/equator-maths/result1-max-10.PNG)
 
 When I viewed the output, it was apparent that the variable's value was way too low, which also makes sense since the maximal temperature of most cities exceeds at least 30 Celsius on a sunny day. Just out of curiosity, I incremented `highestCityTemperature` to 20 to see the difference on the appearance of the graph:
 
-![result-max-20](readme-pictures/equator-maths/result1-max-20.PNG)
+![result-max-20](docs/readme-pictures/equator-maths/result1-max-20.PNG)
 
 The result demonstrated above was slightly better than the previous one. Now, I increased the variable to 100 to verify that my formula is properly working, even on the extreme input values:
 
-![result-max-100](readme-pictures/equator-maths/result1-max-100.PNG)
+![result-max-100](docs/readme-pictures/equator-maths/result1-max-100.PNG)
 
 Finally, I used an estimated approximation and set `highestCityTemperature` to 40 Celsius:
 
-![result-max-40](readme-pictures/equator-maths/result1-max-40.PNG)
+![result-max-40](docs/readme-pictures/equator-maths/result1-max-40.PNG)
 
 ### Equator Solution
 
@@ -507,31 +507,31 @@ Later on, I also implemented a line that displays the general trend of the tempe
 
 This is the linear trend of the Asian cities:
 
-![asia-linear-trend](readme-pictures/equator-solution/asia-linear-trend.PNG)
+![asia-linear-trend](docs/readme-pictures/equator-solution/asia-linear-trend.PNG)
 
 Now, we also add the logarithmic trend on top of that to compare my [Equator Distance Hypothesis](#equator-distance-temperature-hypothesis) and the general trends:
 
-![asia-linear-trend-and-logarithmic](readme-pictures/equator-solution/asia-linear-trend-and-logarithmic.PNG)
+![asia-linear-trend-and-logarithmic](docs/readme-pictures/equator-solution/asia-linear-trend-and-logarithmic.PNG)
 
 One noteworthy result I observed was a query of European cities. I didn't expect the red curve to manifest itself in such an unpredictable shape. At first, I thought this completely invalidated my [Equator Distance Hypothesis](#equator-distance-temperature-hypothesis). Once I examined the projected data more closely, I realized that since the cities involved in the query were all spread across Europe, their temperatures must then deviate to a greater extent, as their timezones are different:
 
-![europe-varying-results](readme-pictures/equator-solution/europe-varying-results.PNG)
+![europe-varying-results](docs/readme-pictures/equator-solution/europe-varying-results.PNG)
 
 As a result of the obfuscated and arbitrary result above, I applied my other query-filtering operation. Instead of querying cities by continent, I queried it by timezone. In `configuration.yml` I changed the value of `queryAttribute` from *Continent* to *timeZoneOffset* and `queryRequirement` from *Europe* to *UTC+1*:
 
-![utc+1-results](readme-pictures/equator-solution/utc+1-result1.png)
+![utc+1-results](docs/readme-pictures/equator-solution/utc+1-result1.png)
 
 This result was more convincing, as we can observe apparent non-linear increments molding into an exponential- or logarithmic-like structure, similar to the formula I came up with. To test this assumption, we now open the central config file `configuration.yml` and set `displayLogarithmicTrend` to *True*:
 
-![utc+1-results-logarithmic](readme-pictures/equator-solution/utc+1-result1-logarithmic.png)
+![utc+1-results-logarithmic](docs/readme-pictures/equator-solution/utc+1-result1-logarithmic.png)
 
 As this data-visualization implies, when looking at the overall trends of the red and blue lines, my [Equator Distance Hypothesis](#equator-distance-temperature-hypothesis) is proved to be true. In the video below, I executed the system a few days later, and as a result used different temperature-values that the [APIs](#apis) retrieved at that very moment, and as we can see the general trends of city temperatures and the blue logarithmic line still hold true:
 
-![plot-logaritgmic-chart-1](readme-videos/plot-logarithmic-eq-chart.mp4)
+![plot-logaritgmic-chart-1](docs/readme-videos/plot-logarithmic-eq-chart.mp4)
 
 Interact with equator curve:
 
-![interact-equator-chart-logarithmic](readme-videos/interact-equator-chart-logarithmic.mp4)
+![interact-equator-chart-logarithmic](docs/readme-videos/interact-equator-chart-logarithmic.mp4)
 
 ## 🎁 Bonus Features
 
@@ -541,21 +541,21 @@ In addition to all the features this project has to offer, there two more notewo
 
 As a challenge for me, I added a text file as a docker container volume. In my previous courses [Project Branno](https://github.com/mrjex/Project-Branno) and [Cyber Physical Systems of Systems](https://github.com/mrjex/Cyber-Physical-Systems-and-Sytems-of-Systems), I familiarized myself with docker-compose and the feature of persisting data such that it remains even when the containers aren't running. What I did in this project was to direct output from the kafka- and flink-containers to `/debug-api/exec-settings.txt`, such that the kafka producer writes the API request intervals and the flink consumer writes the time in sample duration for each instance to be inserted in the database.
 
-![docker-volume-architecture](readme-pictures/architecture/docker-volumes-project-architecture.PNG)
+![docker-volume-architecture](docs/readme-pictures/architecture/docker-volumes-project-architecture.PNG)
 
 ### Complexities Analysis
 
 Last but not least, a surface-level analysis of the complexities were conducted. In the first picture, we can see how we can derive categories of cities by applying integrals, as well as in what order the complexities grow, even though they all are linear:
 
-![chart-time-coplexity-plots](readme-pictures/fancy-edited/chart-time-complexity-plots.png)
+![chart-time-coplexity-plots](docs/readme-pictures/fancy-edited/chart-time-complexity-plots.png)
 
 Considering the features of the system and the interactions of the entities, each chart have their own complexities:
 
-![chart-time-coplexity](readme-pictures/fancy-edited/charts-time-complexity.png)
+![chart-time-coplexity](docs/readme-pictures/fancy-edited/charts-time-complexity.png)
 
 And lastly, if you want to calculate the number of database instances, you need to check the api-responses or the number of CSV rows in `/debug-api`
 
-![num-cities-calculation](readme-pictures/fancy-edited/num-cities-calculation.png)
+![num-cities-calculation](docs/readme-pictures/fancy-edited/num-cities-calculation.png)
 
 ## 📚 Learning Lessons
 
