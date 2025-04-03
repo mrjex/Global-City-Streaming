@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
@@ -273,46 +273,46 @@ async def health_check():
     return {"status": "healthy"}
 
 # Add new endpoints for charts
-@app.get("/api/charts")
-async def get_charts():
-    try:
-        # Ensure directories exist
-        output_dir = Path('city-api/generated-artifacts')
-        csv_dir = output_dir / 'csvs'
-        chart_dir = output_dir / 'charts'
-        os.makedirs(chart_dir, exist_ok=True)
-        os.makedirs(csv_dir, exist_ok=True)
-
-        # Get cities from configuration
-        config_path = Path('configuration.yml')
-        if not config_path.exists():
-            return JSONResponse(
-                content={"error": "Configuration file not found"},
-                status_code=500
-            )
-
-        with open(config_path) as f:
-            config = yaml.safe_load(f)
-
-        cities = config.get('debugApi', {}).get('citiesPool', [])
-        if not cities:
-            return JSONResponse(
-                content={"error": "No cities configured"},
-                status_code=500
-            )
-
-        # Process data and generate charts
-        charts = []
-        chart_files = chart_dir.glob('*.png')
-        for chart_file in chart_files:
-            charts.append(f"/api/chart-images/{chart_file.name}")
-
-        return JSONResponse(content={"charts": charts})
-    except Exception as e:
-        return JSONResponse(
-            content={"error": str(e)},
-            status_code=500
-        )
+# @app.get("/api/charts")
+# async def get_charts():
+#     try:
+#         # Ensure directories exist
+#         output_dir = Path('city-api/generated-artifacts')
+#         csv_dir = output_dir / 'csvs'
+#         chart_dir = output_dir / 'charts'
+#         os.makedirs(chart_dir, exist_ok=True)
+#         os.makedirs(csv_dir, exist_ok=True)
+#
+#         # Get cities from configuration
+#         config_path = Path('configuration.yml')
+#         if not config_path.exists():
+#             return JSONResponse(
+#                 content={"error": "Configuration file not found"},
+#                 status_code=500
+#             )
+#
+#         with open(config_path) as f:
+#             config = yaml.safe_load(f)
+#
+#         cities = config.get('debugApi', {}).get('citiesPool', [])
+#         if not cities:
+#             return JSONResponse(
+#                 content={"error": "No cities configured"},
+#                 status_code=500
+#             )
+#
+#         # Process data and generate charts
+#         charts = []
+#         chart_files = chart_dir.glob('*.png')
+#         for chart_file in chart_files:
+#             charts.append(f"/api/chart-images/{chart_file.name}")
+#
+#         return JSONResponse(content={"charts": charts})
+#     except Exception as e:
+#         return JSONResponse(
+#             content={"error": str(e)},
+#             status_code=500
+#         )
 
 @app.get("/api/chart-images/{filename}")
 async def get_chart_image(filename: str):
@@ -332,5 +332,61 @@ async def get_chart_image(filename: str):
     except Exception as e:
         return JSONResponse(
             content={"error": str(e)},
+            status_code=500
+        )
+
+@app.get("/api/config")
+async def get_config():
+    print("#############################        CONFIG ENDPOINT RECEIVED (GET)           #############################")
+    try:
+        config_path = Path('configuration.yml')
+        if not config_path.exists():
+            return JSONResponse(
+                content={"error": "Configuration file not found"},
+                status_code=500
+            )
+
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+        return JSONResponse(content=config)
+    except Exception as e:
+        print(f"Error reading configuration: {str(e)}")
+        return JSONResponse(
+            content={"error": "Failed to read configuration"},
+            status_code=500
+        )
+
+@app.post("/api/config")
+async def update_config(request: Request):
+    print("#############################        CONFIG ENDPOINT RECEIVED (POST)          #############################")
+    try:
+        body = await request.json()
+        config_path = Path('configuration.yml')
+        
+        # Read existing config
+        if config_path.exists():
+            with open(config_path) as f:
+                config = yaml.safe_load(f)
+        else:
+            config = {}
+            
+        # Update config using the path
+        path = body.get('path', '').split('.')
+        current = config
+        for part in path[:-1]:
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+        current[path[-1]] = body.get('config')
+        
+        # Write updated config
+        with open(config_path, 'w') as f:
+            yaml.dump(config, f, default_flow_style=False)
+            
+        return JSONResponse(content={"success": True})
+    except Exception as e:
+        print(f"Error updating configuration: {str(e)}")
+        return JSONResponse(
+            content={"error": "Failed to update configuration"},
             status_code=500
         )

@@ -9,9 +9,6 @@ const Navigation: React.FC = () => {
   const pathname = usePathname();
 
   const isActive = (path: string) => {
-    if (path === '/charts/view' && (pathname === '/charts' || pathname === '/charts/view')) {
-      return styles.active;
-    }
     return pathname === path ? styles.active : '';
   };
 
@@ -24,11 +21,6 @@ const Navigation: React.FC = () => {
         <li className={styles.navItem}>
           <Link href="/" className={`${styles.navLink} ${isActive('/')}`}>
             Dashboard
-          </Link>
-        </li>
-        <li className={styles.navItem}>
-          <Link href="/charts/view" className={`${styles.navLink} ${isActive('/charts/view')}`}>
-            Charts
           </Link>
         </li>
         <li className={styles.navItem}>
