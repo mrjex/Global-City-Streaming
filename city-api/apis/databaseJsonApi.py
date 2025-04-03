@@ -15,11 +15,16 @@ import apis.weatherApi as weatherApi
 import json
 import utils
 
+print("Starting databaseJsonApi.py...")
+print(f"Current working directory: {sys.path}")
+
 configPath = "/app/configuration.yml"
+print(f"Reading config from: {configPath}")
 
 # In shell scripts where this script is combined with other scripts to create a bigger sequence of automation,
 # the path below is used from the invoking point to this file
 databasePath = "/app/city-api/apis/database/db.json"
+print(f"Database path: {databasePath}")
 
 
 # The query-file paths for "/logs" directory
@@ -32,9 +37,13 @@ databaseLogPaths = {
 
 
 # READ DEVELOPER DEBUG CONFIGURATIONS from 'configuration.yml'
-citiesPool = utils.parseYmlFile(configPath, "debugApi.citiesPool")
-queryAttribute = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryAttribute")
-queryRequirement = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryRequirement")
+try:
+    citiesPool = utils.parseYmlFile(configPath, "debugApi.citiesPool")
+    queryAttribute = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryAttribute")
+    queryRequirement = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryRequirement")
+    print(f"Query config loaded - {queryAttribute}: {queryRequirement}")
+except Exception as e:
+    print(f"Error loading configuration: {str(e)}")
 
 
 # This function composes each JSON object for all the cities
@@ -84,27 +93,31 @@ def populateDB():
 #   - ("timeZoneOffset", "UTC-6")
 #
 def queryByAttribute(attributeToQuery, queryRequirement):
-
-    # Define the 'log' output file that keeps track of the most recently performed query for a specific type
     outputJsonFile = databaseLogPaths[attributeToQuery]
-    f = open(f"{databasePath}")
-
-    jsonDB = json.load(f)
-
-    matchedObjects = []
-
-    for cityObj in jsonDB:
-        if cityObj[attributeToQuery] == queryRequirement:
-            matchedObjects.append(cityObj)
     
+    try:
+        with open(databasePath) as f:
+            jsonDB = json.load(f)
 
-    # Update "/log" json file
-    with open(outputJsonFile, "w") as outfile: 
-        json.dump(matchedObjects, outfile, indent=4)
-    
-    # Always update 'response.json'
-    with open("/app/city-api/apis/database/response.json", "w") as outfile: 
-        json.dump(matchedObjects, outfile, indent=4)
+        matchedObjects = []
+        for cityObj in jsonDB:
+            if cityObj[attributeToQuery] == queryRequirement:
+                matchedObjects.append(cityObj)
+        
+        print(f"\nQuery results for {attributeToQuery}={queryRequirement}:")
+        print(json.dumps(matchedObjects, indent=2))
+
+        # Update "/log" json file
+        with open(outputJsonFile, "w") as outfile:
+            json.dump(matchedObjects, outfile, indent=4)
+        
+        # Always update 'response.json'
+        responsePath = "/app/city-api/apis/database/response.json"
+        with open(responsePath, "w") as outfile:
+            json.dump(matchedObjects, outfile, indent=4)
+            
+    except Exception as e:
+        print(f"Error in queryByAttribute: {str(e)}")
 
 
 
@@ -162,27 +175,36 @@ def getCityObject(targetCity):
 # Essentially, what this function does is to transfer the content from 'db.json' to
 # 'respone.json'
 def getAllCities():
-    f = open(f"{databasePath}")
-    jsonDB = json.load(f)
+    try:
+        with open(databasePath) as f:
+            jsonDB = json.load(f)
+            print("\nRetrieving all cities:")
+            print(json.dumps(jsonDB, indent=2))
 
-    with open("/app/city-api/apis/database/response.json", "w") as outfile: 
-        json.dump(jsonDB, outfile, indent=4)
+        responsePath = "/app/city-api/apis/database/response.json"
+        with open(responsePath, "w") as outfile:
+            json.dump(jsonDB, outfile, indent=4)
+    except Exception as e:
+        print(f"Error in getAllCities: {str(e)}")
 
 
 
 # Generates the JSON database instances and queries them  -->  EquatorChart
 def initiateDatabaseOperations(recreateDatabase):
+    print(f"\nInitiating database operations - Recreate DB: {recreateDatabase}")
+    
+    if recreateDatabase == 'True':
+        print("Recreating database...")
+        createdDbInstances = populateDB()
+        print(f"Created {len(createdDbInstances)} database instances")
 
-  # Check if the developer wants to create an entirely new database (used for add/delete city operations)
-  if recreateDatabase == 'True':
-    createdDbInstances = populateDB()
-    print(createdDbInstances)
-  
+    if queryAttribute == "timeZoneOffset" or queryAttribute == "continent":
+        print(f"Using attribute query for: {queryAttribute}")
+        queryByAttribute(queryAttribute, queryRequirement)
+    else:
+        print("No specific query attribute, getting all cities")
+        getAllCities()
 
-  if queryAttribute == "timeZoneOffset" or queryAttribute == "continent":
-    queryByAttribute(queryAttribute, queryRequirement)
-  else:
-    getAllCities()
-
-
+print(f"\nStarting database operations with argument: {sys.argv[1]}")
 initiateDatabaseOperations(sys.argv[1])
+print("Database operations completed")
