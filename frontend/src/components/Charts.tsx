@@ -1,3 +1,5 @@
+// This component has been commented out as it was responsible for bubble and pie charts
+/*
 import React, { useEffect, useState } from 'react';
 import styles from '../app/charts/Charts.module.css';
 
@@ -57,4 +59,5 @@ const Charts: React.FC = () => {
   );
 };
 
-export default Charts; 
+export default Charts;
+*/ 

@@ -7,7 +7,7 @@ import DatabaseCounter from '../components/DatabaseCounter';
 import Terminal from '@/components/Terminal';
 import FlinkTerminals from '@/components/FlinkTerminals';
 import CitySelector from '@/components/CitySelector';
-import Charts from '@/components/Charts';
+// import Charts from '@/components/Charts';  // Commented out bubble and pie charts
 import CityTemperatureChart from '@/components/CityTemperatureChart';
 import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
 
@@ -60,7 +60,8 @@ export default function Home(): ReactElement {
 
       <FlinkTerminals maxLines={10} />
 
-      <Charts />
+      {/* Commented out bubble and pie charts */}
+      {/* <Charts /> */}
     </main>
   );
 } 

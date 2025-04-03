@@ -154,6 +154,8 @@ os.makedirs(chart_dir, exist_ok=True)
 cities = ${JSON.stringify(cities)}
 dfs = []
 
+# Commented out bubble and pie chart generation
+"""
 for city in cities:
     try:
         csv_path = os.path.join(csv_dir, f"{city}.csv")
@@ -194,6 +196,7 @@ if dfs:
     print(f"Chart saved to {os.path.join(chart_dir, 'city_temps.png')}")
 else:
     print("No data available to create chart")
+"""
 `]);
     
     try {
