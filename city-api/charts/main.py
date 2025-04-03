@@ -14,7 +14,7 @@ import equatorChart
 #   Argument 3: visualizeEquatorChart       = ['True' or 'False']
 
 
-numExpectedArguments = 4 # The 0th argument is the path to this script
+numExpectedArguments = 4
 numInputArguments = len(sys.argv)
 
 
@@ -41,20 +41,16 @@ def main():
         visualizeBubbleCharts()
         visualizePieCharts()
         figure_json = visualizeEquatorChart()
-
-    # Only visualize the specified charts, that the developer specified through the passed arguments in the execution of this file
     else:
-        chartVisualizationFunctions = [visualizeBubbleCharts, visualizePieCharts, visualizeEquatorChart]
-
-        # Iterate over all passed arguments
-        for i in range(1, numInputArguments):
-            currentArg = sys.argv[i]
-
-            # If the current element, at the i:th position is true, then call the corresponding function to visualize the specified chart
-            if currentArg == 'True':
-                result = chartVisualizationFunctions[i - 1]()
-                if i == 3:  # This is the equator chart
-                    figure_json = result
+        # Check each argument and execute corresponding function
+        if sys.argv[1] == 'True':
+            visualizeBubbleCharts()
+        
+        if sys.argv[2] == 'True':
+            visualizePieCharts()
+        
+        if sys.argv[3] == 'True':
+            figure_json = visualizeEquatorChart()
 
     return figure_json
 
