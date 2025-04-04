@@ -24,6 +24,27 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [cityData, setCityData] = useState<City[]>([]);
 
+  // Initial load for Sweden
+  useEffect(() => {
+    const defaultCountry = "Sweden";
+    fetch('/api/selected-country', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ country: defaultCountry }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Initial country data loaded:', data);
+      if (data.success && data.cities) {
+        setSelectedCountry(defaultCountry);
+        setCityData(data.cities);
+      }
+    })
+    .catch(error => console.error('Error loading initial country data:', error));
+  }, []); // Empty dependency array means this runs once on mount
+
   // Define colors
   const defaultColor = '#a8d5e5';  // Light blue
   const hoverColor = '#62b3d0';    // Darker blue
