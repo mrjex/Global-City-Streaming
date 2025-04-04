@@ -120,6 +120,19 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
             .style('filter', 'brightness(1.1)');
           
           setSelectedCountry(newSelectedCountry);
+          
+          // Call our API endpoint
+          fetch('/api/selected-country', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ country: newSelectedCountry }),
+          })
+          .then(response => response.json())
+          .then(data => console.log('Country selection response:', data))
+          .catch(error => console.error('Error sending country selection:', error));
+          
           onCountrySelect(newSelectedCountry);
         });
 

@@ -434,3 +434,17 @@ async def update_config(request: Request):
             content={"error": "Failed to update configuration"},
             status_code=500
         )
+
+@app.post("/api/selected-country")
+async def receive_selected_country(request: Request):
+    try:
+        data = await request.json()
+        country = data.get('country')
+        print(f"[DEBUG] City API received country selection from frontend container: {country}")
+        return {"success": True}
+    except Exception as e:
+        print(f"Error processing selected country: {str(e)}")
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        )

@@ -1,18 +1,24 @@
 # This script is used to get the cities of a specific country
 
-# Innput: The name of the country, e.g "Sweden"
+# Input: The name of the country, e.g "Sweden"
 
 # Output: A list of cities in the country
 
 
+
+
+
+##  STEP 1: Get the cities of a specific country  ##
+
 # curl "https://countriesnow.space/api/v0.1/countries/cities/q?country=sweden"
 
 
-# curl -s "https://countriesnow.space/api/v0.1/countries/cities/q?country=sweden" | jq '.data[] | select(test("göteborg"; "i"))'
 
 
+##  STEP 2: Iterate through the cities and get the weather temperature  ##
 
 
+# 1. Use the weatherApi.py script to get the weather temperature for each city
 
+# 2. Print each city's weather temperature that was fetched in step 1
 
-# curl "https://countriesnow.space/api/v0.1/countries/flag/images/q?iso2=SE"
