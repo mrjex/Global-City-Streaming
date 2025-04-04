@@ -5,14 +5,18 @@ echo "Testing basic output"
 echo "Current directory: $(pwd)"
 echo "Script arguments: $@"
 
-# Step 1: Get the cities of a specific country
+# Step 1: Get the country code for the given country
 COUNTRY="$1"
-COUNTRY="SE" # TEMPORARY FIX
-echo "Country parameter: $COUNTRY"
+echo "Input country: $COUNTRY"
+
+# Get country code from Python script
+echo "Getting country code..."
+COUNTRY_CODE=$(python /app/city-api/apis/countryCodeApi.py "$COUNTRY" | grep "Country Code (alpha-2):" | cut -d ":" -f2 | tr -d ' ')
+echo "Retrieved country code: $COUNTRY_CODE"
 
 # Store the curl response in a variable
 echo "Making API request..."
-RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY&limit=3&sort=-population&types=CITY" \
+RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY_CODE&limit=3&sort=-population&types=CITY" \
   -H "X-RapidAPI-Host: wft-geo-db.p.rapidapi.com" \
   -H "X-RapidAPI-Key: $GEODB_CITIES_API_KEY")
 
@@ -39,7 +43,3 @@ echo "$CITIES" | while read -r city; do
 done
 
 echo "=== SCRIPT END ==="
-
-# Step 2: Iterate through the cities and get the weather temperature
-# TODO: Implement weather data fetching in next step
-
