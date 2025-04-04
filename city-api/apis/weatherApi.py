@@ -6,7 +6,6 @@
 import requests
 
 ## Weather API configurations  ##
-# city = "Stockholm" # Send API-requests for weather temperature in London city
 apiKey = "165bb23217d246afb3e161429241806" # Your generated API key from your private account (https://www.weatherapi.com/my/)
 apiUrl = "https://api.weatherapi.com/v1/current.json"
 
