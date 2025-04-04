@@ -479,21 +479,18 @@ async def receive_selected_country(request: Request):
                     status_code=500
                 )
 
-            # Parse the JSON outputs from the script
-            city_data = []
-            for line in result.stdout.splitlines():
-                try:
-                    if line.strip().startswith('{"city"'):
-                        city_data.append(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
-
-            print(f"[DEBUG] Parsed city data: {json.dumps(city_data, indent=2)}", flush=True)
-            return JSONResponse(content={
-                "success": True,
-                "country": country,
-                "cities": city_data
-            })
+            # Parse the entire output as a single JSON object
+            try:
+                response_data = json.loads(result.stdout)
+                print(f"[DEBUG] Parsed response data: {json.dumps(response_data, indent=2)}", flush=True)
+                return JSONResponse(content=response_data)
+            except json.JSONDecodeError as e:
+                print(f"[ERROR] Failed to parse JSON output: {str(e)}", flush=True)
+                print(f"[DEBUG] Raw output: {result.stdout}", flush=True)
+                return JSONResponse(
+                    content={"error": "Failed to parse script output"},
+                    status_code=500
+                )
         except Exception as e:
             print(f"Error executing script: {str(e)}", flush=True)
             return JSONResponse(
