@@ -440,40 +440,40 @@ async def receive_selected_country(request: Request):
     try:
         data = await request.json()
         country = data.get('country')
-        print(f"[DEBUG] City API received country selection from frontend container: {country}")
+        print(f"[DEBUG] Processing country: {country}", flush=True)
 
         # Execute the country cities script
         script_path = Path('/app/city-api/countryCities.sh')
         
-        print(f"Looking for script at: {script_path.absolute()}")
-        print(f"Script exists: {script_path.exists()}")
+        if not script_path.exists():
+            print(f"Error: Script not found at {script_path}", flush=True)
+            return JSONResponse(content={"error": "Script not found"}, status_code=500)
         
-        if script_path.exists():
-            print("Executing country cities script...")
-            try:
-                # Make script executable
-                print("Setting executable permissions...")
-                os.chmod('/app/city-api/countryCities.sh', 0o755)
-                print(f"New file permissions: {os.stat('/app/city-api/countryCities.sh').st_mode}")
-                
-                # Execute script with country parameter
-                print(f"Running script for country: {country}")
-                result = subprocess.run(['/bin/sh', '/app/city-api/countryCities.sh', country], 
-                                     capture_output=True, text=True)
-                print(f"Script stdout: {result.stdout}")
-                print(f"Script stderr: {result.stderr}")
-                
-                if result.returncode != 0:
-                    print(f"Warning: countryCities.sh exited with code {result.returncode}")
-                    print(f"Script stderr: {result.stderr}")
-            except Exception as e:
-                print(f"Error executing country cities script: {str(e)}")
-        else:
-            print(f"Warning: Script not found at {script_path}")
-
-        return {"success": True}
+        try:
+            # Make script executable and run
+            os.chmod('/app/city-api/countryCities.sh', 0o755)
+            result = subprocess.run(
+                ['/bin/sh', '/app/city-api/countryCities.sh', country], 
+                capture_output=True, 
+                text=True
+            )
+            
+            if result.returncode != 0:
+                print(f"Error: Script failed with code {result.returncode}", flush=True)
+                return JSONResponse(
+                    content={"error": "Failed to process country"},
+                    status_code=500
+                )
+            
+            return {"success": True, "data": result.stdout}
+        except Exception as e:
+            print(f"Error executing script: {str(e)}", flush=True)
+            return JSONResponse(
+                content={"error": str(e)},
+                status_code=500
+            )
     except Exception as e:
-        print(f"Error processing selected country: {str(e)}")
+        print(f"Error processing request: {str(e)}", flush=True)
         return JSONResponse(
             content={"error": str(e)},
             status_code=500

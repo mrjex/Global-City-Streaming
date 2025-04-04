@@ -161,6 +161,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PYTHONPATH=/app/city-api
+      - GEODB_CITIES_API_KEY=${GEODB_CITIES_API_KEY}
     networks:
       - app_network
 
