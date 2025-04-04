@@ -442,56 +442,58 @@ async def receive_selected_country(request: Request):
         country = data.get('country')
         print(f"[DEBUG] Processing country: {country}", flush=True)
 
-        # Execute the country cities script
         script_path = Path('/app/city-api/countryCities.sh')
-        
         if not script_path.exists():
-            print(f"Error: Script not found at {script_path}", flush=True)
+            print(f"[ERROR] Script not found at {script_path}", flush=True)
             return JSONResponse(content={"error": "Script not found"}, status_code=500)
         
         try:
-            # Make script executable and run
-            os.chmod('/app/city-api/countryCities.sh', 0o755)
-            # Execute script with country parameter
-            print("=== EXECUTING SCRIPT ===", flush=True)
-            print(f"Running countryCities.sh for country: {country}", flush=True)
+            # Make script executable
+            print("[DEBUG] Setting script permissions...", flush=True)
+            os.chmod(script_path, 0o755)
             
-            # Create environment with both API keys
-            script_env = os.environ.copy()  # Copy current environment
+            # Execute script with environment variables
+            script_env = os.environ.copy()
             script_env.update({
                 "GEODB_CITIES_API_KEY": os.environ.get("GEODB_CITIES_API_KEY", ""),
                 "WEATHER_API_KEY": os.environ.get("WEATHER_API_KEY", "")
             })
             
-            # Debug: Print available environment variables
-            print("Environment variables available:", flush=True)
-            print(f"WEATHER_API_KEY present: {'WEATHER_API_KEY' in script_env}", flush=True)
-            print(f"GEODB_CITIES_API_KEY present: {'GEODB_CITIES_API_KEY' in script_env}", flush=True)
-            
+            print("[DEBUG] Executing script...", flush=True)
             result = subprocess.run(
-                ['/bin/sh', '/app/city-api/countryCities.sh', country],
+                ['/bin/sh', str(script_path), country],
                 capture_output=True,
                 text=True,
                 env=script_env
             )
             
-            print("=== SCRIPT EXECUTION COMPLETED ===", flush=True)
-            print(f"Return code: {result.returncode}", flush=True)
-            
-            print("\n=== STDOUT ===", flush=True)
+            print("[DEBUG] Script stdout:", flush=True)
             print(result.stdout, flush=True)
-            
-            print("\n=== STDERR ===", flush=True)
+            print("[DEBUG] Script stderr:", flush=True)
             print(result.stderr, flush=True)
             
             if result.returncode != 0:
-                print(f"Error: Script failed with code {result.returncode}", flush=True)
+                print(f"[ERROR] Script failed with return code {result.returncode}", flush=True)
                 return JSONResponse(
                     content={"error": "Failed to process country"},
                     status_code=500
                 )
-            
-            return {"success": True, "data": result.stdout}
+
+            # Parse the JSON outputs from the script
+            city_data = []
+            for line in result.stdout.splitlines():
+                try:
+                    if line.strip().startswith('{"city"'):
+                        city_data.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+
+            print(f"[DEBUG] Parsed city data: {json.dumps(city_data, indent=2)}", flush=True)
+            return JSONResponse(content={
+                "success": True,
+                "country": country,
+                "cities": city_data
+            })
         except Exception as e:
             print(f"Error executing script: {str(e)}", flush=True)
             return JSONResponse(

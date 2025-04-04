@@ -11,11 +11,20 @@ echo "Input country: $COUNTRY"
 
 # Get country code from Python script
 echo "Getting country code..."
-COUNTRY_CODE=$(python /app/city-api/apis/countryCodeApi.py "$COUNTRY" | grep "Country Code (alpha-2):" | cut -d ":" -f2 | tr -d ' ')
-echo "Retrieved country code: $COUNTRY_CODE"
+echo "Running: python /app/city-api/apis/countryCodeApi.py \"$COUNTRY\""
+COUNTRY_CODE_OUTPUT=$(python /app/city-api/apis/countryCodeApi.py "$COUNTRY")
+echo "Raw country code output: $COUNTRY_CODE_OUTPUT"
+
+COUNTRY_CODE=$(echo "$COUNTRY_CODE_OUTPUT" | grep "Country Code (alpha-2):" | cut -d ":" -f2 | tr -d ' ')
+echo "Extracted country code: '$COUNTRY_CODE'"
+
+if [ -z "$COUNTRY_CODE" ]; then
+    echo "Error: Failed to get country code"
+    exit 1
+fi
 
 # Store the curl response in a variable
-echo "Making API request..."
+echo "Making API request for country code: $COUNTRY_CODE..."
 RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY_CODE&limit=3&sort=-population&types=CITY" \
   -H "X-RapidAPI-Host: wft-geo-db.p.rapidapi.com" \
   -H "X-RapidAPI-Key: $GEODB_CITIES_API_KEY")
