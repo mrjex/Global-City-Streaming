@@ -11,6 +11,7 @@ import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
 from pathlib import Path
+import subprocess
 
 app = FastAPI()
 
@@ -400,7 +401,6 @@ async def update_config(request: Request):
                 os.chmod('/app/city-api/equatorChart.sh', 0o755)
                 print(f"New file permissions: {os.stat('/app/city-api/equatorChart.sh').st_mode}")
                 # Execute script and capture output
-                import subprocess
                 print("Running script...")
                 # Try with sh explicitly
                 result = subprocess.run(['/bin/sh', '/app/city-api/equatorChart.sh'], capture_output=True, text=True)
@@ -441,6 +441,36 @@ async def receive_selected_country(request: Request):
         data = await request.json()
         country = data.get('country')
         print(f"[DEBUG] City API received country selection from frontend container: {country}")
+
+        # Execute the country cities script
+        script_path = Path('/app/city-api/countryCities.sh')
+        
+        print(f"Looking for script at: {script_path.absolute()}")
+        print(f"Script exists: {script_path.exists()}")
+        
+        if script_path.exists():
+            print("Executing country cities script...")
+            try:
+                # Make script executable
+                print("Setting executable permissions...")
+                os.chmod('/app/city-api/countryCities.sh', 0o755)
+                print(f"New file permissions: {os.stat('/app/city-api/countryCities.sh').st_mode}")
+                
+                # Execute script with country parameter
+                print(f"Running script for country: {country}")
+                result = subprocess.run(['/bin/sh', '/app/city-api/countryCities.sh', country], 
+                                     capture_output=True, text=True)
+                print(f"Script stdout: {result.stdout}")
+                print(f"Script stderr: {result.stderr}")
+                
+                if result.returncode != 0:
+                    print(f"Warning: countryCities.sh exited with code {result.returncode}")
+                    print(f"Script stderr: {result.stderr}")
+            except Exception as e:
+                print(f"Error executing country cities script: {str(e)}")
+        else:
+            print(f"Warning: Script not found at {script_path}")
+
         return {"success": True}
     except Exception as e:
         print(f"Error processing selected country: {str(e)}")

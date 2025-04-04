@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     python3-dev \
     dos2unix \
+    curl \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
