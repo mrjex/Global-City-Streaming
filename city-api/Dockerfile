@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     python3-dev \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -38,8 +39,9 @@ RUN mkdir -p \
     city-api/apis/database \
     city-api/apis/database/logs
 
-# Make shell scripts executable
-RUN chmod +x city-api/equatorChart.sh
+# Convert Windows line endings to Unix and make shell scripts executable
+RUN dos2unix city-api/*.sh && \
+    chmod +x city-api/*.sh
 
 # Set environment variables
 ENV PYTHONPATH=/app/city-api

@@ -124,7 +124,7 @@ def plotEquatorChart():
             exportPng(fig, getTypeOfQueryString(), getPngOutputString())
             
         f.close()
-        return fig.to_json()
+        return go.Figure(data=fig.data).to_json()
 
 
 # Fetches the data from the API and plots it on a graph

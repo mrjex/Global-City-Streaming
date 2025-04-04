@@ -382,19 +382,30 @@ async def update_config(request: Request):
             yaml.dump(config, f, default_flow_style=False)
 
         # Execute the equator chart script and capture its output
-        script_path = Path('city-api/equatorChart.sh')
+        script_path = Path('/app/city-api/equatorChart.sh')
         figure_json = None
+        
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Looking for script at: {script_path.absolute()}")
+        print(f"Script exists: {script_path.exists()}")
+        print(f"Directory contents: {os.listdir('.')}")
+        print(f"city-api contents: {os.listdir('city-api')}")
+        print(f"File stats: {os.stat(script_path) if script_path.exists() else 'No stats'}")
+        
         if script_path.exists():
             print("Executing equator chart script...")
-            # Change to the script's directory to ensure relative paths work
-            original_dir = os.getcwd()
-            os.chdir('city-api')
             try:
                 # Make script executable
-                os.chmod('equatorChart.sh', 0o755)
+                print("Setting executable permissions...")
+                os.chmod('/app/city-api/equatorChart.sh', 0o755)
+                print(f"New file permissions: {os.stat('/app/city-api/equatorChart.sh').st_mode}")
                 # Execute script and capture output
                 import subprocess
-                result = subprocess.run(['./equatorChart.sh'], capture_output=True, text=True)
+                print("Running script...")
+                # Try with sh explicitly
+                result = subprocess.run(['/bin/sh', '/app/city-api/equatorChart.sh'], capture_output=True, text=True)
+                print(f"Script stdout: {result.stdout}")
+                print(f"Script stderr: {result.stderr}")
                 
                 # Extract figure JSON from output
                 output = result.stdout
@@ -408,9 +419,8 @@ async def update_config(request: Request):
                 if result.returncode != 0:
                     print(f"Warning: equatorChart.sh exited with code {result.returncode}")
                     print(f"Script stderr: {result.stderr}")
-            finally:
-                # Always return to original directory
-                os.chdir(original_dir)
+            except Exception as e:
+                print(f"Error executing equator chart script: {str(e)}")
         else:
             print(f"Warning: Script not found at {script_path}")
             

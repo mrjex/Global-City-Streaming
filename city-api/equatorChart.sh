@@ -43,6 +43,4 @@ cd /app/city-api/charts
 
 echo "Running main.py..."
 # Capture and forward the output from main.py
-python main.py "False" "False" ${VISUALIZE_EQUATOR_CHART} | while IFS= read -r line; do
-    echo "$line"
-done
+python main.py "False" "False" ${VISUALIZE_EQUATOR_CHART}
