@@ -23,6 +23,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [cityData, setCityData] = useState<City[]>([]);
+  const [countryCode, setCountryCode] = useState<string | null>(null);
 
   // Initial load for Sweden
   useEffect(() => {
@@ -40,6 +41,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
       if (data.success && data.cities) {
         setSelectedCountry(defaultCountry);
         setCityData(data.cities);
+        setCountryCode(data.country_code);
       }
     })
     .catch(error => console.error('Error loading initial country data:', error));
@@ -162,6 +164,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
             console.log('Country selection response:', data);
             if (data.success && data.cities) {
               setCityData(data.cities);
+              setCountryCode(data.country_code);
             }
           })
           .catch(error => console.error('Error sending country selection:', error));
@@ -187,6 +190,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
             .style('filter', null);
           setSelectedCountry(null);
           setCityData([]);
+          setCountryCode(null);
         }
       });
     });
@@ -214,7 +218,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
           }}
         />
       </div>
-      <CityTemperatures cities={cityData} country={selectedCountry} />
+      <CityTemperatures cities={cityData} country={selectedCountry} country_code={countryCode} />
     </div>
   );
 };

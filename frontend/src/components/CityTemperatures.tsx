@@ -11,18 +11,28 @@ interface City {
 interface CityTemperaturesProps {
   cities: City[];
   country: string | null;
+  country_code?: string;
 }
 
-const CityTemperatures: React.FC<CityTemperaturesProps> = ({ cities, country }) => {
+const CityTemperatures: React.FC<CityTemperaturesProps> = ({ cities, country, country_code }) => {
   if (!country || cities.length === 0) {
     return null;
   }
 
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        Cities in {country}
-      </h2>
+      <div className="flex items-center gap-4 mb-4">
+        <h2 className="text-2xl font-semibold text-gray-800">
+          Cities in {country}
+        </h2>
+        {country_code && (
+          <img
+            src={`https://flagcdn.com/w320/${country_code.toLowerCase()}.png`}
+            alt={`Flag of ${country}`}
+            className="h-8 rounded-lg shadow-sm"
+          />
+        )}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <AnimatePresence>
           {cities.map((city, index) => (
