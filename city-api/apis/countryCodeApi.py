@@ -39,7 +39,8 @@ def get_country_code(country_name):
             "uk": "united kingdom",
             "uae": "united arab emirates",
             "holland": "netherlands",
-            "czechia": "czech republic"
+            "czechia": "czech republic",
+            "england": "united kingdom"
         }
         
         # Check for variations first

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { GeoPath, GeoProjection } from 'd3-geo';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
+import CityTemperatures from './CityTemperatures';
 
 interface WorldMapProps {
   onCountrySelect: (countryName: string) => void;
@@ -13,9 +14,15 @@ interface CountryProperties {
   name: string;
 }
 
+interface City {
+  city: string;
+  temperature: number | null;
+}
+
 const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [cityData, setCityData] = useState<City[]>([]);
 
   // Define colors
   const defaultColor = '#a8d5e5';  // Light blue
@@ -130,7 +137,12 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
             body: JSON.stringify({ country: newSelectedCountry }),
           })
           .then(response => response.json())
-          .then(data => console.log('Country selection response:', data))
+          .then(data => {
+            console.log('Country selection response:', data);
+            if (data.success && data.cities) {
+              setCityData(data.cities);
+            }
+          })
           .catch(error => console.error('Error sending country selection:', error));
           
           onCountrySelect(newSelectedCountry);
@@ -153,6 +165,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
             .attr('stroke-width', 0.5)
             .style('filter', null);
           setSelectedCountry(null);
+          setCityData([]);
         }
       });
     });
@@ -164,20 +177,23 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
   }, [onCountrySelect, selectedCountry]);
 
   return (
-    <div className="world-map-container relative">
-      <svg
-        ref={svgRef}
-        width="960"
-        height="500"
-        viewBox="0 0 960 500"
-        style={{
-          maxWidth: '100%',
-          height: 'auto',
-          backgroundColor: oceanColor,
-          borderRadius: '12px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-        }}
-      />
+    <div className="flex flex-col items-center">
+      <div className="world-map-container relative">
+        <svg
+          ref={svgRef}
+          width="960"
+          height="500"
+          viewBox="0 0 960 500"
+          style={{
+            maxWidth: '100%',
+            height: 'auto',
+            backgroundColor: oceanColor,
+            borderRadius: '12px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        />
+      </div>
+      <CityTemperatures cities={cityData} country={selectedCountry} />
     </div>
   );
 };
