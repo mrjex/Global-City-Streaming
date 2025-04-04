@@ -24,7 +24,9 @@ RUN pip install --no-cache-dir \
     requests \
     docker \
     fastapi \
-    uvicorn
+    uvicorn \
+    statsmodels \
+    scipy
 
 # Copy city-api files
 COPY city-api/ ./city-api/
