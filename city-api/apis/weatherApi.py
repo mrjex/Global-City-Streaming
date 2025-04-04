@@ -2,11 +2,11 @@
 
 # Note: North America and South America are combined into one continent 'America'
 
-
 import requests
+import os
 
 ## Weather API configurations  ##
-apiKey = "165bb23217d246afb3e161429241806" # Your generated API key from your private account (https://www.weatherapi.com/my/)
+apiKey = os.environ.get('WEATHER_API_KEY')  # Get API key from environment variable
 apiUrl = "https://api.weatherapi.com/v1/current.json"
 
 
@@ -14,12 +14,25 @@ apiUrl = "https://api.weatherapi.com/v1/current.json"
 
 
 def fetchCityData(city):
-  query = {'key': apiKey, 'q': city, 'aqi':'yes'}
-  response = requests.get(apiUrl, params=query)
-  body_dict = response.json()
-
-  cityObj = composeCityObject(body_dict, city)
-  return cityObj
+    try:
+        if not apiKey:
+            print(f"Error: WEATHER_API_KEY environment variable not set")
+            return None
+            
+        query = {'key': apiKey, 'q': city, 'aqi':'yes'}
+        response = requests.get(apiUrl, params=query)
+        
+        if not response.ok:
+            print(f"Error: Weather API request failed with status {response.status_code}")
+            print(f"Response: {response.text}")
+            return None
+            
+        body_dict = response.json()
+        cityObj = composeCityObject(body_dict, city)
+        return cityObj
+    except Exception as e:
+        print(f"Error in fetchCityData: {str(e)}")
+        return None
 
 
 

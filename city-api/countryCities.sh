@@ -1,41 +1,44 @@
 #!/bin/sh
 
-echo "Starting country cities script..." >&2
-echo "Current directory: $(pwd)" >&2
+echo "=== SCRIPT START ==="
+echo "Testing basic output"
+echo "Current directory: $(pwd)"
+echo "Script arguments: $@"
 
 # Step 1: Get the cities of a specific country
 COUNTRY="$1"
-echo "Fetching cities for country: $COUNTRY" >&2
+COUNTRY="SE" # TEMPORARY FIX
+echo "Country parameter: $COUNTRY"
 
 # Store the curl response in a variable
-RESPONSE=$(curl -s "https://countriesnow.space/api/v0.1/countries/cities/q?country=$COUNTRY")
+echo "Making API request..."
+RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY&limit=3&sort=-population&types=CITY" \
+  -H "X-RapidAPI-Host: wft-geo-db.p.rapidapi.com" \
+  -H "X-RapidAPI-Key: $GEODB_CITIES_API_KEY")
 
-# Extract cities into an array and get count
-CITIES=$(echo "$RESPONSE" | jq -r '.data[]')
-CITY_COUNT=$(echo "$CITIES" | wc -l)
-echo "Found $CITY_COUNT cities to process" >&2
+echo "Raw API Response:"
+echo "$RESPONSE"
+
+# Extract cities into an array and get count (updated for GeoDB API format)
+echo "Extracting cities..."
+CITIES=$(echo "$RESPONSE" | jq -r '.data[].city')
+CITY_COUNT=$(echo "$CITIES" | grep -v '^$' | wc -l)
+echo "Found $CITY_COUNT cities to process"
 
 # Process cities in smaller batches
-BATCH_SIZE=5
+echo "Starting city processing..."
 CURRENT=0
 
 echo "$CITIES" | while read -r city; do
     if [ -n "$city" ]; then
         CURRENT=$((CURRENT + 1))
-        echo "Processing city ($CURRENT/$CITY_COUNT): $city" >&2
+        echo "Processing city ($CURRENT/$CITY_COUNT): $city"
         python /app/city-api/apis/process_cities.py "$city"
-        
-        # Add a small delay between API calls to prevent overwhelming
         sleep 0.1
-        
-        # Progress update every 5 cities
-        if [ $((CURRENT % 5)) -eq 0 ]; then
-            echo "Progress: $CURRENT/$CITY_COUNT cities processed" >&2
-        fi
     fi
 done
 
-echo "Completed processing all $CITY_COUNT cities" >&2
+echo "=== SCRIPT END ==="
 
 # Step 2: Iterate through the cities and get the weather temperature
 # TODO: Implement weather data fetching in next step

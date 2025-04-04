@@ -452,11 +452,37 @@ async def receive_selected_country(request: Request):
         try:
             # Make script executable and run
             os.chmod('/app/city-api/countryCities.sh', 0o755)
+            # Execute script with country parameter
+            print("=== EXECUTING SCRIPT ===", flush=True)
+            print(f"Running countryCities.sh for country: {country}", flush=True)
+            
+            # Create environment with both API keys
+            script_env = os.environ.copy()  # Copy current environment
+            script_env.update({
+                "GEODB_CITIES_API_KEY": os.environ.get("GEODB_CITIES_API_KEY", ""),
+                "WEATHER_API_KEY": os.environ.get("WEATHER_API_KEY", "")
+            })
+            
+            # Debug: Print available environment variables
+            print("Environment variables available:", flush=True)
+            print(f"WEATHER_API_KEY present: {'WEATHER_API_KEY' in script_env}", flush=True)
+            print(f"GEODB_CITIES_API_KEY present: {'GEODB_CITIES_API_KEY' in script_env}", flush=True)
+            
             result = subprocess.run(
-                ['/bin/sh', '/app/city-api/countryCities.sh', country], 
-                capture_output=True, 
-                text=True
+                ['/bin/sh', '/app/city-api/countryCities.sh', country],
+                capture_output=True,
+                text=True,
+                env=script_env
             )
+            
+            print("=== SCRIPT EXECUTION COMPLETED ===", flush=True)
+            print(f"Return code: {result.returncode}", flush=True)
+            
+            print("\n=== STDOUT ===", flush=True)
+            print(result.stdout, flush=True)
+            
+            print("\n=== STDERR ===", flush=True)
+            print(result.stderr, flush=True)
             
             if result.returncode != 0:
                 print(f"Error: Script failed with code {result.returncode}", flush=True)
