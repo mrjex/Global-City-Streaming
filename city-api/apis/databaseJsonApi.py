@@ -37,20 +37,17 @@ databaseLogPaths = {
 
 
 # READ DEVELOPER DEBUG CONFIGURATIONS from 'configuration.yml'
-try:
-    citiesPool = utils.parseYmlFile(configPath, "debugApi.citiesPool")
-    queryAttribute = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryAttribute")
-    queryRequirement = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryRequirement")
-    print(f"Query config loaded - {queryAttribute}: {queryRequirement}")
-except Exception as e:
-    print(f"Error loading configuration: {str(e)}")
+cities = utils.parseYmlFile(configPath, "cities")
+queryAttribute = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryAttribute")
+queryRequirement = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryRequirement")
+print(f"Query config loaded - {queryAttribute}: {queryRequirement}")
 
 
 # This function composes each JSON object for all the cities
 def populateDB():
   citiesArr = [] # An array that gets assigned the dictionary-object for each city in the loop below
 
-  for city in citiesPool:
+  for city in cities:
 
     # Read the data from the APIs
     weatherCityObj = weatherApi.fetchCityData(city)

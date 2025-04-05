@@ -51,8 +51,8 @@ public class Main {
             InputStream inputStream = new FileInputStream("/app/configuration.yml");
             Map<String, Object> config = yaml.load(inputStream);
             
-            Map<String, Object> realTimeProduction = (Map<String, Object>) config.get("realTimeProduction");
-            Map<String, Object> flinkProcessor = (Map<String, Object>) realTimeProduction.get("flinkProcessor");
+            Map<String, Object> services = (Map<String, Object>) config.get("services");
+            Map<String, Object> flinkProcessor = (Map<String, Object>) services.get("flinkProcessor");
             
             sampleDuration = (Integer) flinkProcessor.get("sampleDuration");
             batchSize = (Integer) flinkProcessor.get("batchSize");

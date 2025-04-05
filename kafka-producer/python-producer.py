@@ -26,8 +26,8 @@ apiKey = os.getenv('WEATHER_API_KEY')
 apiUrl = "https://api.weatherapi.com/v1/current.json"
 
 # Get configuration values from YAML
-cities = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.cities")
-request_interval = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.kafkaProducerRequestInterval")
+cities = utils.parseYmlFile("/app/configuration.yml", "cities")
+request_interval = utils.parseYmlFile("/app/configuration.yml", "services.kafkaProducer.requestInterval")
 
 def log_message(msg):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

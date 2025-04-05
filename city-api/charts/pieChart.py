@@ -18,7 +18,7 @@ import utils
 configPath = "/app/configuration.yml"
 
 # Get cities from configuration
-cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
+cities = utils.parseYmlFile(configPath, "cities")
 
 # Number of latest readings to show
 N_LATEST_READINGS = 10
@@ -323,8 +323,8 @@ with open("/app/public/pie_charts.html", "w") as f:
 chartTypes = ['Random-Colors', '4-Coldest-Cities', 'Color-Theme'] # Available options
 
 ## PIE CHART CONFIGURATIONS  ##
-selectedChartType = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.chartType")
-colorTheme = utils.parseYmlFile(configPath, "debugApi.charts.pieChart.pieColorTheme")
+selectedChartType = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.chartType")
+colorTheme = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.pieColorTheme")
 
 def getCitySums():
     output = {}
@@ -388,3 +388,7 @@ def plotPieChart():
         return plot4HottestCities(cityTemperatureSums)
     else:
         plotColorThemedChart(cityTemperatureSums)
+
+def create_pie_chart():
+    selectedChartType = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.chartType")
+    colorTheme = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.pieColorTheme")

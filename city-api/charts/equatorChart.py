@@ -34,19 +34,18 @@ highestCityTemperature = 40
 
 
 # Assign configuration variables from the central 'configuration.yml' file
-cities = utils.parseYmlFile(configPath, "debugApi.citiesPool")
-displayLinearTrend = utils.parseYmlFile(configPath, "debugApi.charts.equatorChart.displayLinearTrend")
-displayLogarithmicTrend = utils.parseYmlFile(configPath, "debugApi.charts.equatorChart.displayLogarithmicTrend")
-displayActualTrend = utils.parseYmlFile(configPath, "debugApi.charts.equatorChart.displayActualTrend")
-pngOutput = utils.parseYmlFile(configPath, "debugApi.charts.equatorChart.pngOutput")
-queryAttribute = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryAttribute")
+cities = utils.parseYmlFile(configPath, "cities")
+displayLinearTrend = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.displayLinearTrend")
+displayLogarithmicTrend = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.displayLogarithmicTrend")
+displayActualTrend = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.displayActualTrend")
+pngOutput = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.pngOutput")
+queryAttribute = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryAttribute")
+queryRequirement = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryRequirement")
 
 
 # Reads the pre-defined city query configurations from 'configuraiton.yml' and returns a
 # descriptive string of what type of query and parameters were defined by the developer
 def formatQueryConfigs():
-    queryRequirement = utils.parseYmlFile(configPath, "debugApi.queryConfig.queryRequirement")
-
     if queryAttribute == "continent" or queryAttribute == "timeZoneOffset":
         return f", Query: '{queryAttribute}' = '{queryRequirement}'"
 
@@ -176,3 +175,6 @@ def getTypeOfQueryString():
     elif queryAttribute == "timeZoneOffset":
         return "timezone-queries"
     return "none-filter-queries"
+
+def get_cities():
+    # ... existing code ...

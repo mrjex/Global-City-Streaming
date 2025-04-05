@@ -32,9 +32,9 @@ import utils
 configPath = "/app/configuration.yml" # The fixed relative path to the central config file
 
 
-pngOutput = utils.parseYmlFile(configPath, "debugApi.charts.bubbleChart.pngOutput")
-colorTheme = utils.parseYmlFile(configPath, "debugApi.charts.bubbleChart.bubbleColorTheme")
-separateGraphDisplay = utils.parseYmlFile(configPath, "debugApi.charts.bubbleChart.separateGraphDisplay")
+pngOutput = utils.parseYmlFile(configPath, "visualizations.charts.bubbleChart.pngOutput")
+colorTheme = utils.parseYmlFile(configPath, "visualizations.charts.bubbleChart.bubbleColorTheme")
+separateGraphDisplay = utils.parseYmlFile(configPath, "visualizations.charts.bubbleChart.separateGraphDisplay")
  
 
 ##  OUTPUT FORMAT  ##

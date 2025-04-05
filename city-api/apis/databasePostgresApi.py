@@ -45,7 +45,7 @@ res = "{}"
 
 csvFields = ['id', 'city', 'average_temperature', 'API-Call', 'timestamp']
 
-cities = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.cities")
+cities = utils.parseYmlFile("/app/configuration.yml", "cities")
 
 # Send a request to the database and print the response (the matched objects that qualified for the query conditions)
 def queryDB(command, city):
