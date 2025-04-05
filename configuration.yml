@@ -23,7 +23,18 @@ cities:
 - Honolulu
 - Papeete
 - Juneau
+dynamicCities:
+  current:
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  enabled: true
+  previousBatch: []
 services:
+  cityApi:
+    numberOfCitiesForSelectedCountry: 5
   flinkProcessor:
     batchIntervalMs: 200
     batchSize: 1000
@@ -31,12 +42,6 @@ services:
     sampleDuration: 15
   kafkaProducer:
     requestInterval: 0.01
-  cityApi:
-    numberOfCitiesForSelectedCountry: 5
-dynamicCities:
-  enabled: false
-  current: []
-  previousBatch: []
 visualizations:
   charts:
     equatorChart:

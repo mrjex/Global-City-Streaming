@@ -530,35 +530,60 @@ async def receive_selected_country(request: Request):
                 
                 # Extract cities from response
                 if response_data.get('success') and 'cities' in response_data:
-                    cities = [city['name'] for city in response_data['cities']]
+                    # Debug log the cities structure
+                    print("[DEBUG] Cities data structure:", flush=True)
+                    for city in response_data['cities']:
+                        print(f"City object: {json.dumps(city)}", flush=True)
                     
-                    # Check if this is the first batch
-                    config_path = Path('configuration.yml')
-                    is_first_batch = True
-                    if config_path.exists():
-                        with open(config_path) as f:
-                            config = yaml.safe_load(f)
-                            is_first_batch = not config.get('dynamicCities', {}).get('enabled', False)
-                    
-                    # Update configuration file
-                    if update_dynamic_cities(cities, is_first_batch):
-                        # Send update to control topic
-                        try:
-                            producer = get_kafka_producer()
-                            control_message = {
-                                'action': 'UPDATE_CITIES',
-                                'data': {
-                                    'cities': cities,
-                                    'isFirstBatch': is_first_batch
+                    try:
+                        # Extract city names, with better error handling
+                        cities = []
+                        for city in response_data['cities']:
+                            if isinstance(city, dict) and 'city' in city:  # Check if it's a dict and has 'city' key
+                                cities.append(city['city'])
+                            else:
+                                print(f"[WARNING] Unexpected city format: {city}", flush=True)
+                        
+                        if not cities:
+                            print("[WARNING] No valid cities found in response", flush=True)
+                            return JSONResponse(content=response_data)
+                        
+                        print(f"[DEBUG] Extracted city names: {cities}", flush=True)
+                        
+                        # Check if this is the first batch
+                        config_path = Path('configuration.yml')
+                        is_first_batch = True
+                        if config_path.exists():
+                            with open(config_path) as f:
+                                config = yaml.safe_load(f)
+                                is_first_batch = not config.get('dynamicCities', {}).get('enabled', False)
+                        
+                        # Update configuration file
+                        if update_dynamic_cities(cities, is_first_batch):
+                            # Send update to control topic
+                            try:
+                                producer = get_kafka_producer()
+                                control_message = {
+                                    'action': 'UPDATE_CITIES',
+                                    'data': {
+                                        'cities': cities,
+                                        'isFirstBatch': is_first_batch
+                                    }
                                 }
-                            }
-                            producer.send(CONTROL_TOPIC, control_message)
-                            producer.flush()
-                            producer.close()
-                            print(f"[DEBUG] Sent control message: {control_message}", flush=True)
-                        except Exception as e:
-                            print(f"[ERROR] Failed to send control message: {str(e)}", flush=True)
-                    
+                                producer.send(CONTROL_TOPIC, control_message)
+                                producer.flush()
+                                producer.close()
+                                print(f"[DEBUG] Sent control message: {control_message}", flush=True)
+                            except Exception as e:
+                                print(f"[ERROR] Failed to send control message: {str(e)}", flush=True)
+                    except Exception as e:
+                        print(f"[ERROR] Error processing city data: {str(e)}", flush=True)
+                        print(f"[DEBUG] Cities data: {response_data['cities']}", flush=True)
+                        return JSONResponse(
+                            content={"error": f"Error processing city data: {str(e)}"},
+                            status_code=500
+                        )
+                
                 return JSONResponse(content=response_data)
             except json.JSONDecodeError as e:
                 print(f"[ERROR] Failed to parse JSON output: {str(e)}", flush=True)
