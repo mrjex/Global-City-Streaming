@@ -21,7 +21,6 @@ from utils import parseYmlFile
 sys.path.extend(['/app/city-api', '/app/city-api/apis'])
 
 import apis.databaseJsonApi as databaseJsonApi
-# import apis.databaseApi as databaseApi
 import apis.mathCurveApi as mathCurveApi
 
 configPath = "/app/configuration.yml" # The fixed absolute path to the central config file

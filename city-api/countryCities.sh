@@ -28,9 +28,14 @@ if [ -z "$COUNTRY_CODE" ]; then
     exit 1
 fi
 
+# Get number of cities from configuration
+debug "Getting number of cities from configuration..."
+CITIES_LIMIT=$(yq '.services.cityApi.numberOfCitiesForSelectedCountry' /app/configuration.yml)
+debug "Number of cities to fetch: $CITIES_LIMIT"
+
 # Store the curl response in a variable
 debug "Making API request for country code: $COUNTRY_CODE..."
-RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY_CODE&limit=3&sort=-population&types=CITY" \
+RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY_CODE&limit=$CITIES_LIMIT&sort=-population&types=CITY" \
   -H "X-RapidAPI-Host: wft-geo-db.p.rapidapi.com" \
   -H "X-RapidAPI-Key: $GEODB_CITIES_API_KEY")
 

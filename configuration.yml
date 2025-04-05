@@ -31,6 +31,8 @@ services:
     sampleDuration: 15
   kafkaProducer:
     requestInterval: 0.01
+  cityApi:
+    numberOfCitiesForSelectedCountry: 5
 visualizations:
   charts:
     equatorChart:

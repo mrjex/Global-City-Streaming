@@ -8,7 +8,10 @@ RUN apt-get update && apt-get install -y \
     dos2unix \
     curl \
     jq \
-    && rm -rf /var/lib/apt/lists/*
+    wget \
+    && rm -rf /var/lib/apt/lists/* \
+    && wget https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -O /usr/bin/yq \
+    && chmod +x /usr/bin/yq
 
 WORKDIR /app
 
