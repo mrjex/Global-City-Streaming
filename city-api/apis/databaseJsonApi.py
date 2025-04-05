@@ -13,7 +13,7 @@ sys.path.extend(['/app/city-api', '/app/city-api/apis', '/app'])
 import apis.geolocationApi as geolocationApi
 from shared.weather.api import WeatherAPI
 import json
-import utils
+from utils import parseYmlFile
 
 print("Starting databaseJsonApi.py...")
 print(f"Current working directory: {sys.path}")
@@ -40,9 +40,9 @@ databaseLogPaths = {
 
 
 # READ DEVELOPER DEBUG CONFIGURATIONS from 'configuration.yml'
-cities = utils.parseYmlFile(configPath, "cities")
-queryAttribute = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryAttribute")
-queryRequirement = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryRequirement")
+cities = parseYmlFile(configPath, "cities")
+queryAttribute = parseYmlFile(configPath, "visualizations.queryConfig.queryAttribute")
+queryRequirement = parseYmlFile(configPath, "visualizations.queryConfig.queryRequirement")
 print(f"Query config loaded - {queryAttribute}: {queryRequirement}")
 
 

@@ -14,6 +14,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import json
 import sys
+sys.path.append('/app')
+from utils import parseYmlFile
 
 # Add necessary paths for imports
 sys.path.extend(['/app/city-api', '/app/city-api/apis'])
@@ -21,7 +23,6 @@ sys.path.extend(['/app/city-api', '/app/city-api/apis'])
 import apis.databaseJsonApi as databaseJsonApi
 # import apis.databaseApi as databaseApi
 import apis.mathCurveApi as mathCurveApi
-import utils
 
 configPath = "/app/configuration.yml" # The fixed absolute path to the central config file
 
@@ -34,13 +35,13 @@ highestCityTemperature = 40
 
 
 # Assign configuration variables from the central 'configuration.yml' file
-cities = utils.parseYmlFile(configPath, "cities")
-displayLinearTrend = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.displayLinearTrend")
-displayLogarithmicTrend = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.displayLogarithmicTrend")
-displayActualTrend = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.displayActualTrend")
-pngOutput = utils.parseYmlFile(configPath, "visualizations.charts.equatorChart.pngOutput")
-queryAttribute = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryAttribute")
-queryRequirement = utils.parseYmlFile(configPath, "visualizations.queryConfig.queryRequirement")
+cities = parseYmlFile(configPath, "cities")
+displayLinearTrend = parseYmlFile(configPath, "visualizations.charts.equatorChart.displayLinearTrend")
+displayLogarithmicTrend = parseYmlFile(configPath, "visualizations.charts.equatorChart.displayLogarithmicTrend")
+displayActualTrend = parseYmlFile(configPath, "visualizations.charts.equatorChart.displayActualTrend")
+pngOutput = parseYmlFile(configPath, "visualizations.charts.equatorChart.pngOutput")
+queryAttribute = parseYmlFile(configPath, "visualizations.queryConfig.queryAttribute")
+queryRequirement = parseYmlFile(configPath, "visualizations.queryConfig.queryRequirement")
 
 
 # Reads the pre-defined city query configurations from 'configuraiton.yml' and returns a

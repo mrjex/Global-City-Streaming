@@ -25,8 +25,8 @@ import csv
 import sys
 import os
 from datetime import datetime
-sys.path.append('/app/city-api')
-import utils
+sys.path.append('/app')
+from utils import parseYmlFile
 
 
 # Connect to the database (note that the container 'postgres' in docker-compose must be up and running first)
@@ -45,7 +45,7 @@ res = "{}"
 
 csvFields = ['id', 'city', 'average_temperature', 'API-Call', 'timestamp']
 
-cities = utils.parseYmlFile("/app/configuration.yml", "cities")
+cities = parseYmlFile("/app/configuration.yml", "cities")
 
 # Send a request to the database and print the response (the matched objects that qualified for the query conditions)
 def queryDB(command, city):

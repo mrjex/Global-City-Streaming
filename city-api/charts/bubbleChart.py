@@ -22,19 +22,19 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 
+sys.path.append('/app')
+from utils import parseYmlFile
+
 sys.path.append('/app/city-api')
 import apis.colorApi as colorApi
-
-sys.path.append('../..')
-import utils
 
 
 configPath = "/app/configuration.yml" # The fixed relative path to the central config file
 
 
-pngOutput = utils.parseYmlFile(configPath, "visualizations.charts.bubbleChart.pngOutput")
-colorTheme = utils.parseYmlFile(configPath, "visualizations.charts.bubbleChart.bubbleColorTheme")
-separateGraphDisplay = utils.parseYmlFile(configPath, "visualizations.charts.bubbleChart.separateGraphDisplay")
+pngOutput = parseYmlFile(configPath, "visualizations.charts.bubbleChart.pngOutput")
+colorTheme = parseYmlFile(configPath, "visualizations.charts.bubbleChart.bubbleColorTheme")
+separateGraphDisplay = parseYmlFile(configPath, "visualizations.charts.bubbleChart.separateGraphDisplay")
  
 
 ##  OUTPUT FORMAT  ##
@@ -49,7 +49,7 @@ dataPointOutlizeWidth = 0
 
 
 
-cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
+cities = parseYmlFile(configPath, "realTimeProduction.cities")
 
 
 
@@ -134,7 +134,7 @@ def plotBubbleChart():
 
 # Configuration
 configPath = "/app/configuration.yml"
-cities = utils.parseYmlFile(configPath, "realTimeProduction.cities")
+cities = parseYmlFile(configPath, "realTimeProduction.cities")
 
 # Number of latest readings to show in the sliding window
 N_LATEST_READINGS = 10  # Reduced from 20 to 10 for smoother updates

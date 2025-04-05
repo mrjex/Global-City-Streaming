@@ -1,7 +1,6 @@
 #####     UTILS     #####
 
 import yaml
-import os
 
 # Function:
 #   - This function parses a key-value structured file, by traversing the nested

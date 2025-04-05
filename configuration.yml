@@ -35,9 +35,9 @@ visualizations:
   charts:
     equatorChart:
       displayActualTrend: false
-      displayLinearTrend: true
+      displayLinearTrend: false
       displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
-    queryRequirement: UTC+1
+    queryRequirement: UTC+0

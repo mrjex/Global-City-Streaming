@@ -9,16 +9,16 @@ import json
 import numpy as np
 from datetime import datetime
 
-sys.path.append('/app/city-api')
+sys.path.append('/app')
 
 import apis.colorApi as colorApi
-import utils
+from utils import parseYmlFile
 
 # Configuration file path
 configPath = "/app/configuration.yml"
 
 # Get cities from configuration
-cities = utils.parseYmlFile(configPath, "cities")
+cities = parseYmlFile(configPath, "cities")
 
 # Number of latest readings to show
 N_LATEST_READINGS = 10
@@ -323,8 +323,8 @@ with open("/app/public/pie_charts.html", "w") as f:
 chartTypes = ['Random-Colors', '4-Coldest-Cities', 'Color-Theme'] # Available options
 
 ## PIE CHART CONFIGURATIONS  ##
-selectedChartType = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.chartType")
-colorTheme = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.pieColorTheme")
+selectedChartType = parseYmlFile(configPath, "visualizations.charts.pieChart.chartType")
+colorTheme = parseYmlFile(configPath, "visualizations.charts.pieChart.pieColorTheme")
 
 def getCitySums():
     output = {}
@@ -390,5 +390,5 @@ def plotPieChart():
         plotColorThemedChart(cityTemperatureSums)
 
 def create_pie_chart():
-    selectedChartType = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.chartType")
-    colorTheme = utils.parseYmlFile(configPath, "visualizations.charts.pieChart.pieColorTheme")
+    selectedChartType = parseYmlFile(configPath, "visualizations.charts.pieChart.chartType")
+    colorTheme = parseYmlFile(configPath, "visualizations.charts.pieChart.pieColorTheme")
