@@ -381,6 +381,11 @@ async def update_config(request: Request):
         # Write updated config
         with open(config_path, 'w') as f:
             yaml.dump(config, f, default_flow_style=False)
+            
+        # Debug: Print the updated configuration
+        print("Updated configuration:")
+        with open(config_path) as f:
+            print(f.read())
 
         # Execute the equator chart script and capture its output
         script_path = Path('/app/city-api/equatorChart.sh')

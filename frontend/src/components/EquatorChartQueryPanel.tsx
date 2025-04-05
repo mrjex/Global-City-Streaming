@@ -24,8 +24,13 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
 
   // Requirement options based on attribute selection
   const requirementOptions = {
-    continent: ['Europe', 'Asia'],
-    timeZoneOffset: ['UTC+0', 'UTC+1', 'UTC+2', 'UTC+3']
+    continent: ['Europe', 'Asia', 'America', 'Atlantic', 'Africa'],
+    timeZoneOffset: [
+      'UTC+0', 'UTC+1', 'UTC+2', 'UTC+3', 'UTC+4', 'UTC+5', 'UTC+6', 
+      'UTC+7', 'UTC+8', 'UTC+9', 'UTC+10', 'UTC+11', 'UTC+12',
+      'UTC-1', 'UTC-2', 'UTC-3', 'UTC-4', 'UTC-5', 'UTC-6',
+      'UTC-7', 'UTC-8', 'UTC-9', 'UTC-10', 'UTC-11', 'UTC-12'
+    ]
   };
 
   // Fetch current config on initial load
@@ -47,12 +52,12 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
       const response = await fetch('/api/config');
       if (response.ok) {
         const config = await response.json();
-        if (config.debugApi && config.debugApi.queryConfig) {
-          setQueryAttribute(config.debugApi.queryConfig.queryAttribute || 'continent');
-          setQueryRequirement(config.debugApi.queryConfig.queryRequirement || 'Europe');
+        if (config.visualizations && config.visualizations.queryConfig) {
+          setQueryAttribute(config.visualizations.queryConfig.queryAttribute || 'continent');
+          setQueryRequirement(config.visualizations.queryConfig.queryRequirement || 'Europe');
         }
-        if (config.debugApi?.charts?.equatorChart) {
-          const chartConfig = config.debugApi.charts.equatorChart;
+        if (config.visualizations?.charts?.equatorChart) {
+          const chartConfig = config.visualizations.charts.equatorChart;
           setDisplayLinearTrend(chartConfig.displayLinearTrend || false);
           setDisplayLogarithmicTrend(chartConfig.displayLogarithmicTrend || true);
           setDisplayActualTrend(chartConfig.displayActualTrend || false);
@@ -75,7 +80,7 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          path: 'debugApi',
+          path: 'visualizations',
           config: {
             queryConfig: {
               queryAttribute,
