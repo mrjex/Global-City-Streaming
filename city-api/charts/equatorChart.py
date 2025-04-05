@@ -175,6 +175,3 @@ def getTypeOfQueryString():
     elif queryAttribute == "timeZoneOffset":
         return "timezone-queries"
     return "none-filter-queries"
-
-def get_cities():
-    # ... existing code ...
