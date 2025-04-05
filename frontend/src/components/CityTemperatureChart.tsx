@@ -35,23 +35,19 @@ ChartJS.register(
 
 interface CityTemperatureData {
   city: string;
-  timestamps: number[]; // Relative time in seconds since start
+  timestamps: number[];
   temperatures: number[];
+}
+
+interface TemperatureDataPoint {
+  city: string;
+  temperature: number;
+  timestamp: string;
 }
 
 interface CityTemperatureChartProps {
   title?: string;
 }
-
-// Only display these 3 default cities
-const DEFAULT_CITIES = ['London', 'Stockholm', 'Venice'];
-
-// Colors for each city
-const CITY_COLORS: Record<string, string> = {
-  'London': 'rgb(75, 192, 192)',
-  'Stockholm': 'rgb(153, 102, 255)',
-  'Venice': 'rgb(255, 99, 132)'
-};
 
 // Window size in seconds - reduced to show less data points
 const TIME_WINDOW = 5;
@@ -64,88 +60,54 @@ const MIN_TEMP = -15;
 const MAX_TEMP = 45;
 
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
-  title = 'City Temperatures'
+  title = 'Dynamic City Temperatures'
 }) => {
   const [cityData, setCityData] = useState<Record<string, CityTemperatureData>>({});
   const [isLoading, setIsLoading] = useState(true);
   const startTimeRef = useRef<number>(Date.now());
   const currentTimeRef = useRef<number>(0);
+  const [cityColors, setCityColors] = useState<Record<string, string>>({});
+
+  // Generate a color for a new city
+  const getColorForCity = (city: string) => {
+    if (cityColors[city]) return cityColors[city];
+    
+    const hue = Math.random() * 360;
+    const color = `hsl(${hue}, 70%, 50%)`;
+    setCityColors(prev => ({ ...prev, [city]: color }));
+    return color;
+  };
 
   useEffect(() => {
-    // Initialize with empty data for each city
-    const initialData: Record<string, CityTemperatureData> = {};
-    DEFAULT_CITIES.forEach(city => {
-      initialData[city] = {
-        city,
-        timestamps: [],
-        temperatures: []
-      };
-    });
-    setCityData(initialData);
-    
-    const fetchAndProcessLogs = async () => {
+    const fetchAndProcessData = async () => {
       try {
         const response = await fetch('/api/logs');
-        const data = await response.text();
+        const data = await response.json();
         
         // Update current time
         currentTimeRef.current = (Date.now() - startTimeRef.current) / 1000;
         
-        if (data && data !== '[]') {
-          const allLogs = data.split('\n').filter(line => line.trim());
-          
-          // Process logs to extract city temperature data
+        if (data && data.temperatureData) {
           setCityData(prevData => {
             const newCityData = { ...prevData };
             
-            allLogs.forEach(log => {
-              // Match the specific log format from python-producer.py:
-              // [timestamp] Sent data: {"city": "CityName", "temperature": "23.45"}
-              const jsonMatch = log.match(/Sent data: (\{.*\})/);
+            data.temperatureData.forEach((point: TemperatureDataPoint) => {
+              if (!newCityData[point.city]) {
+                newCityData[point.city] = {
+                  city: point.city,
+                  timestamps: [],
+                  temperatures: []
+                };
+              }
               
-              if (jsonMatch) {
-                try {
-                  const jsonData = JSON.parse(jsonMatch[1]);
-                  const cityName = jsonData.city === 'Moscow' ? 'Venice' : jsonData.city;
-                  
-                  if (jsonData.city && jsonData.temperature && DEFAULT_CITIES.includes(cityName)) {
-                    const city = cityName;
-                    const temperature = parseFloat(jsonData.temperature);
-                    
-                    if (!isNaN(temperature)) {
-                      if (!newCityData[city]) {
-                        newCityData[city] = {
-                          city,
-                          timestamps: [],
-                          temperatures: []
-                        };
-                      }
-                      
-                      // Only add a new data point if there's a significant change in time
-                      // or it's the first data point for this city
-                      const lastTimestamp = newCityData[city].timestamps.length > 0 
-                        ? newCityData[city].timestamps[newCityData[city].timestamps.length - 1] 
-                        : 0;
-                        
-                      // Add data point if it's the first one or at least 0.5 second has passed
-                      if (newCityData[city].timestamps.length === 0 || 
-                          (currentTimeRef.current - lastTimestamp) >= 0.5) {
-                        
-                        // Add new data point with the current time
-                        newCityData[city].timestamps.push(currentTimeRef.current);
-                        newCityData[city].temperatures.push(temperature);
-                        
-                        // Limit number of data points
-                        if (newCityData[city].timestamps.length > MAX_DATA_POINTS) {
-                          newCityData[city].timestamps = newCityData[city].timestamps.slice(-MAX_DATA_POINTS);
-                          newCityData[city].temperatures = newCityData[city].temperatures.slice(-MAX_DATA_POINTS);
-                        }
-                      }
-                    }
-                  }
-                } catch (error) {
-                  console.error('Error parsing JSON from logs:', error);
-                }
+              // Add new data point
+              newCityData[point.city].timestamps.push(currentTimeRef.current);
+              newCityData[point.city].temperatures.push(point.temperature);
+              
+              // Keep only last MAX_DATA_POINTS
+              if (newCityData[point.city].timestamps.length > MAX_DATA_POINTS) {
+                newCityData[point.city].timestamps = newCityData[point.city].timestamps.slice(-MAX_DATA_POINTS);
+                newCityData[point.city].temperatures = newCityData[point.city].temperatures.slice(-MAX_DATA_POINTS);
               }
             });
             
@@ -154,17 +116,13 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         }
         setIsLoading(false);
       } catch (error) {
-        console.error('Error fetching logs:', error);
+        console.error('Error fetching data:', error);
         setIsLoading(false);
       }
     };
 
-    // Initial fetch
-    fetchAndProcessLogs();
-
-    // Poll for updates every 100ms (increased from 250ms)
-    const interval = setInterval(fetchAndProcessLogs, 100);
-
+    fetchAndProcessData();
+    const interval = setInterval(fetchAndProcessData, 100);
     return () => clearInterval(interval);
   }, []);
 
@@ -174,22 +132,19 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
   // Prepare data for Chart.js
   const chartData = {
-    datasets: Object.entries(cityData).map(([cityName, data]) => {
-      const city = data as CityTemperatureData;
-      return {
-        label: cityName,
-        data: city.temperatures.map((temp, idx) => ({
-          x: city.timestamps[idx],
-          y: temp
-        })),
-        borderColor: CITY_COLORS[cityName] || 'rgb(200, 200, 200)',
-        backgroundColor: 'rgba(0, 0, 0, 0)', // Transparent background
-        borderWidth: 3,
-        pointRadius: 0, // Hide points for a cleaner look
-        tension: 0.4, // Increased smoothing for better curves
-        fill: false
-      };
-    })
+    datasets: Object.entries(cityData).map(([cityName, data]) => ({
+      label: cityName,
+      data: data.temperatures.map((temp, idx) => ({
+        x: data.timestamps[idx],
+        y: temp
+      })),
+      borderColor: getColorForCity(cityName),
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      borderWidth: 3,
+      pointRadius: 0,
+      tension: 0.4,
+      fill: false
+    }))
   };
   
   // Chart options

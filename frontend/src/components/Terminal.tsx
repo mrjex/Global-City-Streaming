@@ -17,10 +17,10 @@ const Terminal: React.FC<TerminalProps> = ({
     const fetchLogs = async () => {
       try {
         const response = await fetch('/api/logs');
-        const data = await response.text();
+        const data = await response.json();
         
-        if (data && data !== '[]') {
-          const allLogs = data.split('\n').filter(line => line.trim());
+        if (data && data.logs) {
+          const allLogs = data.logs.split('\n').filter(line => line.trim());
           setLogs(allLogs.slice(-maxLines));
         }
         setIsLoading(false);

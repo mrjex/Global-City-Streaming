@@ -278,12 +278,46 @@ async def proxy_flink_db_logs():
 @app.get("/api/kafka-logs")
 async def get_kafka_logs():
     try:
-        # This endpoint can still be implemented with the docker client as before
         client = get_docker_client()
         if client:
             container = client.containers.get("kafka-producer")
             logs = container.logs(tail=1000).decode("utf-8")
-            return {"logs": logs}
+            
+            # Parse logs to extract temperature data
+            temperature_data = []
+            raw_logs = []
+            
+            # Get current dynamic cities from configuration
+            config_path = Path('configuration.yml')
+            dynamic_cities = []
+            if config_path.exists():
+                with open(config_path) as f:
+                    config = yaml.safe_load(f)
+                    dynamic_cities = config.get('dynamicCities', {}).get('current', [])
+            
+            for line in logs.split('\n'):
+                raw_logs.append(line)
+                if "Sent data for" in line:
+                    try:
+                        # Extract JSON data
+                        json_str = line[line.find('{'): line.rfind('}')+1]
+                        data = json.loads(json_str)
+                        
+                        # Only include dynamic cities
+                        if data['city'] in dynamic_cities:
+                            timestamp = line[1:20]  # Extract timestamp [YYYY-MM-DD HH:MM:SS]
+                            temperature_data.append({
+                                'city': data['city'],
+                                'temperature': float(data['temperature']),
+                                'timestamp': timestamp
+                            })
+                    except:
+                        continue
+            
+            return {
+                "logs": "\n".join(raw_logs),
+                "temperatureData": temperature_data
+            }
         else:
             return {"error": "Docker client initialization failed"}
     except Exception as e:

@@ -12,24 +12,24 @@ export async function GET() {
     const response = await fetch(`${CITY_API_URL}/api/kafka-logs`, {
       cache: 'no-store',
       headers: {
-        'Accept': 'text/plain',
+        'Accept': 'application/json',
       },
     });
 
     if (!response.ok) {
       console.error('Failed to fetch logs:', response.status, response.statusText);
-      return NextResponse.json({ logs: [] }, { status: response.status });
+      return NextResponse.json({ logs: [], temperatureData: [] }, { status: response.status });
     }
 
     const data = await response.json();
-    return new NextResponse(data.logs, {
+    
+    return NextResponse.json(data, {
       headers: {
-        'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     });
   } catch (error) {
     console.error('Error fetching logs:', error);
-    return NextResponse.json({ logs: [] }, { status: 500 });
+    return NextResponse.json({ logs: [], temperatureData: [] }, { status: 500 });
   }
 } 

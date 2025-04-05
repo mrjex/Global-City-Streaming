@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Seoul
-  - Busan
-  - Incheon
-  - Daegu
-  - Daejeon
+  - Riyadh
+  - Jeddah
+  - Mecca
+  - Medina
+  - Sultanah
   enabled: true
   previousBatch:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
