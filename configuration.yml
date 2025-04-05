@@ -1,49 +1,42 @@
 cities:
-  - London
-  - Stockholm
-  - Toronto
-  - Moscow
-  - Madrid
-  - Reykjavik
-  - Helsinki
-  - Rome
-  - Venice
-  - Lisbon
-  - Paris
-  - Amsterdam
-  - Chernobyl
-  - Nairobi
-  - Dubai
-  - Bali
-  - Tokyo
-  - Bangkok
-  - Seoul
-  - Buenos Aires
-  - Mexico City
+- London
+- Stockholm
+- Toronto
+- Moscow
+- Madrid
+- Reykjavik
+- Helsinki
+- Rome
+- Venice
+- Lisbon
+- Paris
+- Amsterdam
+- Chernobyl
+- Nairobi
+- Dubai
+- Bali
+- Tokyo
+- Bangkok
+- Seoul
+- Buenos Aires
+- Mexico City
+- Honolulu
+- Papeete
 services:
+  flinkProcessor:
+    batchIntervalMs: 200
+    batchSize: 1000
+    maxRetries: 5
+    sampleDuration: 15
   kafkaProducer:
     requestInterval: 0.01
-  flinkProcessor:
-    sampleDuration: 15
-    batchSize: 1000
-    batchIntervalMs: 200
-    maxRetries: 5
 visualizations:
-  queryConfig:
-    queryAttribute: continent
-    queryRequirement: Europe
   charts:
-    bubbleChart:
-      separateGraphDisplay: False
-      bubbleColorTheme: brown
-      pngOutput: True
-    pieChart:
-      chartType: Color-Theme
-      pieColorTheme: orange
-      pngOutput: True
     equatorChart:
-      displayLinearTrend: False
-      displayLogarithmicTrend: True
-      displayActualTrend: False
-      pngOutput: False
-
+      displayActualTrend: false
+      displayLinearTrend: false
+      displayLogarithmicTrend: true
+      pngOutput: false
+  queryConfig:
+    queryAttribute: timeZoneOffset
+    queryRequirement: UTC-10

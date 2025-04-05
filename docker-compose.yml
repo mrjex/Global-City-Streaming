@@ -160,7 +160,7 @@ services:
       - "8003:8003"
     volumes:
       - ./city-api:/app/city-api:rw
-      - .:/app:ro
+      - .:/app:rw
       - ./city-api/generated-artifacts:/app/city-api/generated-artifacts
       - /var/run/docker.sock:/var/run/docker.sock
     environment:

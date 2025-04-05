@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Starting equator chart script..."
 echo "Current directory: $(pwd)"
@@ -36,11 +36,11 @@ echo "Step 1 - Query DB"
 cd /app/city-api/apis
 
 echo "Running databaseJsonApi.py..."
-python databaseJsonApi.py ${RECREATE_DATABASE}
+python /app/city-api/apis/databaseJsonApi.py ${RECREATE_DATABASE}
 
 echo "Step 2 - Visualize data"
 cd /app/city-api/charts
 
 echo "Running main.py..."
 # Capture and forward the output from main.py
-python main.py "False" "False" ${VISUALIZE_EQUATOR_CHART}
+python /app/city-api/charts/main.py "False" "False" ${VISUALIZE_EQUATOR_CHART}
