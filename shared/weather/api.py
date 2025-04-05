@@ -6,6 +6,7 @@ class WeatherAPI:
     def __init__(self):
         self.api_key = os.environ.get('WEATHER_API_KEY')
         self.api_url = "https://api.weatherapi.com/v1/current.json"
+        self.batch_enabled = False  # Default to sequential processing
         
         if not self.api_key:
             raise ValueError("WEATHER_API_KEY environment variable not set")
@@ -33,13 +34,21 @@ class WeatherAPI:
     
     def fetch_cities_batch(self, cities: List[str]) -> Dict[str, Dict[str, Any]]:
         """
-        Fetch weather data for multiple cities in a batch.
-        Returns a dictionary mapping city names to their data.
+        Fetch weather data for multiple cities.
+        If batch_enabled is True, returns a dictionary of all cities at once.
+        If batch_enabled is False (default), yields each city's data as it's processed.
         """
-        results = {}
-        for city in cities:
-            results[city] = self.fetch_city_data(city)
-        return results
+        if self.batch_enabled:
+            # Batch mode: process all cities at once and return dict
+            results = {}
+            for city in cities:
+                results[city] = self.fetch_city_data(city)
+            return results
+        else:
+            # Sequential mode: yield each city's data as it's processed
+            for city in cities:
+                data = self.fetch_city_data(city)
+                yield city, data
             
     def _compose_city_object(self, api_response: Dict[str, Any], city: str) -> Dict[str, Any]:
         """

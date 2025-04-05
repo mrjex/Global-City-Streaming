@@ -47,11 +47,8 @@ def main():
 
     while True:
         try:
-            # Fetch all cities in one batch
-            city_data = weather_api.fetch_cities_batch(cities)
-            
-            # Send data for each city
-            for city, data in city_data.items():
+            # Process each city sequentially
+            for city, data in weather_api.fetch_cities_batch(cities):
                 if data:  # Only send if we got valid data
                     message = {
                         "city": city,
@@ -59,9 +56,11 @@ def main():
                     }
                     
                     prod.send(topic=myTopic, value=message)
-                    log_message(f"Sent data: {json.dumps(message)}")
+                    log_message(f"Sent data for {city}: {json.dumps(message)}")
+                else:
+                    log_message(f"No data received for {city}, skipping")
                 
-            time.sleep(request_interval)  # Wait before next batch
+            time.sleep(request_interval)  # Wait before next round
             
         except Exception as e:
             log_message(f"Error in main loop: {str(e)}")
