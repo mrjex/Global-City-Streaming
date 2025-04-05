@@ -38,10 +38,10 @@ import java.util.Map;
 public class Main {
 
     static final String BROKERS = "kafka:9092";
-    static final Integer sampleDuration;
-    static final Integer batchSize;
-    static final Integer batchIntervalMs;
-    static final Integer maxRetries;
+    static Integer sampleDuration;
+    static Integer batchSize;
+    static Integer batchIntervalMs;
+    static Integer maxRetries;
     static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     // Load configuration from YAML

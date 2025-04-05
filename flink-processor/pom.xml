@@ -136,6 +136,13 @@
             <version>${kafka.version}</version>
         </dependency>
 
+        <!-- SnakeYAML for configuration parsing -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.0</version>
+        </dependency>
+
         <!-- Add logging framework, to produce console output when running in the IDE. -->
         <!-- These dependencies are excluded from the application JAR by default. -->
         <dependency>
@@ -216,17 +223,6 @@
             <artifactId>flink-streaming-java</artifactId>
             <version>${flink.version}</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-jdbc_2.12</artifactId>
-            <version>1.16.0</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>2.0</version>
         </dependency>
     </dependencies>
 
