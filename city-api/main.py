@@ -466,7 +466,7 @@ async def receive_selected_country(request: Request):
             
             print("[DEBUG] Executing script...", flush=True)
             result = subprocess.run(
-                ['/bin/sh', str(script_path), country],
+                ['/bin/bash', str(script_path), country],
                 capture_output=True,
                 text=True,
                 env=script_env

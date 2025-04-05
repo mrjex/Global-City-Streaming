@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Debug output redirected to stderr so it doesn't interfere with JSON output
 debug() {

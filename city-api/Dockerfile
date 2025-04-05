@@ -43,9 +43,11 @@ RUN mkdir -p \
     city-api/apis/database \
     city-api/apis/database/logs
 
-# Convert Windows line endings to Unix and make shell scripts executable
-RUN dos2unix city-api/*.sh && \
-    chmod +x city-api/*.sh
+# Fix line endings for shell scripts
+RUN sed -i 's/\r$//' ./city-api/countryCities.sh && \
+    sed -i 's/\r$//' ./city-api/equatorChart.sh && \
+    sed -i 's/\r$//' ./city-api/realTimeCharts.sh && \
+    chmod +x ./city-api/*.sh
 
 # Set environment variables
 ENV PYTHONPATH=/app/city-api

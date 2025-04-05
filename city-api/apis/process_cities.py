@@ -5,26 +5,28 @@
 #     external functionalities. Then, @countryCodeApi.py could also
 #     be rewritten/reframed as a middleware layer.
 
-
-from weatherApi import fetchCityData
 import sys
 import json
-import os
+
+# Add project root to Python path
+sys.path.append("/app")
+from shared.weather import WeatherAPI
 
 def process_city(city_name):
     try:
-        # Debug environment variables
-        weather_api_key = os.environ.get('WEATHER_API_KEY')
-        if not weather_api_key:
-            print(f"Warning: WEATHER_API_KEY not found in environment")
+        # Initialize WeatherAPI
+        try:
+            weather_api = WeatherAPI()
+        except ValueError as e:
+            print(f"Failed to initialize WeatherAPI: {str(e)}")
             return {
                 "city": city_name,
                 "temperature": None,
-                "error": "Missing API key"
+                "error": "Failed to initialize WeatherAPI"
             }
 
         print(f"Fetching data for city: {city_name}")
-        city_data = fetchCityData(city_name)
+        city_data = weather_api.fetch_city_data(city_name)
         
         if city_data is None:
             return {
