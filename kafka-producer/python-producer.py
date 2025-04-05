@@ -27,7 +27,7 @@ apiUrl = "https://api.weatherapi.com/v1/current.json"
 
 # Get configuration values from YAML
 cities = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.cities")
-request_interval = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.kafkaProducerRequestInternval")
+request_interval = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.kafkaProducerRequestInterval")
 
 def log_message(msg):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -46,6 +46,12 @@ def main():
     log_message("Connected to Kafka broker")
     log_message(f"Using request interval: {request_interval} seconds")
 
+    # Create producer once outside the loop
+    prod = KafkaProducer(
+        bootstrap_servers=kafka_nodes,
+        value_serializer=lambda x: json.dumps(x).encode('utf-8')
+    )
+
     while True:
         try:
             for city in cities:
@@ -55,14 +61,15 @@ def main():
                     "temperature": str(temperature)
                 }
                 
-                prod = KafkaProducer(bootstrap_servers=kafka_nodes, value_serializer=lambda x: json.dumps(x).encode('utf-8'))
                 prod.send(topic=myTopic, value=data)
                 log_message(f"Sent data: {json.dumps(data)}")
-                prod.close()
                 time.sleep(request_interval)  # Use the interval from configuration
             
         except Exception as e:
             log_message(f"Error in main loop: {str(e)}")
+            
+    # Only close producer if we break out of the loop
+    prod.close()
 
 if __name__ == "__main__":
     main()
