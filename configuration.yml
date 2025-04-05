@@ -77,5 +77,10 @@ realTimeProduction:
   - Seoul
   - Buenos Aires
   - Mexico City
-  kafkaProducerRequestInterval: 0.1
+  kafkaProducerRequestInterval: 0.01
+  flinkProcessor:
+    sampleDuration: 15
+    batchSize: 1000
+    batchIntervalMs: 200
+    maxRetries: 5
 

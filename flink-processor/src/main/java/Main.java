@@ -30,12 +30,50 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.yaml.snakeyaml.Yaml;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.util.Map;
 
 public class Main {
 
     static final String BROKERS = "kafka:9092";
-    static final Integer sampleDuration = 15; // Default: 60
+    static final Integer sampleDuration;
+    static final Integer batchSize;
+    static final Integer batchIntervalMs;
+    static final Integer maxRetries;
     static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
+    // Load configuration from YAML
+    static {
+        try {
+            Yaml yaml = new Yaml();
+            InputStream inputStream = new FileInputStream("/app/configuration.yml");
+            Map<String, Object> config = yaml.load(inputStream);
+            
+            Map<String, Object> realTimeProduction = (Map<String, Object>) config.get("realTimeProduction");
+            Map<String, Object> flinkProcessor = (Map<String, Object>) realTimeProduction.get("flinkProcessor");
+            
+            sampleDuration = (Integer) flinkProcessor.get("sampleDuration");
+            batchSize = (Integer) flinkProcessor.get("batchSize");
+            batchIntervalMs = (Integer) flinkProcessor.get("batchIntervalMs");
+            maxRetries = (Integer) flinkProcessor.get("maxRetries");
+            
+            System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Loaded configuration: " +
+                             "sampleDuration=" + sampleDuration + ", " +
+                             "batchSize=" + batchSize + ", " +
+                             "batchIntervalMs=" + batchIntervalMs + ", " +
+                             "maxRetries=" + maxRetries);
+        } catch (Exception e) {
+            System.err.println("Failed to load configuration, using defaults");
+            e.printStackTrace();
+            // Default values if configuration fails to load
+            sampleDuration = 15;
+            batchSize = 1000;
+            batchIntervalMs = 200;
+            maxRetries = 5;
+        }
+    }
 
     public static void main(String[] args) throws Exception {
       appendToMountedFile();
@@ -91,10 +129,10 @@ public class Main {
               statement.setDouble(2, event.f1);
             },
             JdbcExecutionOptions.builder()
-              .withBatchSize(1000)
-              .withBatchIntervalMs(200)
-              .withMaxRetries(5)
-              .build(),
+                .withBatchSize(batchSize)
+                .withBatchIntervalMs(batchIntervalMs)
+                .withMaxRetries(maxRetries)
+                .build(),
             new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
               .withUrl("jdbc:postgresql://postgres:5432/postgres")
               .withDriverName("org.postgresql.Driver")

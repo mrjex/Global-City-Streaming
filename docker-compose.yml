@@ -123,6 +123,8 @@ services:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:2181"
       PRODUCER_INTERVAL: 100
+    volumes:
+      - .:/app:ro
     networks:
       - app_network
     restart: unless-stopped
