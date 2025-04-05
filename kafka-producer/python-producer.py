@@ -21,29 +21,57 @@ control_topic = "city-control"
 
 class CityManager:
     def __init__(self):
-        self.static_cities = []  # Cities from configuration.yml
-        self.dynamic_cities = []  # Dynamically added cities
+        self.static_cities = set()  # Using sets to automatically handle duplicates
+        self.dynamic_cities = set()
         self.is_first_batch = False
         self.cities_lock = threading.Lock()
         
     def get_all_cities(self):
         with self.cities_lock:
-            return self.static_cities + self.dynamic_cities
+            # Combine sets and convert to list, automatically removing duplicates
+            all_cities = list(self.static_cities | self.dynamic_cities)
+            log_message(f"get_all_cities called - Static: {list(self.static_cities)}, Dynamic: {list(self.dynamic_cities)}, Combined: {all_cities}")
+            return all_cities
             
     def update_dynamic_cities(self, new_cities, is_first_batch):
         with self.cities_lock:
-            if is_first_batch and not self.is_first_batch:
-                self.dynamic_cities = new_cities
+            log_message(f"Updating dynamic cities - New cities: {new_cities}, Is first batch: {is_first_batch}")
+            log_message(f"Before update - Static: {list(self.static_cities)}, Dynamic: {list(self.dynamic_cities)}")
+            
+            # Convert new cities to set to remove any duplicates within the new batch
+            new_cities_set = set(new_cities)
+            old_dynamic = self.dynamic_cities.copy()
+            
+            # Always update dynamic cities, but track if it's the first batch
+            self.dynamic_cities = new_cities_set
+            if is_first_batch:
                 self.is_first_batch = True
-            elif self.is_first_batch:
-                # Replace existing dynamic cities
-                self.dynamic_cities = new_cities
-            log_message(f"Updated dynamic cities. Current cities: {self.get_all_cities()}")
+                log_message("Marked as first batch of dynamic cities")
+            
+            # Log changes
+            duplicates = new_cities_set & self.static_cities
+            added_cities = new_cities_set - old_dynamic
+            removed_cities = old_dynamic - new_cities_set
+            
+            if duplicates:
+                log_message(f"Found duplicate cities (will be processed once): {duplicates}")
+            if added_cities:
+                log_message(f"Added new cities: {added_cities}")
+            if removed_cities:
+                log_message(f"Removed cities: {removed_cities}")
+            
+            log_message(f"After update - Static: {list(self.static_cities)}, Dynamic: {list(self.dynamic_cities)}")
+            log_message(f"Final combined cities: {self.get_all_cities()}")
 
     def load_static_cities(self):
         with self.cities_lock:
-            self.static_cities = utils.parseYmlFile("/app/configuration.yml", "cities")
-            log_message(f"Loaded static cities: {self.static_cities}")
+            try:
+                cities = utils.parseYmlFile("/app/configuration.yml", "cities")
+                self.static_cities = set(cities)
+                log_message(f"Loaded static cities: {list(self.static_cities)}")
+            except Exception as e:
+                log_message(f"Error loading static cities: {str(e)}")
+                self.static_cities = set()
 
 class CityUpdateConsumer:
     def __init__(self, city_manager):
@@ -53,7 +81,8 @@ class CityUpdateConsumer:
             bootstrap_servers=kafka_nodes,
             group_id='city-updater',
             enable_auto_commit=True,
-            value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+            value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+            auto_offset_reset='latest'
         )
         self.running = False
         self.thread = None
@@ -83,10 +112,14 @@ class CityUpdateConsumer:
                     data = message.value
                     if data.get('action') == 'UPDATE_CITIES':
                         log_message(f"Received city update: {data}")
-                        self.city_manager.update_dynamic_cities(
-                            data['data']['cities'],
-                            data['data']['isFirstBatch']
-                        )
+                        try:
+                            self.city_manager.update_dynamic_cities(
+                                data['data']['cities'],
+                                data['data']['isFirstBatch']
+                            )
+                            log_message("Successfully processed city update")
+                        except Exception as e:
+                            log_message(f"Error processing city update: {str(e)}")
             except Exception as e:
                 log_message(f"Error in consumer thread: {str(e)}")
                 time.sleep(1)  # Wait before retrying
@@ -120,41 +153,63 @@ def main():
         return
 
     # Create producer
-    prod = KafkaProducer(
-        bootstrap_servers=kafka_nodes,
-        value_serializer=lambda x: json.dumps(x).encode('utf-8')
-    )
+    while True:  # Outer loop for reconnection attempts
+        try:
+            prod = KafkaProducer(
+                bootstrap_servers=kafka_nodes,
+                value_serializer=lambda x: json.dumps(x).encode('utf-8')
+            )
+            log_message("Successfully connected to Kafka")
 
-    try:
-        while True:
-            try:
-                # Get current list of all cities
-                cities = city_manager.get_all_cities()
-                
-                # Process each city sequentially
-                for city, data in weather_api.fetch_cities_batch(cities):
-                    if data:  # Only send if we got valid data
-                        message = {
-                            "city": city,
-                            "temperature": str(data['temperatureCelsius'])
-                        }
-                        
-                        prod.send(topic=weather_topic, value=message)
-                        log_message(f"Sent data for {city}: {json.dumps(message)}")
-                    else:
-                        log_message(f"No data received for {city}, skipping")
+            while True:  # Inner loop for message production
+                try:
+                    # Get current list of all cities
+                    cities = city_manager.get_all_cities()
+                    log_message(f"Starting new processing cycle with {len(cities)} cities")
                     
-                time.sleep(request_interval)  # Wait before next round
-                
-            except Exception as e:
-                log_message(f"Error in main loop: {str(e)}")
-                time.sleep(1)  # Wait before retrying
-                
-    except KeyboardInterrupt:
-        log_message("Shutting down...")
-    finally:
-        consumer.stop()
-        prod.close()
+                    if not cities:
+                        log_message("No cities to process, waiting...")
+                        time.sleep(request_interval)
+                        continue
+                    
+                    # Process each city sequentially
+                    for city in cities:
+                        try:
+                            city_data = next(weather_api.fetch_cities_batch([city]))
+                            if city_data and city_data[1]:  # Check if we got valid data
+                                message = {
+                                    "city": city_data[0],
+                                    "temperature": str(city_data[1]['temperatureCelsius'])
+                                }
+                                
+                                prod.send(topic=weather_topic, value=message)
+                                log_message(f"Sent data for {city}: {json.dumps(message)}")
+                            else:
+                                log_message(f"No data received for {city}, skipping")
+                        except Exception as e:
+                            log_message(f"Error processing city {city}: {str(e)}")
+                            continue
+                    
+                    # Ensure messages are sent and wait before next cycle
+                    prod.flush()
+                    log_message("Completed processing cycle, waiting before next round")
+                    time.sleep(request_interval)
+                    
+                except Exception as e:
+                    log_message(f"Error in message production loop: {str(e)}")
+                    log_message(f"Current cities state - Static: {list(city_manager.static_cities)}, Dynamic: {list(city_manager.dynamic_cities)}")
+                    time.sleep(1)  # Wait before retrying
+                    continue  # Continue inner loop instead of breaking
+                    
+        except Exception as e:
+            log_message(f"Error with Kafka producer: {str(e)}")
+            time.sleep(5)  # Wait before attempting to reconnect
+            continue  # Continue outer loop to recreate producer
+        finally:
+            try:
+                prod.close()
+            except:
+                pass  # Ignore errors during close
 
 if __name__ == "__main__":
     main()
