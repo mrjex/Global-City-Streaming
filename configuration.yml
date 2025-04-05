@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Seoul
+  - Busan
+  - Incheon
+  - Daegu
+  - Daejeon
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Madrid
+  - Madrid city
+  - Barcelona
+  - Barcelona City
+  - Valencia
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
