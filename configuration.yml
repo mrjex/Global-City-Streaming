@@ -34,10 +34,10 @@ services:
 visualizations:
   charts:
     equatorChart:
-      displayActualTrend: true
-      displayLinearTrend: false
+      displayActualTrend: false
+      displayLinearTrend: true
       displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
-    queryRequirement: UTC-9
+    queryRequirement: UTC+1
