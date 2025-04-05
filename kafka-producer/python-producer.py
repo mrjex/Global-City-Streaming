@@ -24,14 +24,10 @@ myTopic = "weather"
 load_dotenv()  # Load environment variables from .env file
 apiKey = os.getenv('WEATHER_API_KEY')
 apiUrl = "https://api.weatherapi.com/v1/current.json"
-idleTime = 0.5 # Default: 0.5
-intervalTime = 3 # Default: 3
 
-# Cities to analyize and take real-time samples of in the kafka-to-flink pipeline.
-# Note that this array of cities must be identical to the local city array declared
-# in "/debug-api/charts/real-time-multi-samples" in 'bubble-chart.py' and
-# 'pie-chart.py'
+# Get configuration values from YAML
 cities = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.cities")
+request_interval = utils.parseYmlFile("/app/configuration.yml", "realTimeProduction.kafkaProducerRequestInternval")
 
 def log_message(msg):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -48,11 +44,12 @@ def fetch_api_data(city):
 def main():
     log_message("Starting Kafka producer...")
     log_message("Connected to Kafka broker")
+    log_message(f"Using request interval: {request_interval} seconds")
 
     while True:
         try:
             for city in cities:
-                temperature = round(random.uniform(-10, 40), 2)
+                temperature = round(random.uniform(-10, 40), 2) # TODO: Replace with actual temperature from API
                 data = {
                     "city": city,
                     "temperature": str(temperature)
@@ -62,11 +59,10 @@ def main():
                 prod.send(topic=myTopic, value=data)
                 log_message(f"Sent data: {json.dumps(data)}")
                 prod.close()
+                time.sleep(request_interval)  # Use the interval from configuration
             
-            time.sleep(1)
         except Exception as e:
             log_message(f"Error in main loop: {str(e)}")
-            time.sleep(1)
 
 if __name__ == "__main__":
     main()
