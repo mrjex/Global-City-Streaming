@@ -1,24 +1,13 @@
 [
     {
-        "city": "Honolulu",
+        "city": "Juneau",
         "country": "United States of America",
-        "continent": "Pacific",
-        "temperatureCelsius": 25.2,
-        "latitude": 21.3069,
-        "longitude": -157.8583,
-        "timeZoneNotation": "Pacific/Honolulu",
-        "timeZoneOffset": "UTC-10",
-        "equatorDistance": 21.3069
-    },
-    {
-        "city": "Papeete",
-        "country": "French Polynesia Islands",
-        "continent": "Pacific",
-        "temperatureCelsius": 26.2,
-        "latitude": -17.5333,
-        "longitude": -149.5667,
-        "timeZoneNotation": "Pacific/Tahiti",
-        "timeZoneOffset": "UTC-10",
-        "equatorDistance": 17.5333
+        "continent": "America",
+        "temperatureCelsius": 8.2,
+        "latitude": 58.3019,
+        "longitude": -134.4197,
+        "timeZoneNotation": "America/Juneau",
+        "timeZoneOffset": "UTC-9",
+        "equatorDistance": 58.3019
     }
 ]

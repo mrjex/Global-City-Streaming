@@ -8,10 +8,10 @@
 import sys
 
 # Add necessary paths for imports
-sys.path.extend(['/app/city-api', '/app/city-api/apis'])
+sys.path.extend(['/app/city-api', '/app/city-api/apis', '/app'])
 
 import apis.geolocationApi as geolocationApi
-import apis.weatherApi as weatherApi
+from shared.weather.api import WeatherAPI
 import json
 import utils
 
@@ -20,6 +20,9 @@ print(f"Current working directory: {sys.path}")
 
 configPath = "/app/configuration.yml"
 print(f"Reading config from: {configPath}")
+
+# Initialize the shared WeatherAPI
+weather_api = WeatherAPI()
 
 # In shell scripts where this script is combined with other scripts to create a bigger sequence of automation,
 # the path below is used from the invoking point to this file
@@ -48,9 +51,8 @@ def populateDB():
   citiesArr = [] # An array that gets assigned the dictionary-object for each city in the loop below
 
   for city in cities:
-
     # Read the data from the APIs
-    weatherCityObj = weatherApi.fetchCityData(city)
+    weatherCityObj = weather_api.fetch_city_data(city)
     timezoneDictionary = geolocationApi.fetchTimeZoneData(weatherCityObj['latitude'], weatherCityObj['longitude'])
 
     equatorDistanceAttribute = abs(weatherCityObj['latitude'])

@@ -22,6 +22,7 @@ cities:
 - Mexico City
 - Honolulu
 - Papeete
+- Juneau
 services:
   flinkProcessor:
     batchIntervalMs: 200
@@ -33,10 +34,10 @@ services:
 visualizations:
   charts:
     equatorChart:
-      displayActualTrend: false
+      displayActualTrend: true
       displayLinearTrend: false
-      displayLogarithmicTrend: true
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
-    queryRequirement: UTC-10
+    queryRequirement: UTC-9
