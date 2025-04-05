@@ -33,6 +33,10 @@ services:
     requestInterval: 0.01
   cityApi:
     numberOfCitiesForSelectedCountry: 5
+dynamicCities:
+  enabled: false
+  current: []
+  previousBatch: []
 visualizations:
   charts:
     equatorChart:

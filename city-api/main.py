@@ -12,6 +12,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from pathlib import Path
 import subprocess
+from kafka import KafkaProducer
 
 app = FastAPI()
 
@@ -23,6 +24,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Kafka configuration
+KAFKA_NODES = "kafka:9092"
+CONTROL_TOPIC = "city-control"
 
 # Initialize Docker client with improved error handling
 def get_docker_client():
@@ -70,6 +75,40 @@ def get_docker_client():
         print(f"Error setting up Docker client: {str(e)}")
         return None
 
+# Initialize Kafka producer for control messages
+def get_kafka_producer():
+    return KafkaProducer(
+        bootstrap_servers=KAFKA_NODES,
+        value_serializer=lambda x: json.dumps(x).encode('utf-8')
+    )
+
+# Function to update dynamic cities in configuration
+def update_dynamic_cities(cities, is_first_batch):
+    try:
+        config_path = Path('configuration.yml')
+        if config_path.exists():
+            with open(config_path) as f:
+                config = yaml.safe_load(f)
+                
+            # Update dynamic cities section
+            if 'dynamicCities' not in config:
+                config['dynamicCities'] = {}
+            
+            config['dynamicCities']['enabled'] = True
+            if is_first_batch:
+                config['dynamicCities']['previousBatch'] = []
+            else:
+                config['dynamicCities']['previousBatch'] = config['dynamicCities'].get('current', [])
+            config['dynamicCities']['current'] = cities
+            
+            # Write updated config
+            with open(config_path, 'w') as f:
+                yaml.dump(config, f, default_flow_style=False)
+                
+            return True
+    except Exception as e:
+        print(f"Error updating configuration: {str(e)}")
+        return False
 
 @app.get("/test-flink-connection")
 async def test_flink_connection():
@@ -484,10 +523,42 @@ async def receive_selected_country(request: Request):
                     status_code=500
                 )
 
-            # Parse the entire output as a single JSON object
+            # Parse the script output
             try:
                 response_data = json.loads(result.stdout)
                 print(f"[DEBUG] Parsed response data: {json.dumps(response_data, indent=2)}", flush=True)
+                
+                # Extract cities from response
+                if response_data.get('success') and 'cities' in response_data:
+                    cities = [city['name'] for city in response_data['cities']]
+                    
+                    # Check if this is the first batch
+                    config_path = Path('configuration.yml')
+                    is_first_batch = True
+                    if config_path.exists():
+                        with open(config_path) as f:
+                            config = yaml.safe_load(f)
+                            is_first_batch = not config.get('dynamicCities', {}).get('enabled', False)
+                    
+                    # Update configuration file
+                    if update_dynamic_cities(cities, is_first_batch):
+                        # Send update to control topic
+                        try:
+                            producer = get_kafka_producer()
+                            control_message = {
+                                'action': 'UPDATE_CITIES',
+                                'data': {
+                                    'cities': cities,
+                                    'isFirstBatch': is_first_batch
+                                }
+                            }
+                            producer.send(CONTROL_TOPIC, control_message)
+                            producer.flush()
+                            producer.close()
+                            print(f"[DEBUG] Sent control message: {control_message}", flush=True)
+                        except Exception as e:
+                            print(f"[ERROR] Failed to send control message: {str(e)}", flush=True)
+                    
                 return JSONResponse(content=response_data)
             except json.JSONDecodeError as e:
                 print(f"[ERROR] Failed to parse JSON output: {str(e)}", flush=True)
