@@ -4,10 +4,20 @@
 # geo-coordinates. This script serves as the composer of these two in Python-form
 # that the fetched responses to the other components of this system upon request
 
-
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-
+# Configure retry strategy
+retry_strategy = Retry(
+    total=3,
+    backoff_factor=1,
+    status_forcelist=[429, 500, 502, 503, 504],
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+session = requests.Session()
+session.mount("https://", adapter)
+session.mount("http://", adapter)
 
 apiNotationUrl = "https://timeapi.io/api/Time/current/coordinate"     # API Website: https://timeapi.io/swagger/index.html
 apiOffsetUrl = "https://api.geotimezone.com/public/timezone"          # API Website: https://www.geotimezone.com/
@@ -24,7 +34,16 @@ apiOffsetUrl = "https://api.geotimezone.com/public/timezone"          # API Webs
 
 def fetchApiData(apiUrl, latitude, longitude, attributeKey):
     query = {'latitude': latitude, 'longitude': longitude}
-    response = requests.get(apiUrl, params=query)
+    try:
+        # First try with SSL verification
+        response = session.get(apiUrl, params=query)
+        response.raise_for_status()
+    except requests.exceptions.SSLError:
+        # If SSL fails, try without verification
+        print(f"Warning: SSL verification failed for {apiUrl}, retrying without verification")
+        response = session.get(apiUrl, params=query, verify=False)
+        response.raise_for_status()
+    
     body_dict = response.json()
     return body_dict[attributeKey]
 

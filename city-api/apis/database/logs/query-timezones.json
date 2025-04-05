@@ -1,1 +1,24 @@
-[]
+[
+    {
+        "city": "Honolulu",
+        "country": "United States of America",
+        "continent": "Pacific",
+        "temperatureCelsius": 25.2,
+        "latitude": 21.3069,
+        "longitude": -157.8583,
+        "timeZoneNotation": "Pacific/Honolulu",
+        "timeZoneOffset": "UTC-10",
+        "equatorDistance": 21.3069
+    },
+    {
+        "city": "Papeete",
+        "country": "French Polynesia Islands",
+        "continent": "Pacific",
+        "temperatureCelsius": 26.2,
+        "latitude": -17.5333,
+        "longitude": -149.5667,
+        "timeZoneNotation": "Pacific/Tahiti",
+        "timeZoneOffset": "UTC-10",
+        "equatorDistance": 17.5333
+    }
+]

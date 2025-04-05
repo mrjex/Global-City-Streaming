@@ -30,11 +30,6 @@ RUN pip install --no-cache-dir \
     statsmodels \
     scipy
 
-# Copy city-api files
-COPY city-api/ ./city-api/
-COPY configuration.yml ./configuration.yml
-COPY utils.py ./utils.py
-
 # Create necessary directories
 RUN mkdir -p \
     city-api/generated-artifacts/csvs \
@@ -42,7 +37,6 @@ RUN mkdir -p \
     city-api/chart-helpers \
     city-api/apis/database \
     city-api/apis/database/logs
-
 
 # Set environment variables
 ENV PYTHONPATH=/app/city-api
