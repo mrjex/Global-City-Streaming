@@ -42,6 +42,9 @@ public class Main {
     static Integer batchSize;
     static Integer batchIntervalMs;
     static Integer maxRetries;
+    static Double requestInterval;
+    static Integer staticCitiesCount;
+    static Integer dynamicCitiesCount;
     static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     // Load configuration from YAML
@@ -53,11 +56,24 @@ public class Main {
             
             Map<String, Object> services = (Map<String, Object>) config.get("services");
             Map<String, Object> flinkProcessor = (Map<String, Object>) services.get("flinkProcessor");
+            Map<String, Object> kafkaProducer = (Map<String, Object>) services.get("kafkaProducer");
+            Map<String, Object> cityApi = (Map<String, Object>) services.get("cityApi");
             
+            // Load Flink processor settings
             sampleDuration = (Integer) flinkProcessor.get("sampleDuration");
             batchSize = (Integer) flinkProcessor.get("batchSize");
             batchIntervalMs = (Integer) flinkProcessor.get("batchIntervalMs");
             maxRetries = (Integer) flinkProcessor.get("maxRetries");
+            
+            // Load Kafka producer settings
+            requestInterval = (Double) kafkaProducer.get("requestInterval");
+            
+            // Count static cities
+            java.util.List<String> staticCities = (java.util.List<String>) config.get("cities");
+            staticCitiesCount = staticCities != null ? staticCities.size() : 0;
+            
+            // Get dynamic cities count from cityApi config
+            dynamicCitiesCount = (Integer) cityApi.get("numberOfCitiesForSelectedCountry");
             
             System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Loaded configuration: " +
                              "sampleDuration=" + sampleDuration + ", " +
@@ -72,6 +88,9 @@ public class Main {
             batchSize = 1000;
             batchIntervalMs = 200;
             maxRetries = 5;
+            requestInterval = 0.01;
+            staticCitiesCount = 24;
+            dynamicCitiesCount = 5;
         }
     }
 
@@ -150,20 +169,26 @@ public class Main {
      * Writes the execution settings to the monitoring file, overriding any existing content
      */
     public static void writeExecutionSettings() {
+      // Calculate metrics
+      int totalCities = staticCitiesCount + dynamicCitiesCount;
+      double cycleTime = totalCities * requestInterval;
+      double messagesPerSecond = totalCities / cycleTime;
+      double maxProcessingRate = (double) batchSize / (batchIntervalMs / 1000.0);
+
       String content = "-- -- - EXECUTION SETTINGS AND METRICS - -- -- \n\n" +
                       "KAFKA PRODUCER METRICS:\n" +
-                      "- Total Cities Processed: 29 (24 static + 5 dynamic)\n" +
-                      "- Request Interval: 0.01 seconds\n" +
-                      "- Messages per Second: ~100 (29 cities / 0.29 seconds cycle)\n\n" +
+                      "- Total Cities Processed: " + totalCities + " (" + staticCitiesCount + " static + " + dynamicCitiesCount + " dynamic)\n" +
+                      "- Request Interval: " + requestInterval + " seconds\n" +
+                      "- Messages per Second: " + String.format("%.2f", messagesPerSecond) + " (" + totalCities + " cities / " + String.format("%.2f", cycleTime) + " seconds cycle)\n\n" +
                       "FLINK PROCESSOR METRICS:\n" +
                       "- Batch Size: " + batchSize + " records\n" +
                       "- Batch Interval: " + batchIntervalMs + "ms\n" +
-                      "- Maximum Theoretical Processing Rate: 5000 records/second\n" +
-                      "- Actual Processing Rate: ~100 records/second (limited by producer rate)\n" +
+                      "- Maximum Theoretical Processing Rate: " + String.format("%.2f", maxProcessingRate) + " records/second\n" +
+                      "- Actual Processing Rate: " + String.format("%.2f", messagesPerSecond) + " records/second (limited by producer rate)\n" +
                       "- Sample Duration: " + sampleDuration + " seconds\n" +
                       "- Max Retries: " + maxRetries + "\n\n" +
                       "POSTGRES DATABASE:\n" +
-                      "- Actual Insertion Rate: ~100 records/second (matches input rate from Kafka)\n\n" +
+                      "- Actual Insertion Rate: " + String.format("%.2f", messagesPerSecond) + " records/second (matches input rate from Kafka)\n\n" +
                       "Note: All rates are theoretical maximums under ideal conditions. Actual rates may vary due to network latency, processing overhead, and system factors.";
       
       try {

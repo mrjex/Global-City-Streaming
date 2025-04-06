@@ -23,6 +23,8 @@ cities:
 - Honolulu
 - Papeete
 - Juneau
+- Sacramento
+- Tijuana
 dynamicCities:
   current:
   - Stockholm
@@ -30,16 +32,18 @@ dynamicCities:
   - "Malm\xF6"
   - Uppsala
   - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - Greater London
-  - London
-  - Birmingham
-  - Leeds
-  - Tyneside
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
 services:
   cityApi:
-    numberOfCitiesForSelectedCountry: 5
+    numberOfCitiesForSelectedCountry: 7
   flinkProcessor:
     batchIntervalMs: 200
     batchSize: 1000
