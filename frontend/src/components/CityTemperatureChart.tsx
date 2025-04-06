@@ -84,8 +84,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         const response = await fetch('/api/logs');
         const data = await response.json();
         
-        // Update current time
-        currentTimeRef.current = (Date.now() - startTimeRef.current) / 1000;
+        // Update current time and wrap it within TIME_WINDOW
+        currentTimeRef.current = ((Date.now() - startTimeRef.current) / 1000) % TIME_WINDOW;
         
         if (data && data.temperatureData) {
           setCityData(prevData => {
@@ -100,7 +100,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
                 };
               }
               
-              // Add new data point
+              // Add new data point with wrapped timestamp
               newCityData[point.city].timestamps.push(currentTimeRef.current);
               newCityData[point.city].temperatures.push(point.temperature);
               
@@ -126,9 +126,9 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Calculate time window bounds
-  const maxTime = currentTimeRef.current;
-  const minTime = Math.max(0, maxTime - TIME_WINDOW);
+  // Set fixed window bounds
+  const maxTime = TIME_WINDOW;
+  const minTime = 0;
 
   // Prepare data for Chart.js
   const chartData = {

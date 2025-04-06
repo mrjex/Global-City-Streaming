@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Riyadh
-  - Jeddah
-  - Mecca
-  - Medina
-  - Sultanah
+  - Lisbon
+  - Sintra
+  - Vila Nova de Gaia
+  - Porto city
+  - Porto
   enabled: true
   previousBatch:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
