@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Jakarta
-  - Surabaya
-  - Bekasi
-  - Tangerang
-  - Medan
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
   enabled: true
   previousBatch:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
+  - Oslo
+  - Bergen
+  - Trondheim
+  - Stavanger
+  - Stavanger town
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

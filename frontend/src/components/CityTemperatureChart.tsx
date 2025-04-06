@@ -56,7 +56,7 @@ const TIME_WINDOW = 5;
 const MAX_DATA_POINTS = 10;
 
 // Add these constants at the top with other constants
-const TEMPERATURE_VARIANCE = 3.5; // Maximum temperature change in °C between points
+const TEMPERATURE_VARIANCE = 8.0; // Maximum temperature change in °C between points
 const FALLBACK_UPDATE_THRESHOLD = 2000; // ms before using fallback if no new data
 const REQUIRED_TIMESTAMPS = [0, 1, 2, 3, 4]; // Timestamps we want to ensure are covered
 
@@ -65,6 +65,9 @@ const POINTS_PER_WINDOW = 5; // One point per second in our 5-second window
 
 // Add polling interval constant
 const POLLING_INTERVAL = 1000; // Milliseconds between data fetches
+
+// Add these constants at the top
+const RANDOMIZATION_CHANCE = 0.3; // 30% chance to randomize any given update
 
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   title = 'Dynamic City Temperatures'
@@ -145,9 +148,19 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
                 // Use last known temperature with small variance
                 const variance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
                 currentTemp = lastKnownTemperatures.current[city].temp + variance;
+                console.log(`RANDOMIZATION: City ${city} - Base temp: ${lastKnownTemperatures.current[city].temp}, Variance: ${variance.toFixed(2)}, New temp: ${currentTemp.toFixed(2)}`);
               } else {
                 // Default temperature for new cities
                 currentTemp = 20;
+              }
+
+              // Randomly decide if we should replace this real reading
+              if (Math.random() < RANDOMIZATION_CHANCE) {
+                // Use the real temperature as reference for our randomization
+                const variance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
+                const randomizedTemp = currentTemp + variance;
+                console.log(`RANDOMIZATION: City ${city} - Real temp: ${currentTemp}, Variance: ${variance.toFixed(2)}, Randomized temp: ${randomizedTemp.toFixed(2)}`);
+                currentTemp = randomizedTemp;
               }
 
               // Create array of timestamps spanning the window
