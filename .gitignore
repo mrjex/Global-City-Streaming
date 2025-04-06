@@ -4,7 +4,6 @@
 dev-rebuild.sh
 droplet-ssh-connect.sh
 droplet-management.sh
-dev-new.sh
 
 # Python cache files
 __pycache__/
