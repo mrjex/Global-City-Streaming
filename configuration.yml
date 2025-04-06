@@ -25,11 +25,11 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
   enabled: true
   previousBatch:
   - Oslo

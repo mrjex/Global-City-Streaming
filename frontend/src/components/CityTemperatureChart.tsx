@@ -50,13 +50,12 @@ interface CityTemperatureChartProps {
 }
 
 // Window size in seconds - reduced to show less data points
-const TIME_WINDOW = 5;
-
-// Maximum number of data points per city
-const MAX_DATA_POINTS = 10;
+const TIME_WINDOW = 4;  // Change to 4 fixed points
+const MAX_DATA_POINTS = 4;
+const FIXED_TIMESTAMPS = [1, 2, 3, 4];  // Fixed timestamp positions
 
 // Add these constants at the top with other constants
-const TEMPERATURE_VARIANCE = 8.0; // Maximum temperature change in °C between points
+const TEMPERATURE_VARIANCE = 0.5; // Maximum temperature change in °C between points
 const FALLBACK_UPDATE_THRESHOLD = 2000; // ms before using fallback if no new data
 const REQUIRED_TIMESTAMPS = [0, 1, 2, 3, 4]; // Timestamps we want to ensure are covered
 
@@ -67,7 +66,7 @@ const POINTS_PER_WINDOW = 5; // One point per second in our 5-second window
 const POLLING_INTERVAL = 1000; // Milliseconds between data fetches
 
 // Add these constants at the top
-const RANDOMIZATION_CHANCE = 0.3; // 30% chance to randomize any given update
+const RANDOMIZATION_CHANCE = 0.2; // 30% chance to randomize any given update
 
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   title = 'Dynamic City Temperatures'
@@ -126,14 +125,6 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
             
             // Initialize or update each city's data
             dynamicCities.forEach(city => {
-              if (!newCityData[city]) {
-                newCityData[city] = {
-                  city: city,
-                  timestamps: [],
-                  temperatures: []
-                };
-              }
-
               // Find the latest real temperature for this city
               const cityData = data.temperatureData.find(point => point.city === city);
               let currentTemp;
@@ -156,28 +147,27 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
               // Randomly decide if we should replace this real reading
               if (Math.random() < RANDOMIZATION_CHANCE) {
-                // Use the real temperature as reference for our randomization
                 const variance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
                 const randomizedTemp = currentTemp + variance;
                 console.log(`RANDOMIZATION: City ${city} - Real temp: ${currentTemp}, Variance: ${variance.toFixed(2)}, Randomized temp: ${randomizedTemp.toFixed(2)}`);
                 currentTemp = randomizedTemp;
               }
 
-              // Create array of timestamps spanning the window
-              const timestamps = Array.from({ length: POINTS_PER_WINDOW }, (_, i) => i);
-              
-              // If we have existing data, shift it left and add new point
-              if (newCityData[city].timestamps.length > 0) {
-                newCityData[city].timestamps = newCityData[city].timestamps
-                  .slice(1)
-                  .concat(currentTimeRef.current);
-                newCityData[city].temperatures = newCityData[city].temperatures
-                  .slice(1)
-                  .concat(currentTemp);
+              if (!newCityData[city]) {
+                // Initialize with all timestamps but same temperature
+                newCityData[city] = {
+                  city: city,
+                  timestamps: FIXED_TIMESTAMPS.slice(),
+                  temperatures: Array(MAX_DATA_POINTS).fill(currentTemp)
+                };
               } else {
-                // Initialize with current temperature across all points
-                newCityData[city].timestamps = timestamps;
-                newCityData[city].temperatures = timestamps.map(() => currentTemp);
+                // Shift all temperatures left and add new temperature at the end
+                newCityData[city].temperatures = [
+                  ...newCityData[city].temperatures.slice(1),
+                  currentTemp
+                ];
+                // Keep timestamps fixed
+                newCityData[city].timestamps = FIXED_TIMESTAMPS.slice();
               }
             });
             
@@ -226,8 +216,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
       pointBackgroundColor: getColorForCity(cityName),
       pointBorderColor: '#fff',
       pointBorderWidth: 1,
-      tension: 0.4,
-      cubicInterpolationMode: 'monotone',
+      tension: 0,  // Remove curve interpolation
+      cubicInterpolationMode: 'default',  // Use default interpolation
       fill: false
     }))
   };
@@ -241,8 +231,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     },
     elements: {
       line: {
-        tension: 0.4,
-        cubicInterpolationMode: 'monotone'
+        tension: 0,  // Remove curve interpolation
+        cubicInterpolationMode: 'default'  // Use default interpolation
       },
       point: {
         radius: 4,
@@ -258,16 +248,16 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
           text: 'Time (seconds)',
           color: '#ddd'
         },
-        min: minTime,
-        max: maxTime,
+        min: 1,
+        max: 4,
         ticks: {
           color: '#ddd',
-          maxTicksLimit: 5, // Limit number of ticks for cleaner x-axis
+          stepSize: 1,
           callback: (value: number) => value.toFixed(0)
         },
         grid: {
           color: '#444',
-          drawOnChartArea: false // Only show grid at axes
+          drawOnChartArea: false
         }
       },
       y: {
