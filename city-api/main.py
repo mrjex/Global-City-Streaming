@@ -316,7 +316,8 @@ async def get_kafka_logs():
             
             return {
                 "logs": "\n".join(raw_logs),
-                "temperatureData": temperature_data
+                "temperatureData": temperature_data,
+                "dynamicCities": dynamic_cities
             }
         else:
             return {"error": "Docker client initialization failed"}

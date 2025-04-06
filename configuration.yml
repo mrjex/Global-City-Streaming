@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Lisbon
-  - Sintra
-  - Vila Nova de Gaia
-  - Porto city
-  - Porto
+  - Santiago
+  - Puente Alto
+  - "Maip\xFA"
+  - Santiago commune
+  - La Florida
   enabled: true
   previousBatch:
-  - Paris
-  - Marseille
-  - Lyon
-  - Toulouse
-  - Nice
+  - Buenos Aires
+  - La Matanza Partido
+  - "C\xF3rdoba"
+  - Rosario
+  - La Plata Partido
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

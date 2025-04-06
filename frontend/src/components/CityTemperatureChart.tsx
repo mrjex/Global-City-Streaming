@@ -67,6 +67,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   const startTimeRef = useRef<number>(Date.now());
   const currentTimeRef = useRef<number>(0);
   const [cityColors, setCityColors] = useState<Record<string, string>>({});
+  const [currentDynamicCities, setCurrentDynamicCities] = useState<string[]>([]);
 
   // Generate a color for a new city
   const getColorForCity = (city: string) => {
@@ -84,6 +85,18 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         const response = await fetch('/api/logs');
         const data = await response.json();
         
+        // Safely get dynamic cities with a default empty array
+        const dynamicCities = data?.dynamicCities || [];
+        
+        // Check if dynamic cities have changed
+        if (JSON.stringify(dynamicCities) !== JSON.stringify(currentDynamicCities)) {
+          // Clear old data when cities change
+          setCityData({});
+          setCityColors({});
+          setCurrentDynamicCities(dynamicCities);
+          startTimeRef.current = Date.now(); // Reset start time
+        }
+        
         // Update current time and wrap it within TIME_WINDOW
         currentTimeRef.current = ((Date.now() - startTimeRef.current) / 1000) % TIME_WINDOW;
         
@@ -91,23 +104,33 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
           setCityData(prevData => {
             const newCityData = { ...prevData };
             
-            data.temperatureData.forEach((point: TemperatureDataPoint) => {
-              if (!newCityData[point.city]) {
-                newCityData[point.city] = {
-                  city: point.city,
-                  timestamps: [],
-                  temperatures: []
-                };
+            // Remove any cities that aren't in the current dynamic cities list
+            Object.keys(newCityData).forEach(city => {
+              if (!dynamicCities.includes(city)) {
+                delete newCityData[city];
               }
-              
-              // Add new data point with wrapped timestamp
-              newCityData[point.city].timestamps.push(currentTimeRef.current);
-              newCityData[point.city].temperatures.push(point.temperature);
-              
-              // Keep only last MAX_DATA_POINTS
-              if (newCityData[point.city].timestamps.length > MAX_DATA_POINTS) {
-                newCityData[point.city].timestamps = newCityData[point.city].timestamps.slice(-MAX_DATA_POINTS);
-                newCityData[point.city].temperatures = newCityData[point.city].temperatures.slice(-MAX_DATA_POINTS);
+            });
+            
+            data.temperatureData.forEach((point: TemperatureDataPoint) => {
+              // Only process points for current dynamic cities
+              if (dynamicCities.includes(point.city)) {
+                if (!newCityData[point.city]) {
+                  newCityData[point.city] = {
+                    city: point.city,
+                    timestamps: [],
+                    temperatures: []
+                  };
+                }
+                
+                // Add new data point with wrapped timestamp
+                newCityData[point.city].timestamps.push(currentTimeRef.current);
+                newCityData[point.city].temperatures.push(point.temperature);
+                
+                // Keep only last MAX_DATA_POINTS
+                if (newCityData[point.city].timestamps.length > MAX_DATA_POINTS) {
+                  newCityData[point.city].timestamps = newCityData[point.city].timestamps.slice(-MAX_DATA_POINTS);
+                  newCityData[point.city].temperatures = newCityData[point.city].temperatures.slice(-MAX_DATA_POINTS);
+                }
               }
             });
             
@@ -124,7 +147,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     fetchAndProcessData();
     const interval = setInterval(fetchAndProcessData, 100);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentDynamicCities]);
 
   // Set fixed window bounds
   const maxTime = TIME_WINDOW;
