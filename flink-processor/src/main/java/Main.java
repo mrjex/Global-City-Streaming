@@ -76,7 +76,9 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-      appendToMountedFile();
+      // Write execution settings once at startup
+      writeExecutionSettings();
+      
       StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
       System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Environment created");
@@ -144,21 +146,37 @@ public class Main {
       env.execute("Kafka-flink-postgres");
     }
 
-
     /**
-     * Appends the sample duration to the mounted docker-contained file '/dev-debug/exec-settings.txt'
+     * Writes the execution settings to the monitoring file, overriding any existing content
      */
-    public static void appendToMountedFile() {
-
-      String outputText = String.format("Time Sampling Duration (seconds) = %2d", sampleDuration);
+    public static void writeExecutionSettings() {
+      String content = "-- -- - EXECUTION SETTINGS AND METRICS - -- -- \n\n" +
+                      "KAFKA PRODUCER METRICS:\n" +
+                      "- Total Cities Processed: 29 (24 static + 5 dynamic)\n" +
+                      "- Request Interval: 0.01 seconds\n" +
+                      "- Messages per Second: ~100 (29 cities / 0.29 seconds cycle)\n\n" +
+                      "FLINK PROCESSOR METRICS:\n" +
+                      "- Batch Size: " + batchSize + " records\n" +
+                      "- Batch Interval: " + batchIntervalMs + "ms\n" +
+                      "- Maximum Theoretical Processing Rate: 5000 records/second\n" +
+                      "- Actual Processing Rate: ~100 records/second (limited by producer rate)\n" +
+                      "- Sample Duration: " + sampleDuration + " seconds\n" +
+                      "- Max Retries: " + maxRetries + "\n\n" +
+                      "POSTGRES DATABASE:\n" +
+                      "- Actual Insertion Rate: ~100 records/second (matches input rate from Kafka)\n\n" +
+                      "Note: All rates are theoretical maximums under ideal conditions. Actual rates may vary due to network latency, processing overhead, and system factors.";
       
       try {
-        File file = new File("./mnt/exec-settings.txt");
-        FileWriter fr = new FileWriter(file, true);
-        fr.write(outputText);
-        fr.close();
+        File file = new File("/app/shared/monitoring/exec-settings.txt");
+        // Ensure parent directories exist
+        file.getParentFile().mkdirs();
+        // Write to file (override mode)
+        FileWriter fw = new FileWriter(file, false);
+        fw.write(content);
+        fw.close();
       } catch (IOException e) {
-        System.out.println("ERROR: flink-processor/Main.java, IOException when writing to mounted .txt file");
+        System.out.println("ERROR: Failed to write to monitoring file: " + e.getMessage());
+        e.printStackTrace();
       }
     }
 

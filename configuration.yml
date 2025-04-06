@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Greater Rio de Janeiro
-  - "S\xE3o Paulo"
-  - Rio de Janeiro
-  - "Bras\xEDlia"
-  - Fortaleza
-  enabled: true
-  previousBatch:
   - Stockholm
   - Gothenburg
   - "Malm\xF6"
   - Uppsala
   - "V\xE4ster\xE5s"
+  enabled: true
+  previousBatch:
+  - Greater London
+  - London
+  - Birmingham
+  - Leeds
+  - Tyneside
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

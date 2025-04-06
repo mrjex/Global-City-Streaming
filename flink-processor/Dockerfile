@@ -45,8 +45,6 @@ echo "[$(date)] Raw data received: Connected to Zookeeper" \n\
 echo "[$(date)] Inserting into DB: Connected to PostgreSQL" \n\
 echo "[$(date)] Raw data received: Starting Flink job" \n\
 cd /opt/flink && \
-mkdir -p /opt/flink/mnt && \
-touch /opt/flink/mnt/exec-settings.txt && \
 # Periodically output sample logs for testing
 (while true; do \
   echo "[$(date)] Raw data received: Processing messages from Kafka topic"; \

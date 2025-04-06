@@ -124,7 +124,7 @@ services:
       ZOOKEEPER_SERVER: "zookeeper:2181"
       PRODUCER_INTERVAL: 100
     volumes:
-      - .:/app:ro
+      - .:/app:rw
     networks:
       - app_network
     restart: unless-stopped
