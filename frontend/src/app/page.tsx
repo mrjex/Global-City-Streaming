@@ -39,7 +39,7 @@ export default function Home(): ReactElement {
             <DatabaseCounter />
           </div>
           
-          <CityVideo />
+          <CityVideo selectedCountry={selectedCountry} />
           
           <CityTemperatureChart title="City Temperature Trends" />
         </div>
