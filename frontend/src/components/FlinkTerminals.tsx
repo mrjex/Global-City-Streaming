@@ -10,8 +10,6 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
   const [dbLogs, setDbLogs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [testResults, setTestResults] = useState<any>(null);
-  const [isTesting, setIsTesting] = useState(false);
 
   // Function to clean log messages by removing prefixes
   const cleanLogs = (logs: string[], prefix: string): string[] => {
@@ -59,25 +57,6 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
 
     return () => clearInterval(interval);
   }, [maxLines]);
-
-  const runConnectionTest = async () => {
-    setIsTesting(true);
-    try {
-      const response = await fetch('/api/test-connectivity');
-      if (response.ok) {
-        const results = await response.json();
-        setTestResults(results);
-        console.log('Connection test results:', results);
-      } else {
-        setTestResults({ error: `Request failed with status ${response.status}` });
-      }
-    } catch (error) {
-      console.error('Error running connection test:', error);
-      setTestResults({ error: error.message });
-    } finally {
-      setIsTesting(false);
-    }
-  };
 
   const Terminal = ({ title, logs }: { title: string; logs: string[] }) => (
     <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl w-1/2">
@@ -130,27 +109,8 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
       className="w-full max-w-6xl mx-auto p-4"
     >
       <h2 className="text-2xl font-bold text-gray-200 mb-4 text-center">
-        Flink Processor / Aggregate / Insert Data
+        My Header
       </h2>
-      
-      <div className="text-center mb-4">
-        <button 
-          onClick={runConnectionTest}
-          disabled={isTesting}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          {isTesting ? 'Testing Connection...' : 'Run Connection Test'}
-        </button>
-      </div>
-      
-      {testResults && (
-        <div className="mb-4 p-4 bg-gray-800 rounded text-white text-sm">
-          <h3 className="font-bold mb-2">Connection Test Results:</h3>
-          <pre className="overflow-auto max-h-40">
-            {JSON.stringify(testResults, null, 2)}
-          </pre>
-        </div>
-      )}
       
       <div className="flex space-x-4">
         <Terminal title="Raw Data Reception" logs={rawLogs} />
