@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Greater London
-  - London
-  - Birmingham
-  - Leeds
-  - Tyneside
-  - Glasgow
-  - Sheffield
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - Greater Rio de Janeiro
-  - "S\xE3o Paulo"
-  - Rio de Janeiro
-  - "Bras\xEDlia"
-  - Fortaleza
-  - Salvador
-  - Belo Horizonte
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

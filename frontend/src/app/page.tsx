@@ -6,22 +6,16 @@ import WorldMap from '../components/WorldMap';
 import DatabaseCounter from '../components/DatabaseCounter';
 import Terminal from '@/components/Terminal';
 import FlinkTerminals from '@/components/FlinkTerminals';
-import CitySelector from '@/components/CitySelector';
 // import Charts from '@/components/Charts';  // Commented out bubble and pie charts
 import CityTemperatureChart from '@/components/CityTemperatureChart';
 import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [selectedCities, setSelectedCities] = useState<string[]>([]);
 
   const handleCountrySelect = (countryName: string) => {
     setSelectedCountry(countryName);
     console.log(`Selected country: ${countryName}`);
-  };
-
-  const handleCitiesChange = (cities: string[]) => {
-    setSelectedCities(cities);
   };
 
   return (
@@ -48,10 +42,6 @@ export default function Home(): ReactElement {
           
           <CityTemperatureChart title="City Temperature Trends" />
         </div>
-      </div>
-
-      <div className="mt-8">
-        <CitySelector onCitiesChange={handleCitiesChange} />
       </div>
 
       <div className="mt-8">
