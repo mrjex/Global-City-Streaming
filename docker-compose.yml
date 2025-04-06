@@ -167,6 +167,7 @@ services:
       - PYTHONPATH=/app/city-api
       - GEODB_CITIES_API_KEY=${GEODB_CITIES_API_KEY}
       - WEATHER_API_KEY=${WEATHER_API_KEY}
+      - GIPHY_API_KEY=${GIPHY_API_KEY}
     networks:
       - app_network
 

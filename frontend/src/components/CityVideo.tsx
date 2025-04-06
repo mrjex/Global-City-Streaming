@@ -1,6 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const CityVideo: React.FC = () => {
+  const [videoUrl, setVideoUrl] = useState<string>('');
+
+  useEffect(() => {
+    const fetchVideoUrl = async () => {
+      try {
+        const response = await fetch('/api/selected-country');
+        const data = await response.json();
+        if (data.success && data.capital_city_video_link) {
+          setVideoUrl(data.capital_city_video_link);
+        }
+      } catch (error) {
+        console.error('Error fetching video URL:', error);
+      }
+    };
+
+    fetchVideoUrl();
+  }, []);
+
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
@@ -22,19 +40,25 @@ const CityVideo: React.FC = () => {
             overflowY: 'hidden'
           }}
         >
-          <video
-            className="w-full h-full object-cover rounded-lg"
-            autoPlay
-            loop
-            muted
-            playsInline
-          >
-            <source
-              src="https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlaTB0OWowbnEyZXlhemk2YWxybnF0a2h5b2gxb3JlMnhvMnp6ajA2dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/wuk4K58OTyYec/giphy.mp4"
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
+          {videoUrl ? (
+            <video
+              className="w-full h-full object-cover rounded-lg"
+              autoPlay
+              loop
+              muted
+              playsInline
+            >
+              <source
+                src={videoUrl}
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <div className="text-gray-500 italic text-center h-full flex items-center justify-center">
+              Loading video...
+            </div>
+          )}
         </div>
       </div>
     </div>

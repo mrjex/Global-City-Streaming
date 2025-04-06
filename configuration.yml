@@ -27,15 +27,6 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Sapporo
-  - Sapporo
-  - Fukuoka
-  enabled: true
-  previousBatch:
   - Stockholm
   - Gothenburg
   - "Malm\xF6"
@@ -43,6 +34,15 @@ dynamicCities:
   - "V\xE4ster\xE5s"
   - "\xD6rebro"
   - "Link\xF6ping"
+  enabled: true
+  previousBatch:
+  - Tokyo
+  - Yokohama
+  - Osaka
+  - Nagoya
+  - Sapporo
+  - Sapporo
+  - Fukuoka
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

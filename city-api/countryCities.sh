@@ -48,6 +48,25 @@ CITIES=$(echo "$RESPONSE" | jq -r '.data[].city' | tr '\n' '|')
 CITY_COUNT=$(echo "$CITIES" | tr '|' '\n' | grep -v '^$' | wc -l)
 debug "Found $CITY_COUNT cities to process"
 
+# Get the capital city (first city in response)
+CAPITAL_CITY=$(echo "$RESPONSE" | jq -r '.data[0].city')
+debug "Capital city: $CAPITAL_CITY"
+
+# Get Giphy video for capital city
+debug "Getting Giphy video for $CAPITAL_CITY..."
+GIPHY_RESPONSE=$(curl -G "https://api.giphy.com/v1/gifs/search" \
+--data-urlencode "api_key=$GIPHY_API_KEY" \
+--data-urlencode "q=$COUNTRY $CAPITAL_CITY aerial view" \
+--data-urlencode "limit=1" \
+--data-urlencode "offset=0" \
+--data-urlencode "rating=g" \
+--data-urlencode "lang=en" \
+-s)
+
+# Extract MP4 URL
+MP4_URL=$(echo $GIPHY_RESPONSE | jq -r '.data[0].images.original.mp4')
+debug "MP4 URL: $MP4_URL"
+
 # Initialize variables for collecting city data
 CITY_DATA_ARRAY=""
 SEPARATOR=""
@@ -75,6 +94,7 @@ echo "{"
 echo "  \"success\": true,"
 echo "  \"country\": \"$COUNTRY\","
 echo "  \"country_code\": \"$(echo $COUNTRY_CODE | tr '[:upper:]' '[:lower:]')\","
+echo "  \"capital_city_video_link\": \"$MP4_URL\","
 echo "  \"cities\": ["
 echo "    ${CITY_DATA_ARRAY}"
 echo "  ]"
