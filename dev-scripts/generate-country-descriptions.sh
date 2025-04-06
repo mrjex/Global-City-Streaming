@@ -21,7 +21,7 @@ tail -n +2 country-capitals.csv | while IFS=, read -r country capital; do
     echo "Processing: $country - $capital"
     
     # Craft the prompt
-    PROMPT="Describe the capital city $capital of $country in 2-3 sentences, focusing on its unique architectural features, cultural significance, and any notable landmarks. Make it engaging and informative."
+    PROMPT="Describe the capital city $capital of $country in 2-3 sentences, focusing on its unique architectural features, cultural significance, and any notable landmarks. Add 2-3 relevant emojis that match the description's key features (like buildings, cultural elements, or landmarks). Make it engaging and informative."
     
     # Make the API call
     RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
@@ -37,11 +37,8 @@ tail -n +2 country-capitals.csv | while IFS=, read -r country capital; do
         \"max_tokens\": 150
       }")
     
-    # Extract the generated text from the response
-    DESCRIPTION=$(echo $RESPONSE | jq -r '.choices[0].message.content')
-    
-    # Escape any double quotes in the description
-    DESCRIPTION=$(echo "$DESCRIPTION" | sed 's/"/\\"/g')
+    # Extract the generated text from the response and format it for JSON
+    DESCRIPTION=$(echo $RESPONSE | jq -r '.choices[0].message.content' | tr '\n' ' ' | sed 's/"/\\"/g')
     
     # Add the entry to the JSON file
     # If it's not the first entry, add a comma
@@ -51,7 +48,7 @@ tail -n +2 country-capitals.csv | while IFS=, read -r country capital; do
     echo "    \"$country, $capital\": \"$DESCRIPTION\"" >> ../city-api/country-capital-config/city-description.json
     
     # Add a small delay to respect API rate limits
-    sleep 1
+    sleep 0.5
 done
 
 # Close the JSON file with a closing brace
