@@ -68,6 +68,17 @@ const POLLING_INTERVAL = 1000; // Milliseconds between data fetches
 // Add these constants at the top
 const RANDOMIZATION_CHANCE = 0.2; // 30% chance to randomize any given update
 
+// Define sophisticated color palette (pastel/jewel tones)
+const CHART_COLORS = [
+  'hsla(350, 70%, 70%, 1)', // Soft Rose
+  'hsla(190, 75%, 60%, 1)', // Soft Azure
+  'hsla(150, 65%, 65%, 1)', // Mint Green
+  'hsla(280, 60%, 70%, 1)', // Lavender
+  'hsla(35, 80%, 75%, 1)',  // Peach
+  'hsla(210, 70%, 65%, 1)', // Sky Blue
+  'hsla(320, 65%, 65%, 1)'  // Pink Orchid
+];
+
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   title = 'Dynamic City Temperatures'
 }) => {
@@ -79,14 +90,26 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   const [currentDynamicCities, setCurrentDynamicCities] = useState<string[]>([]);
   const lastKnownTemperatures = useRef<Record<string, { temp: number; timestamp: number }>>({});
 
-  // Generate a color for a new city
+  // Modify getColorForCity to use city index from dynamic cities list
   const getColorForCity = (city: string) => {
     if (cityColors[city]) return cityColors[city];
     
-    const hue = Math.random() * 360;
-    const color = `hsl(${hue}, 70%, 50%)`;
-    setCityColors(prev => ({ ...prev, [city]: color }));
-    return color;
+    // Get index of city in dynamic cities list
+    const cityIndex = currentDynamicCities.indexOf(city);
+    const colorIndex = Math.max(0, cityIndex) % CHART_COLORS.length;
+    const newColor = CHART_COLORS[colorIndex];
+    
+    setCityColors(prev => ({ ...prev, [city]: newColor }));
+    return newColor;
+  };
+
+  // Create gradient background function
+  const createGradient = (ctx: CanvasRenderingContext2D, color: string) => {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    const transparentColor = color.replace('1)', '0.1)');
+    gradient.addColorStop(0, transparentColor);
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    return gradient;
   };
 
   useEffect(() => {
@@ -203,28 +226,33 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
   // Prepare data for Chart.js
   const chartData = {
-    datasets: Object.entries(cityData).map(([cityName, data]) => ({
-      label: cityName,
-      data: data.temperatures.map((temp, idx) => ({
-        x: data.timestamps[idx],
-        y: temp
-      })),
-      borderColor: getColorForCity(cityName),
-      backgroundColor: 'rgba(0, 0, 0, 0)',
-      borderWidth: 3,
-      pointRadius: 6,  // Increased point size
-      pointBackgroundColor: getColorForCity(cityName),
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      tension: 0.4,  // Add tension for smoothing
-      cubicInterpolationMode: 'monotone',  // Smooth interpolation
-      fill: false,
-      // Add shadow effect
-      shadowColor: 'rgba(0, 0, 0, 0.3)',
-      shadowBlur: 10,
-      shadowOffsetX: 0,
-      shadowOffsetY: 4
-    }))
+    datasets: Object.entries(cityData).map(([cityName, data]) => {
+      const baseColor = getColorForCity(cityName);
+      return {
+        label: cityName,
+        data: data.temperatures.map((temp, idx) => ({
+          x: data.timestamps[idx],
+          y: temp
+        })),
+        borderColor: baseColor,
+        backgroundColor: (context: any) => {
+          const ctx = context.chart.ctx;
+          return createGradient(ctx, baseColor);
+        },
+        borderWidth: 3,
+        pointRadius: 6,
+        pointBackgroundColor: baseColor,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        tension: 0.4,
+        cubicInterpolationMode: 'monotone',
+        fill: true, // Enable fill for gradient
+        shadowColor: 'rgba(0, 0, 0, 0.3)',
+        shadowBlur: 10,
+        shadowOffsetX: 0,
+        shadowOffsetY: 4
+      };
+    })
   };
   
   // Chart options
@@ -232,7 +260,22 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 0
+      duration: 750, // Longer animation duration
+      easing: 'easeInOutQuart', // Smooth easing function
+      animations: {
+        numbers: {
+          type: 'number',
+          duration: 750,
+        },
+        x: {
+          type: 'number',
+          duration: 750,
+        },
+        y: {
+          type: 'number',
+          duration: 750,
+        }
+      }
     },
     elements: {
       line: {

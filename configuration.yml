@@ -25,11 +25,11 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Kuala Lumpur
-  - Klang
-  - Ipoh
-  - Kampung Baru Subang
-  - Johor Bahru
+  - Greater Rio de Janeiro
+  - "S\xE3o Paulo"
+  - Rio de Janeiro
+  - "Bras\xEDlia"
+  - Fortaleza
   enabled: true
   previousBatch:
   - Stockholm
@@ -52,7 +52,7 @@ visualizations:
     equatorChart:
       displayActualTrend: false
       displayLinearTrend: false
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
