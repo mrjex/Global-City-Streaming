@@ -212,13 +212,18 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
       borderColor: getColorForCity(cityName),
       backgroundColor: 'rgba(0, 0, 0, 0)',
       borderWidth: 3,
-      pointRadius: 4,
+      pointRadius: 6,  // Increased point size
       pointBackgroundColor: getColorForCity(cityName),
       pointBorderColor: '#fff',
-      pointBorderWidth: 1,
-      tension: 0,  // Remove curve interpolation
-      cubicInterpolationMode: 'default',  // Use default interpolation
-      fill: false
+      pointBorderWidth: 2,
+      tension: 0.4,  // Add tension for smoothing
+      cubicInterpolationMode: 'monotone',  // Smooth interpolation
+      fill: false,
+      // Add shadow effect
+      shadowColor: 'rgba(0, 0, 0, 0.3)',
+      shadowBlur: 10,
+      shadowOffsetX: 0,
+      shadowOffsetY: 4
     }))
   };
   
@@ -231,13 +236,28 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     },
     elements: {
       line: {
-        tension: 0,  // Remove curve interpolation
-        cubicInterpolationMode: 'default'  // Use default interpolation
+        tension: 0.4,
+        cubicInterpolationMode: 'monotone',
+        // Add shadow to lines
+        shadowColor: 'rgba(0, 0, 0, 0.3)',
+        shadowBlur: 10,
+        shadowOffsetX: 0,
+        shadowOffsetY: 4
       },
       point: {
-        radius: 4,
-        hitRadius: 10,
-        hoverRadius: 6
+        radius: 6,  // Larger points
+        hitRadius: 12,
+        hoverRadius: 8,
+        // Add glow effect to points
+        borderWidth: 2,
+        hoverBorderWidth: 3,
+        hoverBackgroundColor: 'white',
+        pointStyle: 'circle',
+        // Add shadow/glow
+        shadowColor: 'rgba(255, 255, 255, 0.5)',
+        shadowBlur: 15,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0
       }
     },
     scales: {

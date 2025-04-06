@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - New York City
-  - Los Angeles
-  - Chicago
-  - Brooklyn
-  - Queens
+  - Kuala Lumpur
+  - Klang
+  - Ipoh
+  - Kampung Baru Subang
+  - Johor Bahru
   enabled: true
   previousBatch:
-  - Oslo
-  - Bergen
-  - Trondheim
-  - Stavanger
-  - Stavanger town
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
