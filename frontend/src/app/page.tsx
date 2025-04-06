@@ -9,6 +9,7 @@ import FlinkTerminals from '@/components/FlinkTerminals';
 // import Charts from '@/components/Charts';  // Commented out bubble and pie charts
 import CityTemperatureChart from '@/components/CityTemperatureChart';
 import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
+import CityVideo from '@/components/CityVideo';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -38,7 +39,7 @@ export default function Home(): ReactElement {
             <DatabaseCounter />
           </div>
           
-          <Terminal maxLines={10} />
+          <CityVideo />
           
           <CityTemperatureChart title="City Temperature Trends" />
         </div>
@@ -49,6 +50,10 @@ export default function Home(): ReactElement {
       </div>
 
       <FlinkTerminals maxLines={10} />
+
+      <div className="mt-8">
+        <Terminal maxLines={10} />
+      </div>
 
       {/* Commented out bubble and pie charts */}
       {/* <Charts /> */}

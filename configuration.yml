@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Lisbon
-  - Sintra
-  - Vila Nova de Gaia
-  - Porto city
-  - Porto
-  - Cascais
-  - Loures
+  - Tokyo
+  - Yokohama
+  - Osaka
+  - Nagoya
+  - Sapporo
+  - Sapporo
+  - Fukuoka
   enabled: true
   previousBatch:
-  - Paris
-  - Marseille
-  - Lyon
-  - Toulouse
-  - Nice
-  - Nantes
-  - Montpellier
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
