@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Greater Rio de Janeiro
-  - "S\xE3o Paulo"
-  - Rio de Janeiro
-  - "Bras\xEDlia"
-  - Fortaleza
+  - Jakarta
+  - Surabaya
+  - Bekasi
+  - Tangerang
+  - Medan
   enabled: true
   previousBatch:
-  - Oslo
-  - Bergen
-  - Trondheim
-  - Stavanger
-  - Stavanger town
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

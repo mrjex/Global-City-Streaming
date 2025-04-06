@@ -55,17 +55,16 @@ const TIME_WINDOW = 5;
 // Maximum number of data points per city
 const MAX_DATA_POINTS = 10;
 
-// Y-axis limits for better visualization
-const MIN_TEMP = -15;
-const MAX_TEMP = 45;
-
 // Add these constants at the top with other constants
-const TEMPERATURE_VARIANCE = 0.5; // Maximum temperature change in °C between points
+const TEMPERATURE_VARIANCE = 3.5; // Maximum temperature change in °C between points
 const FALLBACK_UPDATE_THRESHOLD = 2000; // ms before using fallback if no new data
 const REQUIRED_TIMESTAMPS = [0, 1, 2, 3, 4]; // Timestamps we want to ensure are covered
 
 // Add this constant to control how many points we want across the window
 const POINTS_PER_WINDOW = 5; // One point per second in our 5-second window
+
+// Add polling interval constant
+const POLLING_INTERVAL = 1000; // Milliseconds between data fetches
 
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   title = 'Dynamic City Temperatures'
@@ -180,13 +179,24 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     };
 
     fetchAndProcessData();
-    const interval = setInterval(fetchAndProcessData, 1000);
+    const interval = setInterval(fetchAndProcessData, POLLING_INTERVAL);
     return () => clearInterval(interval);
   }, [currentDynamicCities]);
 
   // Set fixed window bounds
   const maxTime = TIME_WINDOW;
   const minTime = 0;
+
+  // Calculate dynamic temperature range from current data
+  const temperatures = Object.values(cityData).flatMap(city => city.temperatures);
+  const minTemp = temperatures.length > 0 ? Math.min(...temperatures) : 0;
+  const maxTemp = temperatures.length > 0 ? Math.max(...temperatures) : 30;
+  
+  // Add padding to the range (10% of the range on each side)
+  const range = maxTemp - minTemp;
+  const padding = range * 0.1;
+  const dynamicMinTemp = minTemp - padding;
+  const dynamicMaxTemp = maxTemp + padding;
 
   // Prepare data for Chart.js
   const chartData = {
@@ -253,11 +263,11 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
           text: 'Temperature (°C)',
           color: '#ddd'
         },
-        min: MIN_TEMP,
-        max: MAX_TEMP,
+        min: dynamicMinTemp,
+        max: dynamicMaxTemp,
         ticks: {
           color: '#ddd',
-          stepSize: 10 // Larger steps for cleaner y-axis
+          stepSize: Math.max(1, Math.ceil((dynamicMaxTemp - dynamicMinTemp) / 5))
         },
         grid: {
           color: '#444',
