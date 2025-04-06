@@ -25,18 +25,18 @@ cities:
 - Juneau
 dynamicCities:
   current:
-  - Santiago
-  - Puente Alto
-  - "Maip\xFA"
-  - Santiago commune
-  - La Florida
+  - Greater Rio de Janeiro
+  - "S\xE3o Paulo"
+  - Rio de Janeiro
+  - "Bras\xEDlia"
+  - Fortaleza
   enabled: true
   previousBatch:
-  - Buenos Aires
-  - La Matanza Partido
-  - "C\xF3rdoba"
-  - Rosario
-  - La Plata Partido
+  - Oslo
+  - Bergen
+  - Trondheim
+  - Stavanger
+  - Stavanger town
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

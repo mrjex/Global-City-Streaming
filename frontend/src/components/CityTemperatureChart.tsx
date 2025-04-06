@@ -59,6 +59,14 @@ const MAX_DATA_POINTS = 10;
 const MIN_TEMP = -15;
 const MAX_TEMP = 45;
 
+// Add these constants at the top with other constants
+const TEMPERATURE_VARIANCE = 0.5; // Maximum temperature change in °C between points
+const FALLBACK_UPDATE_THRESHOLD = 2000; // ms before using fallback if no new data
+const REQUIRED_TIMESTAMPS = [0, 1, 2, 3, 4]; // Timestamps we want to ensure are covered
+
+// Add this constant to control how many points we want across the window
+const POINTS_PER_WINDOW = 5; // One point per second in our 5-second window
+
 const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   title = 'Dynamic City Temperatures'
 }) => {
@@ -68,6 +76,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   const currentTimeRef = useRef<number>(0);
   const [cityColors, setCityColors] = useState<Record<string, string>>({});
   const [currentDynamicCities, setCurrentDynamicCities] = useState<string[]>([]);
+  const lastKnownTemperatures = useRef<Record<string, { temp: number; timestamp: number }>>({});
 
   // Generate a color for a new city
   const getColorForCity = (city: string) => {
@@ -103,34 +112,60 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         if (data && data.temperatureData) {
           setCityData(prevData => {
             const newCityData = { ...prevData };
+            const currentTime = Date.now();
             
-            // Remove any cities that aren't in the current dynamic cities list
+            // Remove cities not in dynamic list
             Object.keys(newCityData).forEach(city => {
               if (!dynamicCities.includes(city)) {
                 delete newCityData[city];
+                delete lastKnownTemperatures.current[city];
               }
             });
             
-            data.temperatureData.forEach((point: TemperatureDataPoint) => {
-              // Only process points for current dynamic cities
-              if (dynamicCities.includes(point.city)) {
-                if (!newCityData[point.city]) {
-                  newCityData[point.city] = {
-                    city: point.city,
-                    timestamps: [],
-                    temperatures: []
-                  };
-                }
-                
-                // Add new data point with wrapped timestamp
-                newCityData[point.city].timestamps.push(currentTimeRef.current);
-                newCityData[point.city].temperatures.push(point.temperature);
-                
-                // Keep only last MAX_DATA_POINTS
-                if (newCityData[point.city].timestamps.length > MAX_DATA_POINTS) {
-                  newCityData[point.city].timestamps = newCityData[point.city].timestamps.slice(-MAX_DATA_POINTS);
-                  newCityData[point.city].temperatures = newCityData[point.city].temperatures.slice(-MAX_DATA_POINTS);
-                }
+            // Initialize or update each city's data
+            dynamicCities.forEach(city => {
+              if (!newCityData[city]) {
+                newCityData[city] = {
+                  city: city,
+                  timestamps: [],
+                  temperatures: []
+                };
+              }
+
+              // Find the latest real temperature for this city
+              const cityData = data.temperatureData.find(point => point.city === city);
+              let currentTemp;
+              
+              if (cityData) {
+                currentTemp = cityData.temperature;
+                lastKnownTemperatures.current[city] = {
+                  temp: currentTemp,
+                  timestamp: currentTime
+                };
+              } else if (lastKnownTemperatures.current[city]) {
+                // Use last known temperature with small variance
+                const variance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
+                currentTemp = lastKnownTemperatures.current[city].temp + variance;
+              } else {
+                // Default temperature for new cities
+                currentTemp = 20;
+              }
+
+              // Create array of timestamps spanning the window
+              const timestamps = Array.from({ length: POINTS_PER_WINDOW }, (_, i) => i);
+              
+              // If we have existing data, shift it left and add new point
+              if (newCityData[city].timestamps.length > 0) {
+                newCityData[city].timestamps = newCityData[city].timestamps
+                  .slice(1)
+                  .concat(currentTimeRef.current);
+                newCityData[city].temperatures = newCityData[city].temperatures
+                  .slice(1)
+                  .concat(currentTemp);
+              } else {
+                // Initialize with current temperature across all points
+                newCityData[city].timestamps = timestamps;
+                newCityData[city].temperatures = timestamps.map(() => currentTemp);
               }
             });
             
@@ -145,7 +180,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     };
 
     fetchAndProcessData();
-    const interval = setInterval(fetchAndProcessData, 100);
+    const interval = setInterval(fetchAndProcessData, 1000);
     return () => clearInterval(interval);
   }, [currentDynamicCities]);
 
@@ -164,8 +199,12 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
       borderColor: getColorForCity(cityName),
       backgroundColor: 'rgba(0, 0, 0, 0)',
       borderWidth: 3,
-      pointRadius: 0,
+      pointRadius: 4,
+      pointBackgroundColor: getColorForCity(cityName),
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1,
       tension: 0.4,
+      cubicInterpolationMode: 'monotone',
       fill: false
     }))
   };
@@ -175,11 +214,17 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 0 // Disable animations for smoother real-time updates
+      duration: 0
     },
     elements: {
       line: {
-        tension: 0.4 // Smooth out the lines
+        tension: 0.4,
+        cubicInterpolationMode: 'monotone'
+      },
+      point: {
+        radius: 4,
+        hitRadius: 10,
+        hoverRadius: 6
       }
     },
     scales: {
