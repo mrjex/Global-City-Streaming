@@ -150,25 +150,19 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
             dynamicCities.forEach(city => {
               // Find the latest real temperature for this city
               const cityData = data.temperatureData.find(point => point.city === city);
-              let currentTemp;
               
-              if (cityData) {
-                currentTemp = cityData.temperature;
-                lastKnownTemperatures.current[city] = {
-                  temp: currentTemp,
-                  timestamp: currentTime
-                };
-              } else if (lastKnownTemperatures.current[city]) {
-                // Use last known temperature with small variance
-                const variance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
-                currentTemp = lastKnownTemperatures.current[city].temp + variance;
-                console.log(`RANDOMIZATION: City ${city} - Base temp: ${lastKnownTemperatures.current[city].temp}, Variance: ${variance.toFixed(2)}, New temp: ${currentTemp.toFixed(2)}`);
-              } else {
-                // Default temperature for new cities
-                currentTemp = 20;
+              // Skip cities without real temperature data
+              if (!cityData) {
+                return; // Skip this city entirely
               }
 
-              // Randomly decide if we should replace this real reading
+              let currentTemp = cityData.temperature;
+              lastKnownTemperatures.current[city] = {
+                temp: currentTemp,
+                timestamp: currentTime
+              };
+
+              // Apply randomization only for cities with real data
               if (Math.random() < RANDOMIZATION_CHANCE) {
                 const variance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
                 const randomizedTemp = currentTemp + variance;
