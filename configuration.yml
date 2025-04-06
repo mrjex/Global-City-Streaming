@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Sapporo
-  - Sapporo
-  - Fukuoka
+  - Buenos Aires
+  - La Matanza Partido
+  - "C\xF3rdoba"
+  - Rosario
+  - La Plata Partido
+  - Lomas de Zamora Partido
+  - "General Pueyrred\xF3n Partido"
   enabled: true
   previousBatch:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Sapporo
-  - Sapporo
-  - Fukuoka
+  - Buenos Aires
+  - La Matanza Partido
+  - "C\xF3rdoba"
+  - Rosario
+  - La Plata Partido
+  - Lomas de Zamora Partido
+  - "General Pueyrred\xF3n Partido"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

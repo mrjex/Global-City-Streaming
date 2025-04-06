@@ -6,11 +6,14 @@ interface CityVideoProps {
 
 const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
   const [videoUrl, setVideoUrl] = useState<string>('');
-  const [key, setKey] = useState<number>(0); // Add key for forcing video reload
+  const [key, setKey] = useState<number>(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     const fetchVideoUrl = async () => {
-      if (!selectedCountry) return;
+      // For initial load, use "Sweden" if no country is selected
+      const countryToFetch = isInitialLoad ? "Sweden" : selectedCountry;
+      if (!countryToFetch) return;
       
       try {
         const response = await fetch('/api/selected-country', {
@@ -18,20 +21,22 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ country: selectedCountry }),
+          body: JSON.stringify({ country: countryToFetch }),
         });
         const data = await response.json();
         if (data.success && data.capital_city_video_link) {
           setVideoUrl(data.capital_city_video_link);
-          setKey(prev => prev + 1); // Increment key to force video reload
+          setKey(prev => prev + 1);
         }
       } catch (error) {
         console.error('Error fetching video URL:', error);
+      } finally {
+        setIsInitialLoad(false);
       }
     };
 
     fetchVideoUrl();
-  }, [selectedCountry]); // Re-run effect when selectedCountry changes
+  }, [selectedCountry, isInitialLoad]);
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
@@ -44,7 +49,7 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
           <div className="text-gray-400 text-sm mx-auto">
-            {selectedCountry ? `${selectedCountry} Capital View` : 'Select a Country'}
+            {selectedCountry ? `${selectedCountry} Capital View` : 'Sweden Capital View'}
           </div>
         </div>
 
@@ -58,7 +63,7 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
         >
           {videoUrl ? (
             <video
-              key={key} // Add key to force remount
+              key={key}
               className="w-full h-full object-cover rounded-lg"
               autoPlay
               loop
@@ -73,7 +78,7 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
             </video>
           ) : (
             <div className="text-gray-500 italic text-center h-full flex items-center justify-center">
-              {selectedCountry ? 'Loading video...' : 'Select a country to view its capital'}
+              Loading video...
             </div>
           )}
         </div>
