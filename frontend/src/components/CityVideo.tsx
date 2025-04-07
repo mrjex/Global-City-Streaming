@@ -27,7 +27,14 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
         const data = await response.json();
         if (data.success) {
           setVideoUrl(data.capital_city_video_link);
-          setDescription(data.capital_city_description || '');
+          // Extract city name from the description
+          const cityMatch = data.capital_city_description?.match(/^([^,]+),/);
+          const cityName = cityMatch ? cityMatch[1] : '';
+          // Add bold to city name if found
+          const enhancedDescription = cityName 
+            ? data.capital_city_description.replace(cityName, `**${cityName}**`) 
+            : data.capital_city_description;
+          setDescription(enhancedDescription || '');
           setKey(prev => prev + 1);
         }
       } catch (error) {
@@ -39,6 +46,11 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
 
     fetchVideoUrl();
   }, [selectedCountry, isInitialLoad]);
+
+  // Function to convert markdown-style bold to HTML
+  const formatDescription = (text: string) => {
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
@@ -85,7 +97,12 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
           )}
         </div>
         <div className="px-4 pb-4 text-gray-300 text-center border-t border-gray-700 mt-4 pt-4">
-          {description || 'Loading description...'}
+          <em 
+            dangerouslySetInnerHTML={{ 
+              __html: formatDescription(description) || 'Loading description...' 
+            }} 
+            className="leading-relaxed tracking-wide"
+          />
         </div>
       </div>
     </div>
