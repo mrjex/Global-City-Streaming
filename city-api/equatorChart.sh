@@ -30,7 +30,7 @@ VISUALIZE_EQUATOR_CHART="True"
 # the attribute 'temperatureCelsius' is fetched from "/apis/weatherApi.py" and 'timeZoneOffset'
 # is fetched from "/apis/timezoneApi.py".
 
-RECREATE_DATABASE="True"
+RECREATE_DATABASE="False"
 
 echo "Step 1 - Query DB"
 cd /app/city-api/apis

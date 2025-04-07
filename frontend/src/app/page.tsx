@@ -6,7 +6,6 @@ import WorldMap from '../components/WorldMap';
 import DatabaseCounter from '../components/DatabaseCounter';
 import Terminal from '@/components/Terminal';
 import FlinkTerminals from '@/components/FlinkTerminals';
-// import Charts from '@/components/Charts';  // Commented out bubble and pie charts
 import CityTemperatureChart from '@/components/CityTemperatureChart';
 import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
 import CityVideo from '@/components/CityVideo';
@@ -54,9 +53,6 @@ export default function Home(): ReactElement {
       <div className="mt-8">
         <Terminal maxLines={10} />
       </div>
-
-      {/* Commented out bubble and pie charts */}
-      {/* <Charts /> */}
     </main>
   );
 } 

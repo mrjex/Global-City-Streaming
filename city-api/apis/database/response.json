@@ -1,35 +1,24 @@
 [
     {
-        "city": "London",
-        "country": "United Kingdom",
+        "city": "Helsinki",
+        "country": "Finland",
         "continent": "Europe",
-        "temperatureCelsius": 9.2,
-        "latitude": 51.5171,
-        "longitude": -0.1062,
-        "timeZoneNotation": "Europe/London",
-        "timeZoneOffset": "UTC+0",
-        "equatorDistance": 51.5171
+        "temperatureCelsius": 2.2,
+        "latitude": 60.176,
+        "longitude": 24.934,
+        "timeZoneNotation": "Europe/Helsinki",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 60.176
     },
     {
-        "city": "Reykjavik",
-        "country": "Iceland",
-        "continent": "Atlantic",
-        "temperatureCelsius": 9.4,
-        "latitude": 64.15,
-        "longitude": -21.95,
-        "timeZoneNotation": "Atlantic/Reykjavik",
-        "timeZoneOffset": "UTC+0",
-        "equatorDistance": 64.15
-    },
-    {
-        "city": "Lisbon",
-        "country": "Portugal",
+        "city": "Chernobyl",
+        "country": "Ukraine",
         "continent": "Europe",
-        "temperatureCelsius": 17.2,
-        "latitude": 38.7167,
-        "longitude": -9.1333,
-        "timeZoneNotation": "Europe/Lisbon",
-        "timeZoneOffset": "UTC+0",
-        "equatorDistance": 38.7167
+        "temperatureCelsius": 0.6,
+        "latitude": 51.2667,
+        "longitude": 30.2333,
+        "timeZoneNotation": "Europe/Kyiv",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 51.2667
     }
 ]
