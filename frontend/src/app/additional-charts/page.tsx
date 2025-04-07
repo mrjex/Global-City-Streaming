@@ -7,14 +7,14 @@ export default function AdditionalChartsPage() {
   // Images from the public directory
   const category1Images = [
     '/images/additional-charts/category1/4-coldest-now.png',
-    '/images/additional-charts/category1/all-cities [AQUA THEME].png',
-    '/images/additional-charts/category1/all-cities [PURPLE THEME].png',
+    '/images/additional-charts/category1/all-cities-aqua-theme.png',
+    '/images/additional-charts/category1/all-cities-purple-theme.png',
   ];
 
   const category2Images = [
-    '/images/additional-charts/category2/all-cities [AQUA THEME].png',
-    '/images/additional-charts/category2/all-cities [BLUE THEME].png',
-    '/images/additional-charts/category2/all-cities [BROWN THEME].png',
+    '/images/additional-charts/category2/all-cities-aqua-theme.png',
+    '/images/additional-charts/category2/all-cities-blue-theme.png',
+    '/images/additional-charts/category2/all-cities-brown-theme.png',
   ];
 
   return (

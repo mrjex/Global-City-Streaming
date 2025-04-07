@@ -24,8 +24,8 @@ const Navigation: React.FC = () => {
           </Link>
         </li>
         <li className={styles.navItem}>
-          <Link href="/logs" className={`${styles.navLink} ${isActive('/logs')}`}>
-            Logs
+          <Link href="/additional-charts" className={`${styles.navLink} ${isActive('/additional-charts')}`}>
+            Additional Charts
           </Link>
         </li>
       </ul>
