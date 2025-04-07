@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Buenos Aires
-  - La Matanza Partido
-  - "C\xF3rdoba"
-  - Rosario
-  - La Plata Partido
-  - Lomas de Zamora Partido
-  - "General Pueyrred\xF3n Partido"
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
+  - City of Gold Coast
+  - Gold Coast
   enabled: true
   previousBatch:
-  - Buenos Aires
-  - La Matanza Partido
-  - "C\xF3rdoba"
-  - Rosario
-  - La Plata Partido
-  - Lomas de Zamora Partido
-  - "General Pueyrred\xF3n Partido"
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
+  - City of Gold Coast
+  - Gold Coast
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

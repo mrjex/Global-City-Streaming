@@ -82,6 +82,9 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
             </div>
           )}
         </div>
+        <div className="px-4 pb-4 text-gray-300 text-center border-t border-gray-700 mt-4 pt-4">
+          Experience the vibrant atmosphere of capital cities around the world through our live streams. Watch as urban life unfolds in real-time, showcasing the unique character of each global metropolis.
+        </div>
       </div>
     </div>
   );
