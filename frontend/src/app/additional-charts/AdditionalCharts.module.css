@@ -1,8 +1,35 @@
 .container {
   display: flex;
+  flex-direction: column;
   width: 100%;
   min-height: 100vh;
   padding: 2rem;
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+}
+
+.mainTitle {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.galleryContainer {
+  display: flex;
+  width: 100%;
 }
 
 .gallerySection {
@@ -14,8 +41,8 @@
   border-right: 1px solid #eaeaea;
 }
 
-.title {
-  font-size: 2rem;
+.sectionTitle {
+  font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 2rem;
   color: #333;
