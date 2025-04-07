@@ -16,7 +16,7 @@ debug "Input country: $COUNTRY"
 
 # Get country code from JSON file
 debug "Getting country code..."
-COUNTRY_CODE=$(echo "$COUNTRY" | tr '[:upper:]' '[:lower:]' | xargs | jq -r --arg country "$COUNTRY" '. | to_entries | .[] | select(.key | ascii_downcase == ($country | ascii_downcase)) | .value' /app/city-api/country-capital-config/country-codes.json)
+COUNTRY_CODE=$(echo "$COUNTRY" | tr '[:upper:]' '[:lower:]' | xargs | jq -r --arg country "$COUNTRY" '. | to_entries | .[] | select(.key | ascii_downcase == ($country | ascii_downcase)) | .value' /app/city-api/config/country-codes.json)
 debug "Extracted country code: '$COUNTRY_CODE'"
 
 if [ -z "$COUNTRY_CODE" ]; then
@@ -51,7 +51,7 @@ debug "Capital city: $CAPITAL_CITY"
 # Get the description for this capital city from the JSON file
 DESCRIPTION_KEY="$COUNTRY, $CAPITAL_CITY"
 debug "Looking up description for key: $DESCRIPTION_KEY"
-CAPITAL_DESCRIPTION=$(jq -r ".[\"$DESCRIPTION_KEY\"]" /app/city-api/country-capital-config/city-description.json)
+CAPITAL_DESCRIPTION=$(jq -r ".[\"$DESCRIPTION_KEY\"]" /app/city-api/config/city-description.json)
 debug "Capital description: $CAPITAL_DESCRIPTION"
 
 # Get Giphy video for capital city

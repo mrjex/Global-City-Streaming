@@ -10,7 +10,7 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # Initialize the JSON file with an opening brace
-echo "{" > ../city-api/country-capital-config/city-description.json
+echo "{" > ../city-api/config/city-description.json
 
 # Read the CSV file, skip the header line
 tail -n +2 most_populated_cities.csv | while IFS=, read -r country city; do
@@ -43,23 +43,23 @@ tail -n +2 most_populated_cities.csv | while IFS=, read -r country city; do
     
     # Add the entry to the JSON file
     # If it's not the first entry, add a comma
-    if [ $(wc -l < ../city-api/country-capital-config/city-description.json) -gt 1 ]; then
-        echo "," >> ../city-api/country-capital-config/city-description.json
+    if [ $(wc -l < ../city-api/config/city-description.json) -gt 1 ]; then
+        echo "," >> ../city-api/config/city-description.json
     fi
     # Use jq to properly format the key and combine with the value
     KEY=$(echo "$country, $city" | jq -R '.')
-    echo "    $KEY: $DESCRIPTION" >> ../city-api/country-capital-config/city-description.json
+    echo "    $KEY: $DESCRIPTION" >> ../city-api/config/city-description.json
     
     # Add a small delay to respect API rate limits
     sleep 0.5
 done
 
 # Close the JSON file with a closing brace
-echo "}" >> ../city-api/country-capital-config/city-description.json
+echo "}" >> ../city-api/config/city-description.json
 
 # Validate and format the JSON file
-if jq '.' ../city-api/country-capital-config/city-description.json > temp.json; then
-    mv temp.json ../city-api/country-capital-config/city-description.json
+if jq '.' ../city-api/config/city-description.json > temp.json; then
+    mv temp.json ../city-api/config/city-description.json
     echo "Successfully generated city descriptions!"
 else
     echo "Error: Generated JSON is invalid"
