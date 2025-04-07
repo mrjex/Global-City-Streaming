@@ -34,4 +34,9 @@ countries:
     video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/JUY1OQS4KIVX4NUrzs/giphy.mp4
   China, Shanghai:
     video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ZEfptwy6Pp5isT20bS/giphy.mp4
-
+  Netherlands, Randstad:
+    description: The Randstad is the largest metropolitan area in the Netherlands, comprising the cities of Amsterdam, The Hague, Rotterdam, and Utrecht. It is a vibrant and dynamic region known for its rich history, diverse culture, and economic prosperity.
+    video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/VIWn4jOf4zr7wPi5D0/giphy.mp4
+  England, Greater London:
+    description: London, the United Kingdom’s most populous city, is a captivating blend of historic grandeur and modern innovation, where Gothic cathedrals, Georgian townhouses, and sleek skyscrapers share the skyline 🏰. As a global cultural powerhouse, it's home to world-famous museums, West End theatres, and a vibrant music and fashion scene 🎭. Iconic landmarks like Big Ben, the Tower Bridge, and the London Eye make the city instantly recognizable and endlessly fascinating 🌉.
+    video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jRHOfOfg4vCYkX7sFE/giphy.mp4

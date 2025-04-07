@@ -51,7 +51,7 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
           <div className="text-gray-400 text-sm mx-auto">
-            {selectedCountry ? `${selectedCountry}'s Most Populated City` : 'Sweden\'s Most Populated City'}
+            {selectedCountry ? `${selectedCountry === 'England' ? 'United Kingdom' : selectedCountry}'s Most Populated City` : 'Sweden\'s Most Populated City'}
           </div>
         </div>
 
