@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Seoul
-  - Busan
-  - Incheon
-  - Daegu
-  - Daejeon
-  - Gwangju
-  - Gwangju
+  - Greater London
+  - London
+  - Birmingham
+  - Leeds
+  - Tyneside
+  - Glasgow
+  - Sheffield
   enabled: true
   previousBatch:
-  - Seoul
-  - Busan
-  - Incheon
-  - Daegu
-  - Daejeon
-  - Gwangju
-  - Gwangju
+  - Greater London
+  - London
+  - Birmingham
+  - Leeds
+  - Tyneside
+  - Glasgow
+  - Sheffield
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
