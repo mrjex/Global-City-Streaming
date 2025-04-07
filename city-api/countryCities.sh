@@ -14,13 +14,9 @@ debug "Script arguments: $@"
 COUNTRY="$1"
 debug "Input country: $COUNTRY"
 
-# Get country code from Python script
+# Get country code from JSON file
 debug "Getting country code..."
-debug "Running: python /app/city-api/apis/countryCodeApi.py \"$COUNTRY\""
-COUNTRY_CODE_OUTPUT=$(python /app/city-api/apis/countryCodeApi.py "$COUNTRY")
-debug "Raw country code output: $COUNTRY_CODE_OUTPUT"
-
-COUNTRY_CODE=$(echo "$COUNTRY_CODE_OUTPUT" | grep "Country Code (alpha-2):" | cut -d ":" -f2 | tr -d ' ')
+COUNTRY_CODE=$(echo "$COUNTRY" | tr '[:upper:]' '[:lower:]' | xargs | jq -r --arg country "$COUNTRY" '. | to_entries | .[] | select(.key | ascii_downcase == ($country | ascii_downcase)) | .value' /app/city-api/country-capital-config/country-codes.json)
 debug "Extracted country code: '$COUNTRY_CODE'"
 
 if [ -z "$COUNTRY_CODE" ]; then

@@ -51,7 +51,7 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
           <div className="text-gray-400 text-sm mx-auto">
-            {selectedCountry ? `${selectedCountry} Capital View` : 'Sweden Capital View'}
+            {selectedCountry ? `${selectedCountry}'s Most Popular City` : 'Sweden\'s Most Popular City'}
           </div>
         </div>
 
@@ -85,11 +85,8 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
           )}
         </div>
         <div className="px-4 pb-4 text-gray-300 text-center border-t border-gray-700 mt-4 pt-4">
-          Experience the vibrant atmosphere of capital cities around the world through our live streams. Watch as urban life unfolds in real-time, showcasing the unique character of each global metropolis.
+          {description || 'Loading description...'}
         </div>
-      </div>
-      <div className="mt-6 text-gray-300 text-center px-4">
-        {description || 'Loading description...'}
       </div>
     </div>
   );
