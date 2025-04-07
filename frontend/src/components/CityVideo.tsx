@@ -8,6 +8,7 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [key, setKey] = useState<number>(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [description, setDescription] = useState<string>('');
 
   useEffect(() => {
     const fetchVideoUrl = async () => {
@@ -24,8 +25,9 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
           body: JSON.stringify({ country: countryToFetch }),
         });
         const data = await response.json();
-        if (data.success && data.capital_city_video_link) {
+        if (data.success) {
           setVideoUrl(data.capital_city_video_link);
+          setDescription(data.capital_city_description || '');
           setKey(prev => prev + 1);
         }
       } catch (error) {
@@ -85,6 +87,9 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
         <div className="px-4 pb-4 text-gray-300 text-center border-t border-gray-700 mt-4 pt-4">
           Experience the vibrant atmosphere of capital cities around the world through our live streams. Watch as urban life unfolds in real-time, showcasing the unique character of each global metropolis.
         </div>
+      </div>
+      <div className="mt-6 text-gray-300 text-center px-4">
+        {description || 'Loading description...'}
       </div>
     </div>
   );

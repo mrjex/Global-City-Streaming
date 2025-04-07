@@ -52,6 +52,12 @@ debug "Found $CITY_COUNT cities to process"
 CAPITAL_CITY=$(echo "$RESPONSE" | jq -r '.data[0].city')
 debug "Capital city: $CAPITAL_CITY"
 
+# Get the description for this capital city from the JSON file
+DESCRIPTION_KEY="$COUNTRY, $CAPITAL_CITY"
+debug "Looking up description for key: $DESCRIPTION_KEY"
+CAPITAL_DESCRIPTION=$(jq -r ".[\"$DESCRIPTION_KEY\"]" /app/city-api/country-capital-config/city-description.json)
+debug "Capital description: $CAPITAL_DESCRIPTION"
+
 # Get Giphy video for capital city
 debug "Getting Giphy video for $CAPITAL_CITY..."
 GIPHY_RESPONSE=$(curl -G "https://api.giphy.com/v1/gifs/search" \
@@ -95,6 +101,7 @@ echo "  \"success\": true,"
 echo "  \"country\": \"$COUNTRY\","
 echo "  \"country_code\": \"$(echo $COUNTRY_CODE | tr '[:upper:]' '[:lower:]')\","
 echo "  \"capital_city_video_link\": \"$MP4_URL\","
+echo "  \"capital_city_description\": \"$CAPITAL_DESCRIPTION\","
 echo "  \"cities\": ["
 echo "    ${CITY_DATA_ARRAY}"
 echo "  ]"
