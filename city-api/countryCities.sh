@@ -66,14 +66,14 @@ debug "Capital description: $CAPITAL_DESCRIPTION"
 # Check if video mapping exists for this city in city-edits.yml
 debug "Checking for existing video mapping in yml..."
 EXISTING_VIDEO=$(yq ".countries[\"$DESCRIPTION_KEY\"].video" /app/city-api/config/city-edits.yml)
-debug "Existing video mapping from yml: $EXISTING_VIDEO"
+debug "Existing video mapping: $EXISTING_VIDEO"
 
 if [ "$EXISTING_VIDEO" != "null" ]; then
-    debug "Found existing video mapping in yml, using it instead of Giphy API"
+    debug "Found existing video mapping, using it instead of Giphy API"
     MP4_URL="$EXISTING_VIDEO"
 else
+    debug "Getting Giphy video for $CAPITAL_CITY..."
     # Get Giphy video for capital city
-    debug "No video mapping found in yml, getting Giphy video for $CAPITAL_CITY..."
     GIPHY_RESPONSE=$(curl -G "https://api.giphy.com/v1/gifs/search" \
     --data-urlencode "api_key=$GIPHY_API_KEY" \
     --data-urlencode "q=$COUNTRY $CAPITAL_CITY aerial view" \
