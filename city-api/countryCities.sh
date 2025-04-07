@@ -63,6 +63,9 @@ if [ "$CAPITAL_DESCRIPTION" = "null" ]; then
 fi
 debug "Capital description: $CAPITAL_DESCRIPTION"
 
+# Escape any special quotes in the description
+CAPITAL_DESCRIPTION=$(echo "$CAPITAL_DESCRIPTION" | sed 's/"/\\"/g')
+
 # Check if video mapping exists for this city in city-edits.yml
 debug "Checking for existing video mapping in yml..."
 EXISTING_VIDEO=$(yq ".countries[\"$DESCRIPTION_KEY\"].video" /app/city-api/config/city-edits.yml)

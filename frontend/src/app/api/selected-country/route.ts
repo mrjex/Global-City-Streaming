@@ -21,15 +21,32 @@ export async function POST(request: Request) {
     });
 
     if (!response.ok) {
+      console.error('API response not OK:', response.status, response.statusText);
       throw new Error('Failed to forward country selection');
     }
 
-    const data = await response.json();
-    console.log('Received city temperature data:', JSON.stringify(data, null, 2));
+    // Get the raw text first for debugging
+    const rawText = await response.text();
+    console.log('Raw API response:', rawText);
 
-    return NextResponse.json(data);
+    try {
+      // Try to parse the text as JSON
+      const data = JSON.parse(rawText);
+      console.log('Successfully parsed city temperature data');
+      return NextResponse.json(data);
+    } catch (parseError) {
+      console.error('Failed to parse API response as JSON:', parseError);
+      console.error('Raw response that failed to parse:', rawText);
+      throw new Error('Invalid JSON response from API');
+    }
   } catch (error) {
     console.error('Error forwarding country selection:', error);
-    return NextResponse.json({ error: 'Failed to process country selection' }, { status: 500 });
+    return NextResponse.json(
+      { 
+        error: 'Failed to process country selection',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }, 
+      { status: 500 }
+    );
   }
 } 

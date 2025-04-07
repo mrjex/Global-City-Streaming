@@ -34,3 +34,10 @@ countries:
   England, Greater London:
     description: London, the United Kingdom’s most populous city, is a captivating blend of historic grandeur and modern innovation, where Gothic cathedrals, Georgian townhouses, and sleek skyscrapers share the skyline 🏰. As a global cultural powerhouse, it's home to world-famous museums, West End theatres, and a vibrant music and fashion scene 🎭. Iconic landmarks like Big Ben, the Tower Bridge, and the London Eye make the city instantly recognizable and endlessly fascinating 🌉.
     video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jRHOfOfg4vCYkX7sFE/giphy.mp4
+  Sri Lanka, Colombo:
+    video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/K8xXVdNvAx6DC9o0rs/giphy.mp4
+    description: Colombo, the capital city of Sri Lanka, is a bustling metropolis that blends modernity with ancient traditions. It is known for its rich cultural heritage, vibrant street life, and delicious cuisine.
+  Azerbaijan, Baku:
+    video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/wqu9NT3DGEMUGS10Re/giphy.mp4
+  Georgia, Batumi:
+    description: Batumi, Georgia's largest city, is a vibrant coastal metropolis that combines modernity with natural beauty. It is known for its beautiful beaches, lush parks, and historic landmarks.

@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
-  - Kawasaki
-  - Kobe
+  - Batumi
+  - Rustavi
+  - Kutaisi
+  - Sukhumi
+  - Gori
+  - Poti
+  - Zugdidi
   enabled: true
   previousBatch:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
-  - Kawasaki
-  - Kobe
+  - Batumi
+  - Rustavi
+  - Kutaisi
+  - Sukhumi
+  - Gori
+  - Poti
+  - Zugdidi
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
