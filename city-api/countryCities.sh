@@ -54,19 +54,29 @@ debug "Looking up description for key: $DESCRIPTION_KEY"
 CAPITAL_DESCRIPTION=$(jq -r ".[\"$DESCRIPTION_KEY\"]" /app/city-api/config/city-description.json)
 debug "Capital description: $CAPITAL_DESCRIPTION"
 
-# Get Giphy video for capital city
-debug "Getting Giphy video for $CAPITAL_CITY..."
-GIPHY_RESPONSE=$(curl -G "https://api.giphy.com/v1/gifs/search" \
---data-urlencode "api_key=$GIPHY_API_KEY" \
---data-urlencode "q=$COUNTRY $CAPITAL_CITY aerial view" \
---data-urlencode "limit=1" \
---data-urlencode "offset=0" \
---data-urlencode "rating=g" \
---data-urlencode "lang=en" \
--s)
+# Check if video mapping exists for this city
+debug "Checking for existing video mapping..."
+EXISTING_VIDEO=$(jq -r ".[\"$DESCRIPTION_KEY\"]" /app/city-api/config/city-video-mapping.json)
+debug "Existing video mapping: $EXISTING_VIDEO"
 
-# Extract MP4 URL
-MP4_URL=$(echo $GIPHY_RESPONSE | jq -r '.data[0].images.original.mp4')
+if [ "$EXISTING_VIDEO" != "null" ]; then
+    debug "Found existing video mapping, using it instead of Giphy API"
+    MP4_URL="$EXISTING_VIDEO"
+else
+    # Get Giphy video for capital city
+    debug "Getting Giphy video for $CAPITAL_CITY..."
+    GIPHY_RESPONSE=$(curl -G "https://api.giphy.com/v1/gifs/search" \
+    --data-urlencode "api_key=$GIPHY_API_KEY" \
+    --data-urlencode "q=$COUNTRY $CAPITAL_CITY aerial view" \
+    --data-urlencode "limit=1" \
+    --data-urlencode "offset=0" \
+    --data-urlencode "rating=g" \
+    --data-urlencode "lang=en" \
+    -s)
+
+    # Extract MP4 URL
+    MP4_URL=$(echo $GIPHY_RESPONSE | jq -r '.data[0].images.original.mp4')
+fi
 debug "MP4 URL: $MP4_URL"
 
 # Initialize variables for collecting city data

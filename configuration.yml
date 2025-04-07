@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Seoul
+  - Busan
+  - Incheon
+  - Daegu
+  - Daejeon
+  - Gwangju
+  - Gwangju
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Seoul
+  - Busan
+  - Incheon
+  - Daegu
+  - Daejeon
+  - Gwangju
+  - Gwangju
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
