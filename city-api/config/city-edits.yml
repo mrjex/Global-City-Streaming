@@ -1,12 +1,6 @@
 # This file is used to manually replace the city description and video for specific cities,
 # as the Giphy API and GPT-3.5 don't always return appropriate results specific to this project
 
-
-settings:
-  parsing:
-    video URL: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UNIQUE_ID_HERE/giphy.mp4
-
-
 countries:
   Sweden, Stockholm:
     video: https://media1.giphy.com/media/v1.Y2lkPTExMDA4NzRlYW5jaGtnN3J0MXRwbHJvdHY0bXludnR5MmVvdmtvZjZ3anM0cG43dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/dy1DoHULvnmIE/giphy.mp4
