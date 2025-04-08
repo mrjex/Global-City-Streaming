@@ -69,8 +69,8 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities }) => {
 
     // Camera setup
     const camera = new THREE.PerspectiveCamera(75, containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
-    camera.position.z = 6;
-    camera.position.y = 2;
+    camera.position.z = 5;
+    camera.position.y = 1.5;
 
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ 
@@ -78,6 +78,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities }) => {
       alpha: true,
       powerPreference: "high-performance"
     });
+    renderer.shadowMap.enabled = false;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     containerRef.current.appendChild(renderer.domElement);
@@ -95,30 +96,30 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities }) => {
     const earthMaterial = new THREE.MeshPhongMaterial({
       map: new THREE.TextureLoader().load('/images/earth-texture.jpg'),
       bumpMap: new THREE.TextureLoader().load('/images/earth-bump.jpg'),
-      bumpScale: 0.05,  // Reduced bump scale for subtler terrain
+      bumpScale: 0.05,
       specularMap: new THREE.TextureLoader().load('/images/earth-specular.jpg'),
       specular: new THREE.Color('grey'),
-      shininess: 10  // Increased shininess
+      shininess: 10
     });
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
     scene.add(earth);
 
     // Atmosphere
-    const atmosphereGeometry = new THREE.SphereGeometry(3.1, 128, 128);  // Increased segments
+    const atmosphereGeometry = new THREE.SphereGeometry(3.1, 128, 128);
     const atmosphereMaterial = new THREE.MeshPhongMaterial({
       color: 0x0077ff,
       transparent: true,
-      opacity: 0.15,  // Slightly increased opacity
+      opacity: 0.15,
       side: THREE.BackSide
     });
     const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
     scene.add(atmosphere);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0x333333, 0.5);  // Increased ambient light intensity
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);  // Increased directional light intensity
-    sunLight.position.set(5, 3, 5);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    sunLight.position.set(1, 1, 1);
     scene.add(sunLight);
 
     // City markers
