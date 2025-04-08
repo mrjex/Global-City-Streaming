@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Bangkok
-  - Bangkok
-  - Chiang Mai
-  - Phrae
-  - Nonthaburi
-  - Sai Mai
-  - Khlong Sam Wa
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
+  - Nantes
+  - Montpellier
   enabled: true
   previousBatch:
-  - Bangkok
-  - Bangkok
-  - Chiang Mai
-  - Phrae
-  - Nonthaburi
-  - Sai Mai
-  - Khlong Sam Wa
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
+  - Nantes
+  - Montpellier
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

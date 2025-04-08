@@ -147,7 +147,9 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
                   <div className="grid grid-cols-2 gap-4 h-full">
                     {/* Dynamic Cities (smaller list) */}
                     <div className="border-r border-white border-opacity-20 pr-2">
-                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">Dynamic Cities</h3>
+                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
+                        Dynamic Cities ({cities.dynamic.length})
+                      </h3>
                       <div className="flex flex-wrap gap-2">
                         {cities.dynamic.map((city, index) => (
                           <div 
@@ -162,7 +164,9 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
                     
                     {/* Static Cities (larger list) */}
                     <div className="pl-2">
-                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">Static Cities</h3>
+                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
+                        Static Cities ({cities.static.length})
+                      </h3>
                       <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                         {cities.static.map((city, index) => (
                           <div 
