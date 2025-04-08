@@ -123,13 +123,11 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
           
           {/* Content Window */}
           <div 
-            className="h-48 rounded-lg overflow-hidden"
+            className="h-48 rounded-lg overflow-hidden relative"
             style={{
-              background: displayMode === 'map' 
-                ? 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)'
-                : '#1a1b1e',
+              background: 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)',
               backgroundSize: '200% 200%',
-              animation: displayMode === 'map' ? 'gradient 15s ease infinite' : 'none'
+              animation: 'gradient 15s ease infinite'
             }}
           >
             {/* Content based on display mode */}
@@ -148,27 +146,33 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
                 ) : (
                   <div className="grid grid-cols-2 gap-4 h-full">
                     {/* Dynamic Cities (smaller list) */}
-                    <div className="border-r border-gray-700 pr-2">
-                      <h3 className="text-sm font-semibold text-blue-400 mb-2">Dynamic Cities</h3>
-                      <ul className="text-xs space-y-1">
+                    <div className="border-r border-white border-opacity-20 pr-2">
+                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">Dynamic Cities</h3>
+                      <div className="flex flex-wrap gap-2">
                         {cities.dynamic.map((city, index) => (
-                          <li key={`dynamic-${index}`} className="text-gray-300">
+                          <div 
+                            key={`dynamic-${index}`} 
+                            className="bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200"
+                          >
                             {city}
-                          </li>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                     
                     {/* Static Cities (larger list) */}
                     <div className="pl-2">
-                      <h3 className="text-sm font-semibold text-green-400 mb-2">Static Cities</h3>
-                      <ul className="text-xs space-y-1 max-h-32 overflow-y-auto">
+                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">Static Cities</h3>
+                      <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                         {cities.static.map((city, index) => (
-                          <li key={`static-${index}`} className="text-gray-300">
+                          <div 
+                            key={`static-${index}`} 
+                            className="bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200"
+                          >
                             {city}
-                          </li>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   </div>
                 )}
