@@ -1,68 +1,24 @@
 [
     {
-        "city": "Toronto",
-        "country": "Canada",
-        "continent": "America",
-        "temperatureCelsius": 6.0,
-        "latitude": 43.6667,
-        "longitude": -79.4167,
-        "timeZoneNotation": "America/Toronto",
-        "timeZoneOffset": "UTC-6",
-        "equatorDistance": 43.6667
+        "city": "Helsinki",
+        "country": "Finland",
+        "continent": "Europe",
+        "temperatureCelsius": 2.2,
+        "latitude": 60.176,
+        "longitude": 24.934,
+        "timeZoneNotation": "Europe/Helsinki",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 60.176
     },
     {
-        "city": "Buenos Aires",
-        "country": "Argentina",
-        "continent": "America",
-        "temperatureCelsius": 22.0,
-        "latitude": -34.5875,
-        "longitude": -58.6725,
-        "timeZoneNotation": "America/Argentina/Buenos_Aires",
-        "timeZoneOffset": "UTC-3",
-        "equatorDistance": 34.5875
-    },
-    {
-        "city": "Mexico City",
-        "country": "Mexico",
-        "continent": "America",
-        "temperatureCelsius": 24.4,
-        "latitude": 19.4285,
-        "longitude": -99.1277,
-        "timeZoneNotation": "America/Mexico_City",
-        "timeZoneOffset": "UTC-6",
-        "equatorDistance": 19.4285
-    },
-    {
-        "city": "Juneau",
-        "country": "United States of America",
-        "continent": "America",
-        "temperatureCelsius": 5.2,
-        "latitude": 58.3019,
-        "longitude": -134.4197,
-        "timeZoneNotation": "America/Juneau",
-        "timeZoneOffset": "UTC-9",
-        "equatorDistance": 58.3019
-    },
-    {
-        "city": "Sacramento",
-        "country": "United States of America",
-        "continent": "America",
-        "temperatureCelsius": 15.2,
-        "latitude": 38.5817,
-        "longitude": -121.4933,
-        "timeZoneNotation": "America/Los_Angeles",
-        "timeZoneOffset": "UTC-8",
-        "equatorDistance": 38.5817
-    },
-    {
-        "city": "Tijuana",
-        "country": "Mexico",
-        "continent": "America",
-        "temperatureCelsius": 17.2,
-        "latitude": 32.5027,
-        "longitude": -117.0037,
-        "timeZoneNotation": "America/Tijuana",
-        "timeZoneOffset": "UTC-8",
-        "equatorDistance": 32.5027
+        "city": "Chernobyl",
+        "country": "Ukraine",
+        "continent": "Europe",
+        "temperatureCelsius": 0.6,
+        "latitude": 51.2667,
+        "longitude": 30.2333,
+        "timeZoneNotation": "Europe/Kyiv",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 51.2667
     }
 ]

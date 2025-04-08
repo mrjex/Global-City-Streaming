@@ -115,6 +115,19 @@ def plotEquatorChart():
         logTrendFig = getexpectedLogarithmicTrend()
         finalFig = go.Figure(data=fig.data + logTrendFig.data)
         
+        # Preserve the color scale from the original scatter plot
+        finalFig.update_layout(
+            coloraxis=dict(
+                colorscale=temperatureColorScale,
+                cmin=0,
+                cmax=highestCityTemperature,
+                colorbar=dict(
+                    title="Temperature (Celsius)",
+                    titleside="right"
+                )
+            )
+        )
+        
         if pngOutput == True:
             exportPng(finalFig, getTypeOfQueryString(), getPngOutputString())
             
@@ -131,7 +144,13 @@ def plotEquatorChart():
 # Fetches the data from the API and plots it on a graph
 def getexpectedLogarithmicTrend():
     logarithmicCurveData = mathCurveApi.getDataArrays(highestCityTemperature)
-    fig1 = px.line(logarithmicCurveData, x="equatorDistance", y="temperatureCelsius")
+    # Create a line plot with a specific color that complements the scatter plot
+    fig1 = px.line(logarithmicCurveData, x="equatorDistance", y="temperatureCelsius", 
+                   color_discrete_sequence=['rgba(255, 255, 255, 0.7)'])  # White line with transparency
+    
+    # Make the line dashed for better visibility
+    fig1.update_traces(line=dict(dash='dash', width=2))
+    
     return fig1
 
 

@@ -57,9 +57,9 @@ visualizations:
   charts:
     equatorChart:
       displayActualTrend: false
-      displayLinearTrend: false
+      displayLinearTrend: true
       displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
-    queryAttribute: continent
-    queryRequirement: America
+    queryAttribute: timeZoneOffset
+    queryRequirement: UTC+2

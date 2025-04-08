@@ -1,24 +1,24 @@
 [
     {
-        "city": "Moscow",
-        "country": "Russia",
+        "city": "Helsinki",
+        "country": "Finland",
         "continent": "Europe",
-        "temperatureCelsius": -1.8,
-        "latitude": 55.7522,
-        "longitude": 37.6156,
-        "timeZoneNotation": "Europe/Moscow",
-        "timeZoneOffset": "UTC+3",
-        "equatorDistance": 55.7522
+        "temperatureCelsius": 2.2,
+        "latitude": 60.176,
+        "longitude": 24.934,
+        "timeZoneNotation": "Europe/Helsinki",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 60.176
     },
     {
-        "city": "Nairobi",
-        "country": "Kenya",
-        "continent": "Africa",
-        "temperatureCelsius": 19.4,
-        "latitude": -1.2833,
-        "longitude": 36.8167,
-        "timeZoneNotation": "Africa/Nairobi",
-        "timeZoneOffset": "UTC+3",
-        "equatorDistance": 1.2833
+        "city": "Chernobyl",
+        "country": "Ukraine",
+        "continent": "Europe",
+        "temperatureCelsius": 0.6,
+        "latitude": 51.2667,
+        "longitude": 30.2333,
+        "timeZoneNotation": "Europe/Kyiv",
+        "timeZoneOffset": "UTC+2",
+        "equatorDistance": 51.2667
     }
 ]
