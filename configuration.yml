@@ -56,10 +56,10 @@ services:
 visualizations:
   charts:
     equatorChart:
-      displayActualTrend: false
+      displayActualTrend: true
       displayLinearTrend: false
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: continent
-    queryRequirement: Europe
+    queryRequirement: Asia

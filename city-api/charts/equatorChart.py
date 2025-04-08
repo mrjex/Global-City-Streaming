@@ -103,14 +103,17 @@ def plotEquatorChart():
         mode='markers',
         marker=dict(
             size=dataPointSize,
-            color=yArr,  # Use temperature values directly for coloring
+            color=yArr,  # Temperature values
             colorscale=temperatureColorScale,
-            cmin=0,
-            cmax=highestCityTemperature,
+            cmin=0,  # Minimum temperature
+            cmax=highestCityTemperature,  # Maximum temperature
             line=dict(width=dataPointOutlizeWidth, color='DarkSlateGrey'),
             colorbar=dict(
                 title="Temperature (Celsius)",
-                titleside="right"
+                titleside="right",
+                tickmode='array',
+                ticktext=[f"{i}°C" for i in range(0, highestCityTemperature + 1, 10)],
+                tickvals=[i for i in range(0, highestCityTemperature + 1, 10)]
             )
         ),
         hovertext=[city['city'] for city in jsonData],
