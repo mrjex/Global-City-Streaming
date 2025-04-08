@@ -65,52 +65,61 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities }) => {
 
     // Scene setup
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a2a);
+
+    // Camera setup
     const camera = new THREE.PerspectiveCamera(75, containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    camera.position.z = 6;
+    camera.position.y = 2;
+
+    // Renderer setup
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     containerRef.current.appendChild(renderer.domElement);
 
-    // Earth
-    const earthGeometry = new THREE.SphereGeometry(5, 64, 64);
-    const earthMaterial = new THREE.MeshPhongMaterial({
-      map: new THREE.TextureLoader().load('/images/earth-texture.jpg'),
-      bumpMap: new THREE.TextureLoader().load('/images/earth-bump.jpg'),
-      bumpScale: 0.1,
-      specularMap: new THREE.TextureLoader().load('/images/earth-specular.jpg'),
-      specular: new THREE.Color('grey'),
-      shininess: 5
-    });
-    const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-    scene.add(earth);
-
-    // Atmosphere
-    const atmosphereGeometry = new THREE.SphereGeometry(5.1, 64, 64);
-    const atmosphereMaterial = new THREE.MeshPhongMaterial({
-      color: 0x0077ff,
-      transparent: true,
-      opacity: 0.1,
-      side: THREE.BackSide
-    });
-    const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-    scene.add(atmosphere);
-
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0x333333);
-    scene.add(ambientLight);
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1);
-    sunLight.position.set(5, 3, 5);
-    scene.add(sunLight);
-
-    // Camera position
-    camera.position.z = 15;
-
-    // Controls
+    // Controls setup
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.rotateSpeed = 0.5;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.5;
+
+    // Earth setup
+    const earthGeometry = new THREE.SphereGeometry(3, 128, 128);
+    const earthMaterial = new THREE.MeshPhongMaterial({
+      map: new THREE.TextureLoader().load('/images/earth-texture.jpg'),
+      bumpMap: new THREE.TextureLoader().load('/images/earth-bump.jpg'),
+      bumpScale: 0.05,  // Reduced bump scale for subtler terrain
+      specularMap: new THREE.TextureLoader().load('/images/earth-specular.jpg'),
+      specular: new THREE.Color('grey'),
+      shininess: 10  // Increased shininess
+    });
+    const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+    scene.add(earth);
+
+    // Atmosphere
+    const atmosphereGeometry = new THREE.SphereGeometry(3.1, 128, 128);  // Increased segments
+    const atmosphereMaterial = new THREE.MeshPhongMaterial({
+      color: 0x0077ff,
+      transparent: true,
+      opacity: 0.15,  // Slightly increased opacity
+      side: THREE.BackSide
+    });
+    const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+    scene.add(atmosphere);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x333333, 0.5);  // Increased ambient light intensity
+    scene.add(ambientLight);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);  // Increased directional light intensity
+    sunLight.position.set(5, 3, 5);
+    scene.add(sunLight);
 
     // City markers
     const markers: THREE.Mesh[] = [];
@@ -126,9 +135,9 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities }) => {
       const phi = (90 - city.lat) * (Math.PI / 180);
       const theta = (city.lng + 180) * (Math.PI / 180);
       
-      marker.position.x = -(5 * Math.sin(phi) * Math.cos(theta));
-      marker.position.y = 5 * Math.cos(phi);
-      marker.position.z = 5 * Math.sin(phi) * Math.sin(theta);
+      marker.position.x = -(3 * Math.sin(phi) * Math.cos(theta));
+      marker.position.y = 3 * Math.cos(phi);
+      marker.position.z = 3 * Math.sin(phi) * Math.sin(theta);
       
       earth.add(marker);
       markers.push(marker);
