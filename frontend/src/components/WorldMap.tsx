@@ -42,6 +42,12 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
         setSelectedCountry(defaultCountry);
         setCityData(data.cities);
         setCountryCode(data.country_code);
+        
+        // Dispatch event for initial country load
+        const event = new CustomEvent('initialCountryLoaded', {
+          detail: { country: defaultCountry, data }
+        });
+        window.dispatchEvent(event);
       }
     })
     .catch(error => console.error('Error loading initial country data:', error));
@@ -165,6 +171,12 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
             if (data.success && data.cities) {
               setCityData(data.cities);
               setCountryCode(data.country_code);
+              
+              // Dispatch custom event for successful country selection
+              const event = new CustomEvent('countrySelected', {
+                detail: { country: newSelectedCountry, data }
+              });
+              window.dispatchEvent(event);
             }
           })
           .catch(error => console.error('Error sending country selection:', error));

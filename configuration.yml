@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
-  - Kawasaki
-  - Kobe
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
+  - Houston
+  - Kansas City metropolitan area
   enabled: true
   previousBatch:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
-  - Kawasaki
-  - Kobe
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
+  - Houston
+  - Kansas City metropolitan area
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
@@ -62,4 +62,4 @@ visualizations:
       pngOutput: false
   queryConfig:
     queryAttribute: continent
-    queryRequirement: Europe
+    queryRequirement: Asia

@@ -3,6 +3,10 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const fetchCache = 'force-no-store';
+
 export async function GET() {
   try {
     // Path to configuration.yml (mounted in the container)

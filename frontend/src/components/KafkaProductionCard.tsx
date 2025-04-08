@@ -19,29 +19,67 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
   const [cities, setCities] = useState<CitiesData>({ static: [], dynamic: [] });
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  useEffect(() => {
-    const fetchCities = async () => {
-      if (displayMode === 'list') {
-        setIsLoadingCities(true);
-        setError(null);
-        try {
-          const response = await fetch('/api/cities');
-          if (!response.ok) {
-            throw new Error('Failed to fetch cities');
-          }
-          const data = await response.json();
-          setCities(data);
-        } catch (err) {
-          console.error('Error fetching cities:', err);
-          setError('Failed to load cities data');
-        } finally {
-          setIsLoadingCities(false);
+  // Function to fetch cities data
+  const fetchCities = async () => {
+    setIsLoadingCities(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/cities', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch cities');
+      }
+      const data = await response.json();
+      setCities(data);
+    } catch (err) {
+      console.error('Error fetching cities:', err);
+      setError('Failed to load cities data');
+    } finally {
+      setIsLoadingCities(false);
+    }
+  };
+
+  // Initial fetch when display mode changes to list
+  useEffect(() => {
+    if (displayMode === 'list') {
+      fetchCities();
+    }
+  }, [displayMode]);
+
+  // Listen for country selection events
+  useEffect(() => {
+    const handleCountrySelected = (event: CustomEvent) => {
+      console.log('Country selected event received:', event.detail);
+      if (displayMode === 'list') {
+        fetchCities();
       }
     };
 
-    fetchCities();
+    // Add event listener for country selection
+    window.addEventListener('countrySelected', handleCountrySelected as EventListener);
+    
+    // Also listen for the initial country load event
+    const handleInitialCountryLoad = () => {
+      console.log('Initial country load event received');
+      setInitialLoadComplete(true);
+      if (displayMode === 'list') {
+        fetchCities();
+      }
+    };
+    
+    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+
+    return () => {
+      window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
+      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+    };
   }, [displayMode]);
 
   return (
