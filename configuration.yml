@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Batumi
-  - Rustavi
-  - Kutaisi
-  - Sukhumi
-  - Gori
-  - Poti
-  - Zugdidi
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - Batumi
-  - Rustavi
-  - Kutaisi
-  - Sukhumi
-  - Gori
-  - Poti
-  - Zugdidi
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
@@ -57,7 +57,7 @@ visualizations:
   charts:
     equatorChart:
       displayActualTrend: false
-      displayLinearTrend: true
+      displayLinearTrend: false
       displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:

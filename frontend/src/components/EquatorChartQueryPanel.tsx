@@ -33,9 +33,59 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
     ]
   };
 
-  // Fetch current config on initial load
+  // Function to fetch chart data
+  const fetchChartData = async () => {
+    setIsLoading(true);
+    setMessage('');
+    
+    try {
+      const response = await fetch('/api/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: 'visualizations',
+          config: {
+            queryConfig: {
+              queryAttribute,
+              queryRequirement
+            },
+            charts: {
+              equatorChart: {
+                displayLinearTrend,
+                displayLogarithmicTrend,
+                displayActualTrend,
+                pngOutput: false
+              }
+            }
+          }
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        if (data.figure) {
+          setFigureData(data.figure);
+        }
+      } else {
+        console.error('Failed to fetch chart data');
+      }
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch current config and chart data on initial load
   useEffect(() => {
-    fetchCurrentConfig();
+    const initializeData = async () => {
+      await fetchCurrentConfig();
+      await fetchChartData();
+    };
+    initializeData();
   }, []);
 
   // When attribute changes, select the first requirement option by default
@@ -69,51 +119,7 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    setMessage('');
-    setFigureData(null);
-    
-    try {
-      const response = await fetch('/api/config', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: 'visualizations',
-          config: {
-            queryConfig: {
-              queryAttribute,
-              queryRequirement
-            },
-            charts: {
-              equatorChart: {
-                displayLinearTrend,
-                displayLogarithmicTrend,
-                displayActualTrend,
-                pngOutput: false
-              }
-            }
-          }
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        setMessage('Configuration updated successfully!');
-        if (data.figure) {
-          setFigureData(data.figure);
-        }
-      } else {
-        setMessage('Failed to update configuration.');
-      }
-    } catch (error) {
-      console.error('Error updating configuration:', error);
-      setMessage('Error updating configuration. Check console for details.');
-    } finally {
-      setIsLoading(false);
-    }
+    await fetchChartData();
   };
 
   // Toggle switch component
