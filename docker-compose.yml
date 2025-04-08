@@ -29,6 +29,7 @@ services:
       - CITY_API_URL=http://city-api:8003
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./configuration.yml:/app/configuration.yml:ro
     depends_on:
       - kafka-producer
       - flink-processor

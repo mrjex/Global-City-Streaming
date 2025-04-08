@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Terminal from './Terminal';
 
 interface KafkaProductionCardProps {
@@ -6,11 +6,43 @@ interface KafkaProductionCardProps {
   messagesPerSecond?: number;
 }
 
+interface CitiesData {
+  static: string[];
+  dynamic: string[];
+}
+
 const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
   requestInterval = 1,
   messagesPerSecond = 10
 }) => {
   const [displayMode, setDisplayMode] = useState<'map' | 'list'>('map');
+  const [cities, setCities] = useState<CitiesData>({ static: [], dynamic: [] });
+  const [isLoadingCities, setIsLoadingCities] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (displayMode === 'list') {
+        setIsLoadingCities(true);
+        setError(null);
+        try {
+          const response = await fetch('/api/cities');
+          if (!response.ok) {
+            throw new Error('Failed to fetch cities');
+          }
+          const data = await response.json();
+          setCities(data);
+        } catch (err) {
+          console.error('Error fetching cities:', err);
+          setError('Failed to load cities data');
+        } finally {
+          setIsLoadingCities(false);
+        }
+      }
+    };
+
+    fetchCities();
+  }, [displayMode]);
 
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-2xl mb-8">
@@ -51,13 +83,15 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
             </button>
           </div>
           
-          {/* Gradient Window */}
+          {/* Content Window */}
           <div 
             className="h-48 rounded-lg overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)',
+              background: displayMode === 'map' 
+                ? 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)'
+                : '#1a1b1e',
               backgroundSize: '200% 200%',
-              animation: 'gradient 15s ease infinite'
+              animation: displayMode === 'map' ? 'gradient 15s ease infinite' : 'none'
             }}
           >
             {/* Content based on display mode */}
@@ -66,8 +100,40 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
                 <span className="text-white text-opacity-50">Map View</span>
               </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-white text-opacity-50">List View</span>
+              <div className="w-full h-full overflow-y-auto p-4 text-white">
+                {isLoadingCities ? (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-gray-400">Loading cities...</span>
+                  </div>
+                ) : error ? (
+                  <div className="text-red-400">{error}</div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 h-full">
+                    {/* Dynamic Cities (smaller list) */}
+                    <div className="border-r border-gray-700 pr-2">
+                      <h3 className="text-sm font-semibold text-blue-400 mb-2">Dynamic Cities</h3>
+                      <ul className="text-xs space-y-1">
+                        {cities.dynamic.map((city, index) => (
+                          <li key={`dynamic-${index}`} className="text-gray-300">
+                            {city}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    {/* Static Cities (larger list) */}
+                    <div className="pl-2">
+                      <h3 className="text-sm font-semibold text-green-400 mb-2">Static Cities</h3>
+                      <ul className="text-xs space-y-1 max-h-32 overflow-y-auto">
+                        {cities.static.map((city, index) => (
+                          <li key={`static-${index}`} className="text-gray-300">
+                            {city}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
