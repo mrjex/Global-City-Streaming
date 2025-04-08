@@ -7,7 +7,7 @@ interface TerminalProps {
 }
 
 const Terminal: React.FC<TerminalProps> = ({ 
-  title = 'Kafka Producer Logs',
+  title = 'Data Production',
   maxLines = 15
 }) => {
   const [logs, setLogs] = useState<string[]>([]);
