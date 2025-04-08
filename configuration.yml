@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Toronto
-  - Lower Mainland
-  - Metro Vancouver Regional District
-  - Montreal
-  - National Capital Region
-  - Calgary
-  - Ottawa
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - Toronto
-  - Lower Mainland
-  - Metro Vancouver Regional District
-  - Montreal
-  - National Capital Region
-  - Calgary
-  - Ottawa
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
@@ -62,4 +62,4 @@ visualizations:
       pngOutput: false
   queryConfig:
     queryAttribute: continent
-    queryRequirement: Asia
+    queryRequirement: Atlantic

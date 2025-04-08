@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import type { ReactElement } from 'react';
 import WorldMap from '../components/WorldMap';
 import DatabaseCounter from '../components/DatabaseCounter';
-import Terminal from '@/components/Terminal';
-import FlinkTerminals from '@/components/FlinkTerminals';
 import CityTemperatureChart from '@/components/CityTemperatureChart';
 import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
 import CityVideo from '@/components/CityVideo';
+import KafkaProductionCard from '@/components/KafkaProductionCard';
+import FlinkProcessorCard from '@/components/FlinkProcessorCard';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -43,10 +43,9 @@ export default function Home(): ReactElement {
         <EquatorChartQueryPanel />
       </div>
 
-      <FlinkTerminals maxLines={10} />
-
-      <div className="mt-8">
-        <Terminal maxLines={10} />
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <KafkaProductionCard requestInterval={1} messagesPerSecond={10} />
+        <FlinkProcessorCard batchSize={100} windowSize={5} />
       </div>
 
       <div className="mt-8 flex justify-center">
