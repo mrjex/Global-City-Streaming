@@ -127,11 +127,45 @@ def plotEquatorChart():
         x_sorted = sorted(xArr)
         if displayActualTrend:
             # For actual trend, use a moving average
-            window_size = max(3, len(xArr) // 10)  # Adjust window size based on data points
-            x_ma = np.convolve(x_sorted, np.ones(window_size)/window_size, mode='valid')
-            y_ma = np.convolve(sorted(yArr), np.ones(window_size)/window_size, mode='valid')
-            trend_x = x_ma
-            trend_y = y_ma
+            # Ensure we have enough points for a meaningful trend
+            if len(xArr) >= 2:
+                # Calculate window size based on data points
+                # For small datasets (2-5 points), use a small window
+                # For medium datasets (6-20 points), use a medium window
+                # For large datasets (20+ points), use a larger window
+                if len(xArr) <= 5:
+                    window_size = 2  # Small window for very small datasets
+                elif len(xArr) <= 20:
+                    window_size = len(xArr) // 4  # Medium window for medium datasets
+                else:
+                    window_size = len(xArr) // 5  # Larger window for large datasets
+                
+                # Ensure window size is at least 2 and not larger than dataset
+                window_size = max(2, min(window_size, len(xArr) - 1))
+                
+                # Sort both arrays together to maintain relationship
+                sorted_indices = np.argsort(xArr)
+                x_sorted = np.array(xArr)[sorted_indices]
+                y_sorted = np.array(yArr)[sorted_indices]
+                
+                # Apply moving average
+                x_ma = np.convolve(x_sorted, np.ones(window_size)/window_size, mode='valid')
+                y_ma = np.convolve(y_sorted, np.ones(window_size)/window_size, mode='valid')
+                
+                # Only use the trend if we have enough points after smoothing
+                if len(x_ma) > 0 and len(y_ma) > 0:
+                    trend_x = x_ma
+                    trend_y = y_ma
+                else:
+                    # Fallback to linear trend if moving average fails
+                    slope, intercept = np.polyfit(xArr, yArr, 1)
+                    trend_x = x_sorted
+                    trend_y = [slope * x + intercept for x in trend_x]
+            else:
+                # For very small datasets, use linear trend
+                slope, intercept = np.polyfit(xArr, yArr, 1)
+                trend_x = x_sorted
+                trend_y = [slope * x + intercept for x in trend_x]
         else:
             # For linear trend, use simple linear regression
             slope, intercept = np.polyfit(xArr, yArr, 1)
