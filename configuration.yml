@@ -58,8 +58,8 @@ visualizations:
     equatorChart:
       displayActualTrend: false
       displayLinearTrend: true
-      displayLogarithmicTrend: true
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
-    queryRequirement: UTC+2
+    queryRequirement: UTC+1

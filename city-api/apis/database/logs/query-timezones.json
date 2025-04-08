@@ -1,24 +1,68 @@
 [
     {
-        "city": "Helsinki",
-        "country": "Finland",
+        "city": "Stockholm",
+        "country": "Sweden",
         "continent": "Europe",
-        "temperatureCelsius": 2.2,
-        "latitude": 60.176,
-        "longitude": 24.934,
-        "timeZoneNotation": "Europe/Helsinki",
-        "timeZoneOffset": "UTC+2",
-        "equatorDistance": 60.176
+        "temperatureCelsius": 8.0,
+        "latitude": 59.3333,
+        "longitude": 18.05,
+        "timeZoneNotation": "Europe/Stockholm",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 59.3333
     },
     {
-        "city": "Chernobyl",
-        "country": "Ukraine",
+        "city": "Madrid",
+        "country": "Spain",
         "continent": "Europe",
-        "temperatureCelsius": 0.6,
-        "latitude": 51.2667,
-        "longitude": 30.2333,
-        "timeZoneNotation": "Europe/Kyiv",
-        "timeZoneOffset": "UTC+2",
-        "equatorDistance": 51.2667
+        "temperatureCelsius": 15.2,
+        "latitude": 40.4,
+        "longitude": -3.6833,
+        "timeZoneNotation": "Europe/Madrid",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 40.4
+    },
+    {
+        "city": "Rome",
+        "country": "Italy",
+        "continent": "Europe",
+        "temperatureCelsius": 17.4,
+        "latitude": 41.9,
+        "longitude": 12.4833,
+        "timeZoneNotation": "Europe/Rome",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 41.9
+    },
+    {
+        "city": "Venice",
+        "country": "Italy",
+        "continent": "Europe",
+        "temperatureCelsius": 13.4,
+        "latitude": 45.4386,
+        "longitude": 12.3267,
+        "timeZoneNotation": "Europe/Rome",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 45.4386
+    },
+    {
+        "city": "Paris",
+        "country": "France",
+        "continent": "Europe",
+        "temperatureCelsius": 17.2,
+        "latitude": 48.8667,
+        "longitude": 2.3333,
+        "timeZoneNotation": "Europe/Paris",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 48.8667
+    },
+    {
+        "city": "Amsterdam",
+        "country": "Netherlands",
+        "continent": "Europe",
+        "temperatureCelsius": 11.3,
+        "latitude": 52.374,
+        "longitude": 4.8897,
+        "timeZoneNotation": "Europe/Amsterdam",
+        "timeZoneOffset": "UTC+1",
+        "equatorDistance": 52.374
     }
 ]

@@ -99,6 +99,25 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
     initializeData();
   }, [configLoaded]);
 
+  // Track if this is the initial load
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Set default query requirement when query attribute changes (but not on initial load)
+  useEffect(() => {
+    // Skip setting defaults on initial load
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+      return;
+    }
+
+    // Only set defaults when user manually changes the attribute
+    if (queryAttribute === 'continent') {
+      setQueryRequirement('Europe');
+    } else if (queryAttribute === 'timeZoneOffset') {
+      setQueryRequirement('UTC+0');
+    }
+  }, [queryAttribute, isInitialLoad]);
+
   const fetchCurrentConfig = async () => {
     try {
       const response = await fetch('/api/config');
