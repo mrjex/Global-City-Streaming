@@ -61,5 +61,5 @@ visualizations:
       displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
-    queryAttribute: continent
-    queryRequirement: Asia
+    queryAttribute: timeZoneOffset
+    queryRequirement: UTC+0

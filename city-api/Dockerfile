@@ -31,7 +31,8 @@ RUN pip install --no-cache-dir \
     fastapi \
     uvicorn \
     statsmodels \
-    scipy
+    scipy \
+    numpy
 
 # Create necessary directories
 RUN mkdir -p \

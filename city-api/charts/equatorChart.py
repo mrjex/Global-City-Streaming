@@ -22,6 +22,7 @@ sys.path.extend(['/app/city-api', '/app/city-api/apis'])
 
 import apis.databaseJsonApi as databaseJsonApi
 import apis.mathCurveApi as mathCurveApi
+import numpy as np
 
 configPath = "/app/configuration.yml" # The fixed absolute path to the central config file
 
@@ -119,6 +120,32 @@ def plotEquatorChart():
         hovertext=[city['city'] for city in jsonData],
         hoverinfo='text+y+x'
     ))
+
+    # Add trend line if needed
+    if displayLinearTrend or displayActualTrend:
+        # Calculate trend line values
+        x_sorted = sorted(xArr)
+        if displayActualTrend:
+            # For actual trend, use a moving average
+            window_size = max(3, len(xArr) // 10)  # Adjust window size based on data points
+            x_ma = np.convolve(x_sorted, np.ones(window_size)/window_size, mode='valid')
+            y_ma = np.convolve(sorted(yArr), np.ones(window_size)/window_size, mode='valid')
+            trend_x = x_ma
+            trend_y = y_ma
+        else:
+            # For linear trend, use simple linear regression
+            slope, intercept = np.polyfit(xArr, yArr, 1)
+            trend_x = x_sorted
+            trend_y = [slope * x + intercept for x in trend_x]
+        
+        # Add trend line trace
+        fig.add_trace(go.Scatter(
+            x=trend_x,
+            y=trend_y,
+            mode='lines',
+            line=dict(color='rgba(255, 255, 255, 0.7)', width=2, dash='dash'),
+            name=f"{'Actual' if displayActualTrend else 'Linear'} Trend"
+        ))
 
     # Update layout
     fig.update_layout(
