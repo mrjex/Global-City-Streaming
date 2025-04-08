@@ -84,12 +84,14 @@ def plotEquatorChart():
         f.close()
         return None
 
-    temperatureColorScale = ['rgb(0, 255, 255)', 'rgb(255, 0, 0)']
+    temperatureColorScale = ['rgb(0, 0, 255)', 'rgb(0, 128, 255)', 'rgb(128, 128, 255)', 'rgb(255, 128, 128)', 'rgb(255, 0, 0)']
 
     # Plot a bubble-chart with 'equatorDistance' as the X-value and 'temperatureCelsius' as the Y-value
     fig = px.scatter(
                         jsonData, x=xArr, y=yArr,
-                        color="temperatureCelsius", color_continuous_scale=temperatureColorScale,
+                        color="temperatureCelsius", 
+                        color_continuous_scale=temperatureColorScale,
+                        range_color=[0, highestCityTemperature],  # Set fixed color range
                         trendline=defineTrendline(),
                         hover_name="city",
                         labels={

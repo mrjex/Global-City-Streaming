@@ -11,11 +11,12 @@ interface EquatorChartQueryPanelProps {
 const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
   title = 'Equator Chart Query Section'
 }) => {
-  const [queryAttribute, setQueryAttribute] = useState<string>('continent');
-  const [queryRequirement, setQueryRequirement] = useState<string>('Europe');
+  const [queryAttribute, setQueryAttribute] = useState<string>('');
+  const [queryRequirement, setQueryRequirement] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [figureData, setFigureData] = useState<string | null>(null);
+  const [configLoaded, setConfigLoaded] = useState(false);
   
   // Chart display options
   const [displayLinearTrend, setDisplayLinearTrend] = useState(false);
@@ -35,10 +36,17 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
 
   // Function to fetch chart data
   const fetchChartData = async () => {
+    // Only proceed if configuration is loaded
+    if (!configLoaded) {
+      console.log('Configuration not loaded yet, skipping chart data fetch');
+      return;
+    }
+    
     setIsLoading(true);
     setMessage('');
     
     try {
+      console.log('Fetching chart data with:', { queryAttribute, queryRequirement });
       const response = await fetch('/api/config', {
         method: 'POST',
         headers: {
@@ -83,19 +91,13 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
   useEffect(() => {
     const initializeData = async () => {
       await fetchCurrentConfig();
-      await fetchChartData();
+      // Only fetch chart data after config is loaded
+      if (configLoaded) {
+        await fetchChartData();
+      }
     };
     initializeData();
-  }, []);
-
-  // When attribute changes, select the first requirement option by default
-  useEffect(() => {
-    if (queryAttribute === 'continent') {
-      setQueryRequirement('Europe');
-    } else {
-      setQueryRequirement('UTC+0');
-    }
-  }, [queryAttribute]);
+  }, [configLoaded]);
 
   const fetchCurrentConfig = async () => {
     try {
@@ -103,8 +105,8 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
       if (response.ok) {
         const config = await response.json();
         if (config.visualizations && config.visualizations.queryConfig) {
-          setQueryAttribute(config.visualizations.queryConfig.queryAttribute || 'continent');
-          setQueryRequirement(config.visualizations.queryConfig.queryRequirement || 'Europe');
+          setQueryAttribute(config.visualizations.queryConfig.queryAttribute || '');
+          setQueryRequirement(config.visualizations.queryConfig.queryRequirement || '');
         }
         if (config.visualizations?.charts?.equatorChart) {
           const chartConfig = config.visualizations.charts.equatorChart;
@@ -112,6 +114,12 @@ const EquatorChartQueryPanel: React.FC<EquatorChartQueryPanelProps> = ({
           setDisplayLogarithmicTrend(chartConfig.displayLogarithmicTrend || true);
           setDisplayActualTrend(chartConfig.displayActualTrend || false);
         }
+        // Mark configuration as loaded
+        setConfigLoaded(true);
+        console.log('Configuration loaded:', { 
+          queryAttribute: config.visualizations?.queryConfig?.queryAttribute,
+          queryRequirement: config.visualizations?.queryConfig?.queryRequirement
+        });
       }
     } catch (error) {
       console.error('Error fetching configuration:', error);

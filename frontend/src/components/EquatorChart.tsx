@@ -62,6 +62,16 @@ const EquatorChart: React.FC<EquatorChartProps> = ({
                   ...plotlyFigure.layout.yaxis,
                   gridcolor: '#444',
                   color: '#ddd'
+                },
+                coloraxis: {
+                  colorbar: {
+                    title: 'Temperature (°C)',
+                    titleside: 'right',
+                    thickness: 15,
+                    len: 0.75,
+                    tickfont: { color: '#ddd' },
+                    titlefont: { color: '#ddd' }
+                  }
                 }
               }}
               config={{

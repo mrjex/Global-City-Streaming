@@ -58,8 +58,8 @@ visualizations:
     equatorChart:
       displayActualTrend: false
       displayLinearTrend: false
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: continent
-    queryRequirement: Asia
+    queryRequirement: America
