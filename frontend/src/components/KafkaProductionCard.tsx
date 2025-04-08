@@ -47,7 +47,12 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
     }
   };
 
-  // Initial fetch when display mode changes to list
+  // Initial fetch when component mounts
+  useEffect(() => {
+    fetchCities();
+  }, []);
+
+  // Fetch when display mode changes to list
   useEffect(() => {
     if (displayMode === 'list') {
       fetchCities();

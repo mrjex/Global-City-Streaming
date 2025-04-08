@@ -89,7 +89,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities }) => {
     controls.dampingFactor = 0.05;
     controls.rotateSpeed = 0.5;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.5;
+    controls.autoRotateSpeed = 1.5;
 
     // Earth setup
     const earthGeometry = new THREE.SphereGeometry(3, 128, 128);
@@ -147,7 +147,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities }) => {
       return marker;
     };
 
-    // Create markers for all cities
+    // Create markers for all cities immediately
     const allCities = [...cities.static, ...cities.dynamic];
     allCities.forEach(cityName => {
       if (cityCoordinates[cityName]) {
