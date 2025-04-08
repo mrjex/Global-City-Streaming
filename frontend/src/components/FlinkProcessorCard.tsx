@@ -25,6 +25,26 @@ const FlinkProcessorCard: React.FC<FlinkProcessorCardProps> = ({
       {/* Empty Window */}
       <div className="px-4 py-2">
         <div className="h-64 rounded-lg bg-gray-900 p-4 text-gray-300">
+          {/* Metrics Section */}
+          <div className="flex justify-between mb-4">
+            <div className="text-sm font-bold text-transparent bg-clip-text" style={{ 
+              backgroundImage: 'linear-gradient(135deg, #00ff9d, #00b8d4, #00ff9d, #39e75f)',
+              WebkitBackgroundClip: 'text',
+              backgroundSize: '200% 200%',
+              animation: 'gradient 5s ease infinite'
+            }}>
+              Throughput: X records/sec
+            </div>
+            <div className="text-sm font-bold text-transparent bg-clip-text" style={{ 
+              backgroundImage: 'linear-gradient(135deg, #00b8d4, #7c4dff, #00b8d4, #536dfe)',
+              WebkitBackgroundClip: 'text',
+              backgroundSize: '200% 200%',
+              animation: 'gradient 5s ease infinite'
+            }}>
+              Window Progress (bar chart here)
+            </div>
+          </div>
+          
           <h4 className="text-sm font-medium mb-2 text-white">Aggregation Formula:</h4>
           <p className="text-sm font-mono">
             For each 15-second window:<br />
