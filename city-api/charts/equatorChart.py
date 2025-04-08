@@ -84,49 +84,57 @@ def plotEquatorChart():
         f.close()
         return None
 
-    temperatureColorScale = ['rgb(0, 0, 255)', 'rgb(0, 128, 255)', 'rgb(128, 128, 255)', 'rgb(255, 128, 128)', 'rgb(255, 0, 0)']
+    # Define color scale with explicit positions
+    temperatureColorScale = [
+        [0, 'rgb(0, 0, 255)'],      # Blue
+        [0.25, 'rgb(0, 128, 255)'], # Light Blue
+        [0.5, 'rgb(128, 128, 255)'], # Purple
+        [0.75, 'rgb(255, 128, 128)'], # Light Red
+        [1, 'rgb(255, 0, 0)']       # Red
+    ]
 
-    # Plot a bubble-chart with 'equatorDistance' as the X-value and 'temperatureCelsius' as the Y-value
-    fig = px.scatter(
-                        jsonData, x=xArr, y=yArr,
-                        color="temperatureCelsius", 
-                        color_continuous_scale=temperatureColorScale,
-                        range_color=[0, highestCityTemperature],  # Set fixed color range
-                        trendline=defineTrendline(),
-                        hover_name="city",
-                        labels={
-                            "x": "Equator Distance (latitudes)",
-                            "y": "Temperature (Celsius)",
-                            "temperatureCelsius": "Temperature Scale"
-                        },
-                        title=f"Cities: Equator Distance vs Temperature{formatQueryConfigs()}"
-                    )
-    
-    # Stylize the data-point-bubbles
-    fig.update_traces(
-                        marker=dict(size=dataPointSize,
-                        line=dict(width=dataPointOutlizeWidth,
-                        color='DarkSlateGrey')),
-                        selector=dict(mode='markers')
-                    )
+    # Create base figure with explicit color scale configuration
+    fig = go.Figure()
+
+    # Add scatter plot with custom color scale
+    fig.add_trace(go.Scatter(
+        x=xArr,
+        y=yArr,
+        mode='markers',
+        marker=dict(
+            size=dataPointSize,
+            color=yArr,  # Use temperature values directly for coloring
+            colorscale=temperatureColorScale,
+            cmin=0,
+            cmax=highestCityTemperature,
+            line=dict(width=dataPointOutlizeWidth, color='DarkSlateGrey'),
+            colorbar=dict(
+                title="Temperature (Celsius)",
+                titleside="right"
+            )
+        ),
+        hovertext=[city['city'] for city in jsonData],
+        hoverinfo='text+y+x'
+    ))
+
+    # Update layout
+    fig.update_layout(
+        title=f"Cities: Equator Distance vs Temperature{formatQueryConfigs()}",
+        xaxis_title="Equator Distance (latitudes)",
+        yaxis_title="Temperature (Celsius)",
+        showlegend=True,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white')
+    )
 
     # If developer wants to plot the logarithmic trend, merge it with the main figure
     if displayLogarithmicTrend == True:
         logTrendFig = getexpectedLogarithmicTrend()
         finalFig = go.Figure(data=fig.data + logTrendFig.data)
         
-        # Preserve the color scale from the original scatter plot
-        finalFig.update_layout(
-            coloraxis=dict(
-                colorscale=temperatureColorScale,
-                cmin=0,
-                cmax=highestCityTemperature,
-                colorbar=dict(
-                    title="Temperature (Celsius)",
-                    titleside="right"
-                )
-            )
-        )
+        # Preserve layout settings
+        finalFig.update_layout(fig.layout)
         
         if pngOutput == True:
             exportPng(finalFig, getTypeOfQueryString(), getPngOutputString())
@@ -138,7 +146,7 @@ def plotEquatorChart():
             exportPng(fig, getTypeOfQueryString(), getPngOutputString())
             
         f.close()
-        return go.Figure(data=fig.data).to_json()
+        return fig.to_json()
 
 
 # Fetches the data from the API and plots it on a graph
