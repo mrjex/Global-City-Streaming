@@ -34,12 +34,7 @@ export default function Home(): ReactElement {
         </div>
 
         <div className="space-y-8">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <DatabaseCounter />
-          </div>
-          
           <CityVideo selectedCountry={selectedCountry} />
-          
           <CityTemperatureChart title="City Temperature Trends" />
         </div>
       </div>
@@ -52,6 +47,10 @@ export default function Home(): ReactElement {
 
       <div className="mt-8">
         <Terminal maxLines={10} />
+      </div>
+
+      <div className="mt-8 flex justify-center">
+        <DatabaseCounter />
       </div>
     </main>
   );

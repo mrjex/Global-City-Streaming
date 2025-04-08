@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Toronto
+  - Lower Mainland
+  - Metro Vancouver Regional District
+  - Montreal
+  - National Capital Region
+  - Calgary
+  - Ottawa
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Toronto
+  - Lower Mainland
+  - Metro Vancouver Regional District
+  - Montreal
+  - National Capital Region
+  - Calgary
+  - Ottawa
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
