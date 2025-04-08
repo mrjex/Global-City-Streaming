@@ -14,7 +14,8 @@ RUN mkdir -p public
 COPY frontend/package.json ./
 RUN npm install --production=false && \
     npm install --save-dev @types/node @types/js-yaml @types/fs-extra && \
-    npm install chart.js@^4.0.0 react-chartjs-2@^5.0.0
+    npm install chart.js@^4.0.0 react-chartjs-2@^5.0.0 && \
+    npm install three @types/three
 
 # Copy frontend source files
 COPY frontend/ ./

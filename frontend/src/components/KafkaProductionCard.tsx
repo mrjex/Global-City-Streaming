@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Terminal from './Terminal';
+import GlobeView from './GlobeView';
 
 interface KafkaProductionCardProps {
   requestInterval?: number;
@@ -132,8 +133,8 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
           >
             {/* Content based on display mode */}
             {displayMode === 'map' ? (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-white text-opacity-50">Map View</span>
+              <div className="w-full h-full">
+                <GlobeView cities={cities} />
               </div>
             ) : (
               <div className="w-full h-full overflow-y-auto p-4 text-white">
