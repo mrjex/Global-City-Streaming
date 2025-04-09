@@ -8,6 +8,7 @@ import CityTemperatureChart from '@/components/CityTemperatureChart';
 import CityVideo from '@/components/CityVideo';
 import KafkaProductionCard from '@/components/KafkaProductionCard';
 import FlinkProcessorCard from '@/components/FlinkProcessorCard';
+import Footer from '@/components/Footer';
 
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -44,6 +45,7 @@ export default function Home(): ReactElement {
       <div className="mt-8 flex justify-center">
         <DatabaseCounter />
       </div>
+      <Footer />
     </main>
   );
 } 
