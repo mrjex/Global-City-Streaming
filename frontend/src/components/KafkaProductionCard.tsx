@@ -121,7 +121,7 @@ const KafkaProductionCard: React.FC = () => {
           
           {/* Content Window */}
           <div 
-            className="h-48 rounded-lg overflow-hidden relative"
+            className="h-64 rounded-lg overflow-hidden relative"
             style={{
               background: 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)',
               backgroundSize: '200% 200%',

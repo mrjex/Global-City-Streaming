@@ -59,7 +59,7 @@ const Terminal: React.FC<TerminalProps> = ({
 
         {/* Terminal Content */}
         <div
-          className="p-4 h-96 font-mono text-sm"
+          className="p-4 h-72 font-mono text-sm"
           style={{
             backgroundColor: '#1a1b1e',
             overflowY: 'hidden'
