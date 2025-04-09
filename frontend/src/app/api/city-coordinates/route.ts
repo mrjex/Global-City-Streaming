@@ -2,39 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-
-// Define a simple WeatherAPI class for build time
-class MockWeatherAPI {
-  batch_enabled: boolean = false;
-  
-  fetch_cities_batch(cities: string[]): Record<string, any> {
-    // Return mock data for build time
-    const mockData: Record<string, any> = {};
-    for (const city of cities) {
-      mockData[city] = {
-        latitude: 0,
-        longitude: 0
-      };
-    }
-    return mockData;
-  }
-}
-
-// Use a dynamic import for the real WeatherAPI at runtime
-let WeatherAPI: any;
-try {
-  // This will only work at runtime when the shared directory is mounted
-  console.log('Attempting to import WeatherAPI from /app/shared/weather/api');
-  const apiModule = require('/app/shared/weather/api');
-  console.log('API module loaded:', apiModule);
-  WeatherAPI = apiModule.WeatherAPI;
-  console.log('Successfully imported real WeatherAPI');
-} catch (error) {
-  // Fallback to mock during build time
-  console.error('Failed to import real WeatherAPI:', error);
-  console.log('Using mock WeatherAPI for build time');
-  WeatherAPI = MockWeatherAPI;
-}
+import { spawn } from 'child_process';
 
 // Define a map of known city coordinates for fallback
 const knownCityCoordinates: Record<string, { lat: number; lng: number }> = {
@@ -86,6 +54,63 @@ export const fetchCache = 'force-no-store';
 // Cache for city coordinates to avoid repeated API calls
 let cityCoordinatesCache: Record<string, { lat: number; lng: number }> = {};
 
+// Function to get city coordinates using the Python script
+async function getCityCoordinates(cities: string[]): Promise<Record<string, any>> {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log(`Executing Python script for cities: ${cities.join(', ')}`);
+      
+      // Path to the Python script
+      const scriptPath = '/app/shared/weather/city_coordinates.py';
+      
+      // Check if the script exists
+      if (!fs.existsSync(scriptPath)) {
+        console.warn(`Python script not found at ${scriptPath}, using fallback coordinates`);
+        return resolve({});
+      }
+      
+      // Execute the Python script
+      const pythonProcess = spawn('python3', [scriptPath, ...cities]);
+      
+      let dataString = '';
+      let errorString = '';
+      
+      // Collect data from stdout
+      pythonProcess.stdout.on('data', (data) => {
+        dataString += data.toString();
+      });
+      
+      // Collect data from stderr
+      pythonProcess.stderr.on('data', (data) => {
+        errorString += data.toString();
+        console.error(`Python script error: ${data}`);
+      });
+      
+      // Handle process completion
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          console.error(`Python script exited with code ${code}`);
+          console.error(`Error output: ${errorString}`);
+          return resolve({});
+        }
+        
+        try {
+          // Parse the JSON output
+          const result = JSON.parse(dataString);
+          console.log(`Python script returned coordinates for ${Object.keys(result).length} cities`);
+          resolve(result);
+        } catch (error) {
+          console.error('Error parsing Python script output:', error);
+          resolve({});
+        }
+      });
+    } catch (error) {
+      console.error('Error executing Python script:', error);
+      resolve({});
+    }
+  });
+}
+
 export async function GET() {
   try {
     console.log('GET /api/city-coordinates called');
@@ -107,9 +132,6 @@ export async function GET() {
     const allCities = [...staticCities, ...dynamicCities];
     console.log(`Total cities: ${allCities.length}`);
     
-    // Initialize WeatherAPI
-    const weatherApi = new WeatherAPI();
-    
     // Fetch coordinates for cities that aren't in the cache
     const citiesToFetch = allCities.filter(city => !cityCoordinatesCache[city]);
     console.log(`Cities to fetch: ${citiesToFetch.length}`, citiesToFetch);
@@ -117,28 +139,17 @@ export async function GET() {
     if (citiesToFetch.length > 0) {
       console.log(`Fetching coordinates for ${citiesToFetch.length} cities`);
       
-      // Fetch city data in batch mode
-      weatherApi.batch_enabled = true;
-      const cityData = weatherApi.fetch_cities_batch(citiesToFetch);
+      // Try to get coordinates from the Python script
+      const cityData = await getCityCoordinates(citiesToFetch);
       
       // Update cache with new coordinates
       for (const [city, data] of Object.entries(cityData)) {
-        if (data) {
+        if (data && data.latitude !== undefined && data.longitude !== undefined) {
           console.log(`Caching coordinates for ${city}:`, data);
-          
-          // Check if we have valid coordinates from the API
-          if (data.latitude !== 0 || data.longitude !== 0) {
-            cityCoordinatesCache[city] = {
-              lat: data.latitude,
-              lng: data.longitude
-            };
-          } else if (knownCityCoordinates[city]) {
-            // Use known coordinates as fallback
-            console.log(`Using known coordinates for ${city}:`, knownCityCoordinates[city]);
-            cityCoordinatesCache[city] = knownCityCoordinates[city];
-          } else {
-            console.warn(`No valid coordinates found for ${city}`);
-          }
+          cityCoordinatesCache[city] = {
+            lat: data.latitude,
+            lng: data.longitude
+          };
         }
       }
     }

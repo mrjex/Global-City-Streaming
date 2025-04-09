@@ -48,7 +48,12 @@ WORKDIR /app
 RUN apk add --no-cache \
     libc6-compat \
     curl \
-    dos2unix
+    dos2unix \
+    python3 \
+    py3-pip
+
+# Install Python dependencies
+RUN pip3 install requests pyyaml
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public

@@ -27,6 +27,7 @@ services:
       - PORT=3001
       - HOSTNAME=0.0.0.0
       - CITY_API_URL=http://city-api:8003
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./configuration.yml:/app/configuration.yml:ro
