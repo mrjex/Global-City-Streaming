@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
-  - City of Gold Coast
-  - Gold Coast
+  - Tokyo
+  - Yokohama
+  - Osaka
+  - Nagoya
+  - Fukuoka
+  - Kawasaki
+  - Kobe
   enabled: true
   previousBatch:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
-  - City of Gold Coast
-  - Gold Coast
+  - Tokyo
+  - Yokohama
+  - Osaka
+  - Nagoya
+  - Fukuoka
+  - Kawasaki
+  - Kobe
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
