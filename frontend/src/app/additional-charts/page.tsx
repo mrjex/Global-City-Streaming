@@ -2,6 +2,7 @@
 
 import React from 'react';
 import styles from './AdditionalCharts.module.css';
+import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
 
 export default function AdditionalChartsPage() {
   // Images from the public directory
@@ -32,6 +33,11 @@ export default function AdditionalChartsPage() {
           <em>Explore the collection of real-time data visualizations, showcasing streaming analytics from the Kafka-Flink pipeline through various chart styles and themes.</em>
         </p>
       </header>
+
+      {/* Equator Chart Section */}
+      <section className={styles.equatorChartSection}>
+        <EquatorChartQueryPanel />
+      </section>
 
       <div className={styles.galleryContainer}>
         {/* Left Section */}

@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Ho Chi Minh City
+  - Hanoi
+  - "\u0110\u1ED3ng Nai"
+  - Haiphong
+  - "Ki\xEAn Giang"
+  - "C\u1EA7n Th\u01A1"
+  - Da Nang
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Ho Chi Minh City
+  - Hanoi
+  - "\u0110\u1ED3ng Nai"
+  - Haiphong
+  - "Ki\xEAn Giang"
+  - "C\u1EA7n Th\u01A1"
+  - Da Nang
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
@@ -57,9 +57,9 @@ visualizations:
   charts:
     equatorChart:
       displayActualTrend: false
-      displayLinearTrend: false
-      displayLogarithmicTrend: true
+      displayLinearTrend: true
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
-    queryAttribute: continent
-    queryRequirement: Asia
+    queryAttribute: timeZoneOffset
+    queryRequirement: UTC+2

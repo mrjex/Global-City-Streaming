@@ -5,7 +5,6 @@ import type { ReactElement } from 'react';
 import WorldMap from '../components/WorldMap';
 import DatabaseCounter from '../components/DatabaseCounter';
 import CityTemperatureChart from '@/components/CityTemperatureChart';
-import EquatorChartQueryPanel from '@/components/EquatorChartQueryPanel';
 import CityVideo from '@/components/CityVideo';
 import KafkaProductionCard from '@/components/KafkaProductionCard';
 import FlinkProcessorCard from '@/components/FlinkProcessorCard';
@@ -39,13 +38,9 @@ export default function Home(): ReactElement {
         </div>
       </div>
 
-      <div className="mt-8">
-        <EquatorChartQueryPanel />
-      </div>
-
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <KafkaProductionCard requestInterval={1} messagesPerSecond={10} />
-        <FlinkProcessorCard batchSize={100} windowSize={5} />
+        <KafkaProductionCard />
+        <FlinkProcessorCard />
       </div>
 
       <div className="mt-8 flex justify-center">
