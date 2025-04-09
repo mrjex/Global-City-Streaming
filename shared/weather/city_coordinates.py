@@ -16,12 +16,15 @@ def get_city_coordinates(cities):
     """
     # Initialize the WeatherAPI
     # The WeatherAPI class gets the API key from environment variables
+    print(f"API Key from environment: {os.environ.get('WEATHER_API_KEY', 'Not set')}", file=sys.stderr)
     weather_api = WeatherAPI()
     
     # Enable batch mode for efficiency
     weather_api.batch_enabled = True
+    print(f"Batch mode enabled: {weather_api.batch_enabled}", file=sys.stderr)
     
     # Fetch city data
+    print(f"Fetching data for cities: {cities}", file=sys.stderr)
     city_data = weather_api.fetch_cities_batch(cities)
     
     # Extract coordinates
@@ -30,21 +33,48 @@ def get_city_coordinates(cities):
     # Handle both dictionary and generator return types
     if hasattr(city_data, 'items'):
         # If it's a dictionary (batch_enabled=True)
+        print(f"City data is a dictionary with {len(city_data)} items", file=sys.stderr)
         for city, data in city_data.items():
+            print(f"Processing city: {city}", file=sys.stderr)
+            print(f"Data type: {type(data)}", file=sys.stderr)
+            print(f"Data content: {data}", file=sys.stderr)
+            
             if data:
-                coordinates[city] = {
-                    'latitude': data.get('latitude', 0),
-                    'longitude': data.get('longitude', 0)
-                }
+                # Check if the data has the expected structure
+                if isinstance(data, dict):
+                    if 'latitude' in data and 'longitude' in data:
+                        coordinates[city] = {
+                            'latitude': data['latitude'],
+                            'longitude': data['longitude']
+                        }
+                    else:
+                        print(f"Data for {city} doesn't have latitude/longitude keys", file=sys.stderr)
+                        print(f"Available keys: {list(data.keys())}", file=sys.stderr)
+                else:
+                    print(f"Data for {city} is not a dictionary", file=sys.stderr)
     else:
         # If it's a generator (batch_enabled=False)
+        print("City data is a generator", file=sys.stderr)
         for city, data in city_data:
+            print(f"Processing city: {city}", file=sys.stderr)
+            print(f"Data type: {type(data)}", file=sys.stderr)
+            print(f"Data content: {data}", file=sys.stderr)
+            
             if data:
-                coordinates[city] = {
-                    'latitude': data.get('latitude', 0),
-                    'longitude': data.get('longitude', 0)
-                }
+                # Check if the data has the expected structure
+                if isinstance(data, dict):
+                    if 'latitude' in data and 'longitude' in data:
+                        coordinates[city] = {
+                            'latitude': data['latitude'],
+                            'longitude': data['longitude']
+                        }
+                    else:
+                        print(f"Data for {city} doesn't have latitude/longitude keys", file=sys.stderr)
+                        print(f"Available keys: {list(data.keys())}", file=sys.stderr)
+                else:
+                    print(f"Data for {city} is not a dictionary", file=sys.stderr)
     
+    print(f"Returning coordinates for {len(coordinates)} cities", file=sys.stderr)
     return coordinates
 
 if __name__ == "__main__":
