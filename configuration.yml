@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Delhi
-  - Mumbai
-  - Bengaluru
-  - Hyderabad
-  - Ahmedabad
-  - Chennai
-  - Pune
+  - Madrid
+  - Madrid city
+  - Barcelona
+  - Barcelona City
+  - Valencia
+  - City of Valencia
+  - Seville
   enabled: true
   previousBatch:
-  - Delhi
-  - Mumbai
-  - Bengaluru
-  - Hyderabad
-  - Ahmedabad
-  - Chennai
-  - Pune
+  - Madrid
+  - Madrid city
+  - Barcelona
+  - Barcelona City
+  - Valencia
+  - City of Valencia
+  - Seville
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

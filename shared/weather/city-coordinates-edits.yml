@@ -1,0 +1,10 @@
+# This file is used to manually replace the city coordinates for specific cities
+# which appear to be either incorrect due to API limitations such as findig cities
+# with similar names, resulting in mismatching latitude and longitude values.
+
+countries:
+  India:
+    Delhi: A, B
+  Spain:
+    Valencia: A, B
+    Barcelona City: A, B

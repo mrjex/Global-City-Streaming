@@ -13,6 +13,7 @@ const KafkaProductionCard: React.FC = () => {
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [globeKey, setGlobeKey] = useState<number>(0);
 
   // Function to fetch cities data
   const fetchCities = async () => {
@@ -31,6 +32,7 @@ const KafkaProductionCard: React.FC = () => {
       }
       const data = await response.json();
       setCities(data);
+      setGlobeKey(prev => prev + 1);
     } catch (err) {
       console.error('Error fetching cities:', err);
       setError('Failed to load cities data');
@@ -57,6 +59,8 @@ const KafkaProductionCard: React.FC = () => {
       console.log('Country selected event received:', event.detail);
       if (displayMode === 'list') {
         fetchCities();
+      } else {
+        setGlobeKey(prev => prev + 1);
       }
     };
 
@@ -132,7 +136,7 @@ const KafkaProductionCard: React.FC = () => {
             {displayMode === 'map' ? (
               <div className="w-full h-full">
                 <GlobeView 
-                  key={`${cities.static.join(',')}-${cities.dynamic.join(',')}`}
+                  key={`globe-${globeKey}`}
                   cities={cities.static} 
                   dynamicCities={cities.dynamic} 
                 />
