@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Delhi
-  - Mumbai
-  - Bengaluru
-  - Hyderabad
-  - Ahmedabad
-  - Chennai
-  - Pune
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
+  - City of Gold Coast
+  - Gold Coast
   enabled: true
   previousBatch:
-  - Delhi
-  - Mumbai
-  - Bengaluru
-  - Hyderabad
-  - Ahmedabad
-  - Chennai
-  - Pune
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
+  - City of Gold Coast
+  - Gold Coast
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
