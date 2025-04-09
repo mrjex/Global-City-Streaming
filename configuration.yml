@@ -58,7 +58,7 @@ visualizations:
     equatorChart:
       displayActualTrend: false
       displayLinearTrend: true
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset

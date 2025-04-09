@@ -5,7 +5,11 @@ const Footer: React.FC = () => {
     <footer className="w-full py-8 px-4 mt-8" style={{
       background: 'linear-gradient(135deg, #0a0a1a, #1a1b1e, #0a0a1a)',
       backgroundSize: '200% 200%',
-      animation: 'gradient 15s ease infinite'
+      animation: 'gradient 15s ease infinite',
+      position: 'relative',
+      width: '100%',
+      left: '0',
+      right: '0'
     }}>
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
