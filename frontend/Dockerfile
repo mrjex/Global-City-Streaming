@@ -52,8 +52,10 @@ RUN apk add --no-cache \
     python3 \
     py3-pip
 
-# Install Python dependencies
-RUN pip3 install requests pyyaml
+# Create a Python virtual environment and install dependencies
+RUN python3 -m venv /app/venv && \
+    . /app/venv/bin/activate && \
+    pip install requests pyyaml
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public
@@ -77,6 +79,7 @@ ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV CITY_API_URL=http://city-api:8003
+ENV PATH="/app/venv/bin:$PATH"
 
 # Expose Next.js port
 EXPOSE 3001

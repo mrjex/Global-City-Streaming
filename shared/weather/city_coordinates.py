@@ -15,8 +15,8 @@ def get_city_coordinates(cities):
         dict: Dictionary mapping city names to their coordinates
     """
     # Initialize the WeatherAPI
-    api_key = os.environ.get('WEATHER_API_KEY', '')
-    weather_api = WeatherAPI(api_key)
+    # The WeatherAPI class gets the API key from environment variables
+    weather_api = WeatherAPI()
     
     # Enable batch mode for efficiency
     weather_api.batch_enabled = True
@@ -26,12 +26,24 @@ def get_city_coordinates(cities):
     
     # Extract coordinates
     coordinates = {}
-    for city, data in city_data.items():
-        if data:
-            coordinates[city] = {
-                'latitude': data.get('latitude', 0),
-                'longitude': data.get('longitude', 0)
-            }
+    
+    # Handle both dictionary and generator return types
+    if hasattr(city_data, 'items'):
+        # If it's a dictionary (batch_enabled=True)
+        for city, data in city_data.items():
+            if data:
+                coordinates[city] = {
+                    'latitude': data.get('latitude', 0),
+                    'longitude': data.get('longitude', 0)
+                }
+    else:
+        # If it's a generator (batch_enabled=False)
+        for city, data in city_data:
+            if data:
+                coordinates[city] = {
+                    'latitude': data.get('latitude', 0),
+                    'longitude': data.get('longitude', 0)
+                }
     
     return coordinates
 
