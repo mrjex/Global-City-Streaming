@@ -20,50 +20,76 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   const [debugInfo, setDebugInfo] = useState<string>('');
   
   // Fetch city coordinates
-  useEffect(() => {
-    const fetchCityCoordinates = async () => {
-      try {
-        console.log('Fetching city coordinates...');
-        const response = await fetch('/api/city-coordinates');
-        if (!response.ok) {
-          throw new Error('Failed to fetch city coordinates');
-        }
-        const data = await response.json();
-        console.log('Fetched city coordinates:', data);
-        
-        // Check if coordinates are valid
-        const validCoordinates: Record<string, { lat: number; lng: number }> = {};
-        
-        // Log the raw coordinates for debugging
-        console.log('Raw coordinates:', data.coordinates);
-        
-        for (const [city, coords] of Object.entries(data.coordinates)) {
-          // Type assertion to handle the coordinates
-          const typedCoords = coords as { lat: number; lng: number };
-          
-          console.log(`Processing ${city}:`, typedCoords);
-          
-          // Less strict validation - just check if the coordinates exist
-          if (typedCoords && typeof typedCoords.lat === 'number' && typeof typedCoords.lng === 'number') {
-            validCoordinates[city] = typedCoords;
-            console.log(`Added ${city} with coordinates:`, typedCoords);
-          } else {
-            console.warn(`Invalid coordinates for ${city}:`, typedCoords);
-          }
-        }
-        
-        console.log('Valid coordinates:', validCoordinates);
-        setCityCoordinates(validCoordinates);
-        
-        // Update debug info
-        setDebugInfo(`Cities: ${Object.keys(validCoordinates).join(', ')}`);
-      } catch (error) {
-        console.error('Error fetching city coordinates:', error);
-        setDebugInfo(`Error: ${error instanceof Error ? error.message : String(error)}`);
+  const fetchCityCoordinates = async () => {
+    try {
+      console.log('Fetching city coordinates...');
+      const response = await fetch('/api/city-coordinates');
+      if (!response.ok) {
+        throw new Error('Failed to fetch city coordinates');
       }
+      const data = await response.json();
+      console.log('Fetched city coordinates:', data);
+      
+      // Check if coordinates are valid
+      const validCoordinates: Record<string, { lat: number; lng: number }> = {};
+      
+      // Log the raw coordinates for debugging
+      console.log('Raw coordinates:', data.coordinates);
+      
+      for (const [city, coords] of Object.entries(data.coordinates)) {
+        // Type assertion to handle the coordinates
+        const typedCoords = coords as { lat: number; lng: number };
+        
+        console.log(`Processing ${city}:`, typedCoords);
+        
+        // Less strict validation - just check if the coordinates exist
+        if (typedCoords && typeof typedCoords.lat === 'number' && typeof typedCoords.lng === 'number') {
+          validCoordinates[city] = typedCoords;
+          console.log(`Added ${city} with coordinates:`, typedCoords);
+        } else {
+          console.warn(`Invalid coordinates for ${city}:`, typedCoords);
+        }
+      }
+      
+      console.log('Valid coordinates:', validCoordinates);
+      setCityCoordinates(validCoordinates);
+      
+      // Update debug info
+      setDebugInfo(`Cities: ${Object.keys(validCoordinates).join(', ')}`);
+    } catch (error) {
+      console.error('Error fetching city coordinates:', error);
+      setDebugInfo(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+  
+  useEffect(() => {
+    fetchCityCoordinates();
+  }, [cities, dynamicCities]);
+  
+  // Listen for country selection events
+  useEffect(() => {
+    const handleCountrySelected = (event: CustomEvent) => {
+      console.log('Country selected event received in GlobeView:', event.detail);
+      // Fetch new city coordinates when country changes
+      fetchCityCoordinates();
     };
     
-    fetchCityCoordinates();
+    // Add event listener for country selection
+    window.addEventListener('countrySelected', handleCountrySelected as EventListener);
+    
+    // Also listen for the initial country load event
+    const handleInitialCountryLoad = () => {
+      console.log('Initial country load event received in GlobeView');
+      // Fetch new city coordinates when initial country is loaded
+      fetchCityCoordinates();
+    };
+    
+    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+    
+    return () => {
+      window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
+      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+    };
   }, []);
   
   // Convert lat/lng to 3D coordinates

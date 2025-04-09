@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Algiers
-  - Oran
-  - Constantine
-  - Batna
-  - "S\xE9tif"
-  - Bab Ezzouar
-  - Djelfa
+  - Delhi
+  - Mumbai
+  - Bengaluru
+  - Hyderabad
+  - Ahmedabad
+  - Chennai
+  - Pune
   enabled: true
   previousBatch:
-  - Algiers
-  - Oran
-  - Constantine
-  - Batna
-  - "S\xE9tif"
-  - Bab Ezzouar
-  - Djelfa
+  - Delhi
+  - Mumbai
+  - Bengaluru
+  - Hyderabad
+  - Ahmedabad
+  - Chennai
+  - Pune
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
