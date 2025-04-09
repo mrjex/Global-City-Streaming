@@ -65,13 +65,19 @@ class WeatherAPI:
         Compose a standardized city object from the API response.
         """
         try:
+            # Extract latitude and longitude from the API response
+            lat = api_response['location']['lat']
+            lon = api_response['location']['lon']
+            
+            print(f"Extracted coordinates for {city}: lat={lat}, lon={lon}", file=sys.stderr)
+            
             result = {
                 'city': city,
                 'country': api_response['location']['country'],
                 'continent': api_response['location']['tz_id'].split("/")[0],
                 'temperatureCelsius': api_response['current']['temp_c'],
-                'latitude': api_response['location']['lat'],
-                'longitude': api_response['location']['lon']
+                'latitude': lat,
+                'longitude': lon
             }
             print(f"Composed city object for {city}: {result}", file=sys.stderr)
             return result

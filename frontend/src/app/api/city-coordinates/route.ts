@@ -58,7 +58,7 @@ let cityCoordinatesCache: Record<string, { lat: number; lng: number }> = {};
 async function getCityCoordinates(cities: string[]): Promise<Record<string, any>> {
   return new Promise((resolve, reject) => {
     try {
-      console.log(`Executing Python script for cities: ${cities.join(', ')}`);
+      console.log(`Executing Python script for ${cities.length} cities`);
       
       // Path to the Python script
       const scriptPath = '/app/shared/weather/city_coordinates.py';
@@ -83,21 +83,36 @@ async function getCityCoordinates(cities: string[]): Promise<Record<string, any>
       // Collect data from stderr
       pythonProcess.stderr.on('data', (data) => {
         errorString += data.toString();
-        console.error(`Python script error: ${data}`);
+        console.log(`Python: ${data.toString()}`);
       });
       
       // Handle process completion
       pythonProcess.on('close', (code) => {
         if (code !== 0) {
           console.error(`Python script exited with code ${code}`);
-          console.error(`Error output: ${errorString}`);
           return resolve({});
         }
         
         try {
+          // Clean up the output to extract valid JSON
+          const jsonMatch = dataString.match(/\{.*\}/s);
+          if (!jsonMatch) {
+            console.error('No valid JSON found in Python output');
+            return resolve({});
+          }
+          
+          const jsonStr = jsonMatch[0];
+          
           // Parse the JSON output
-          const result = JSON.parse(dataString);
+          const result = JSON.parse(jsonStr);
           console.log(`Python script returned coordinates for ${Object.keys(result).length} cities`);
+          
+          // Check if we have any coordinates
+          if (Object.keys(result).length === 0) {
+            console.warn('No coordinates returned from Python script, using fallback coordinates');
+            return resolve({});
+          }
+          
           resolve(result);
         } catch (error) {
           console.error('Error parsing Python script output:', error);
@@ -117,7 +132,6 @@ export async function GET() {
     
     // Path to configuration.yml (mounted in the container)
     const configPath = '/app/configuration.yml';
-    console.log(`Reading configuration from ${configPath}`);
     const fileContents = fs.readFileSync(configPath, 'utf8');
     const config = yaml.load(fileContents);
     
@@ -125,27 +139,23 @@ export async function GET() {
     const staticCities = config.cities || [];
     const dynamicCities = config.dynamicCities?.current || [];
     
-    console.log(`Found ${staticCities.length} static cities:`, staticCities);
-    console.log(`Found ${dynamicCities.length} dynamic cities:`, dynamicCities);
+    console.log(`Found ${staticCities.length} static cities and ${dynamicCities.length} dynamic cities`);
     
     // Combine all cities
     const allCities = [...staticCities, ...dynamicCities];
-    console.log(`Total cities: ${allCities.length}`);
     
     // Fetch coordinates for cities that aren't in the cache
     const citiesToFetch = allCities.filter(city => !cityCoordinatesCache[city]);
-    console.log(`Cities to fetch: ${citiesToFetch.length}`, citiesToFetch);
+    console.log(`Fetching coordinates for ${citiesToFetch.length} cities`);
     
     if (citiesToFetch.length > 0) {
-      console.log(`Fetching coordinates for ${citiesToFetch.length} cities`);
-      
       // Try to get coordinates from the Python script
       const cityData = await getCityCoordinates(citiesToFetch);
       
       // Update cache with new coordinates
       for (const [city, data] of Object.entries(cityData)) {
         if (data && data.latitude !== undefined && data.longitude !== undefined) {
-          console.log(`Caching coordinates for ${city}:`, data);
+          console.log(`Caching coordinates for ${city}: ${data.latitude}, ${data.longitude}`);
           cityCoordinatesCache[city] = {
             lat: data.latitude,
             lng: data.longitude
@@ -165,8 +175,6 @@ export async function GET() {
         // Use known coordinates as fallback
         console.log(`Using known coordinates for static city: ${city}`);
         cityCoordinates[city] = knownCityCoordinates[city];
-      } else {
-        console.warn(`No coordinates found for static city: ${city}`);
       }
     }
     
@@ -178,8 +186,6 @@ export async function GET() {
         // Use known coordinates as fallback
         console.log(`Using known coordinates for dynamic city: ${city}`);
         cityCoordinates[city] = knownCityCoordinates[city];
-      } else {
-        console.warn(`No coordinates found for dynamic city: ${city}`);
       }
     }
     
