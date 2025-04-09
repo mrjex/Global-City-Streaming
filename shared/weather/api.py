@@ -9,8 +9,6 @@ class WeatherAPI:
         self.api_url = "https://api.weatherapi.com/v1/current.json"
         self.batch_enabled = False  # Default to sequential processing
         
-        print(f"WeatherAPI initialized with API key: {self.api_key[:5]}... (length: {len(self.api_key) if self.api_key else 0})", file=sys.stderr)
-        
         if not self.api_key:
             raise ValueError("WEATHER_API_KEY environment variable not set")
 
@@ -21,18 +19,14 @@ class WeatherAPI:
         """
         try:
             query = {'key': self.api_key, 'q': city, 'aqi': 'yes'}
-            print(f"Making API request for city: {city}", file=sys.stderr)
             response = requests.get(self.api_url, params=query)
             
             if not response.ok:
                 print(f"Error: Weather API request failed with status {response.status_code}", file=sys.stderr)
-                print(f"Response: {response.text}", file=sys.stderr)
                 return None
                 
             data = response.json()
-            print(f"Successfully fetched data for {city}", file=sys.stderr)
             result = self._compose_city_object(data, city)
-            print(f"Composed city object: {result}", file=sys.stderr)
             return result
             
         except Exception as e:
@@ -45,14 +39,11 @@ class WeatherAPI:
         If batch_enabled is True, returns a dictionary of all cities at once.
         If batch_enabled is False (default), yields each city's data as it's processed.
         """
-        print(f"fetch_cities_batch called with {len(cities)} cities, batch_enabled: {self.batch_enabled}", file=sys.stderr)
-        
         if self.batch_enabled:
             # Batch mode: process all cities at once and return dict
             results = {}
             for city in cities:
                 results[city] = self.fetch_city_data(city)
-            print(f"Batch mode returning {len(results)} results", file=sys.stderr)
             return results
         else:
             # Sequential mode: yield each city's data as it's processed
@@ -69,8 +60,6 @@ class WeatherAPI:
             lat = api_response['location']['lat']
             lon = api_response['location']['lon']
             
-            print(f"Extracted coordinates for {city}: lat={lat}, lon={lon}", file=sys.stderr)
-            
             result = {
                 'city': city,
                 'country': api_response['location']['country'],
@@ -79,9 +68,7 @@ class WeatherAPI:
                 'latitude': lat,
                 'longitude': lon
             }
-            print(f"Composed city object for {city}: {result}", file=sys.stderr)
             return result
         except Exception as e:
             print(f"Error composing city object for {city}: {str(e)}", file=sys.stderr)
-            print(f"API response: {api_response}", file=sys.stderr)
             return None 

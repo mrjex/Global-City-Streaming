@@ -79,9 +79,11 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   };
   
   // Create a city marker
-  const createCityMarker = (city: string, position: THREE.Vector3) => {
+  const createCityMarker = (city: string, position: THREE.Vector3, isDynamic: boolean = false) => {
     const geometry = new THREE.SphereGeometry(0.1, 16, 16);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const material = new THREE.MeshBasicMaterial({ 
+      color: isDynamic ? 0xffff00 : 0xff0000 // Yellow for dynamic cities, red for static
+    });
     const marker = new THREE.Mesh(geometry, material);
     
     marker.position.copy(position);
@@ -189,20 +191,14 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
         const { lat, lng } = cityCoordinates[city];
         console.log(`Creating marker for ${city} at coordinates: lat=${lat}, lng=${lng}`);
         const position = latLngToVector3(lat, lng, earthRadius + 0.11);
-        const marker = createCityMarker(city, position);
+        const isDynamic = dynamicCities.includes(city);
+        const marker = createCityMarker(city, position, isDynamic);
         markerGroup.add(marker);
         markers.push(marker);
       } else {
         console.warn(`No coordinates found for city: ${city}`);
       }
     }
-    
-    // Add a test marker at a known location (London)
-    console.log('Adding test marker for London');
-    const londonPosition = latLngToVector3(51.5074, -0.1278, earthRadius + 0.11);
-    const londonMarker = createCityMarker('London (Test)', londonPosition);
-    markerGroup.add(londonMarker);
-    markers.push(londonMarker);
     
     // Raycaster for hover detection
     const raycaster = new THREE.Raycaster();

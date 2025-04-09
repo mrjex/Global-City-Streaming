@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
-  - Kawasaki
-  - Kobe
+  - Algiers
+  - Oran
+  - Constantine
+  - Batna
+  - "S\xE9tif"
+  - Bab Ezzouar
+  - Djelfa
   enabled: true
   previousBatch:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
-  - Kawasaki
-  - Kobe
+  - Algiers
+  - Oran
+  - Constantine
+  - Batna
+  - "S\xE9tif"
+  - Bab Ezzouar
+  - Djelfa
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
