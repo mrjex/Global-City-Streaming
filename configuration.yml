@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Ho Chi Minh City
-  - Hanoi
-  - "\u0110\u1ED3ng Nai"
-  - Haiphong
-  - "Ki\xEAn Giang"
-  - "C\u1EA7n Th\u01A1"
-  - Da Nang
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - Ho Chi Minh City
-  - Hanoi
-  - "\u0110\u1ED3ng Nai"
-  - Haiphong
-  - "Ki\xEAn Giang"
-  - "C\u1EA7n Th\u01A1"
-  - Da Nang
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

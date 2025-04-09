@@ -45,13 +45,29 @@ export default function DatabaseCounter() {
   }, [retryCount]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-700 mb-2">Database Entries</h2>
-      <div className="relative h-12 flex items-center justify-center">
+    <div 
+      className="w-full max-w-4xl rounded-lg shadow-xl p-6 mb-6"
+      style={{
+        background: 'linear-gradient(135deg, #1a1b1e, #2a2a2e, #1a1b1e)',
+        backgroundSize: '200% 200%',
+        animation: 'gradient 15s ease infinite',
+        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
+      }}
+    >
+      <h2 className="text-xl font-semibold text-transparent bg-clip-text mb-4 text-center" 
+          style={{ 
+            backgroundImage: 'linear-gradient(135deg, #00b8d4, #7c4dff, #00b8d4, #536dfe)',
+            WebkitBackgroundClip: 'text',
+            backgroundSize: '200% 200%',
+            animation: 'gradient 5s ease infinite'
+          }}>
+        Database Entries
+      </h2>
+      <div className="relative h-16 flex items-center justify-center">
         {isLoading ? (
-          <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+          <div className="animate-pulse bg-gray-700 h-8 w-24 rounded"></div>
         ) : error ? (
-          <div className="text-gray-500">{error}</div>
+          <div className="text-gray-400">{error}</div>
         ) : (
           <AnimatePresence mode="wait">
             <motion.div
@@ -62,8 +78,16 @@ export default function DatabaseCounter() {
               transition={{ duration: 0.3 }}
               className="absolute"
             >
-              <span className="text-3xl font-bold text-blue-600">{count}</span>
-              <span className="ml-2 text-gray-500">records</span>
+              <span className="text-4xl font-bold text-transparent bg-clip-text" 
+                    style={{ 
+                      backgroundImage: 'linear-gradient(135deg, #00ff9d, #00b8d4, #00ff9d, #39e75f)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundSize: '200% 200%',
+                      animation: 'gradient 5s ease infinite'
+                    }}>
+                {count}
+              </span>
+              <span className="ml-2 text-gray-400">records</span>
             </motion.div>
           </AnimatePresence>
         )}

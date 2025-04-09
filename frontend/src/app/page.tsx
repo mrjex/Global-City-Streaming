@@ -19,8 +19,6 @@ export default function Home(): ReactElement {
 
   return (
     <main className="min-h-screen p-8">
-      <h1 className="text-4xl font-bold mb-8">Global City Streaming</h1>
-      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <WorldMap onCountrySelect={handleCountrySelect} />
@@ -42,7 +40,7 @@ export default function Home(): ReactElement {
         <KafkaProductionCard />
         <FlinkProcessorCard />
       </div>
-
+      
       <div className="mt-8 flex justify-center">
         <DatabaseCounter />
       </div>
