@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Delhi
+  - Mumbai
+  - Bengaluru
+  - Hyderabad
+  - Ahmedabad
+  - Chennai
+  - Pune
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Delhi
+  - Mumbai
+  - Bengaluru
+  - Hyderabad
+  - Ahmedabad
+  - Chennai
+  - Pune
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

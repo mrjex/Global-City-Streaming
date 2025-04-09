@@ -21,55 +21,37 @@ def get_city_coordinates(cities):
     print(f"Fetching data for {len(cities)} cities", file=sys.stderr)
     city_data = weather_api.fetch_cities_batch(cities)
     
-    # Extract coordinates
-    coordinates = {}
+    # DEBUG: Print the raw city_data to see what we're getting
+    print(f"Raw city_data type: {type(city_data)}", file=sys.stderr)
     
-    # Handle both dictionary and generator return types
-    if isinstance(city_data, dict):
-        # If it's a dictionary (batch_enabled=True)
-        print(f"Processing {len(city_data)} cities from dictionary", file=sys.stderr)
-        for city, data in city_data.items():
-            if data:
-                # Check if the data has the expected structure
-                if isinstance(data, dict):
-                    if 'latitude' in data and 'longitude' in data:
-                        coordinates[city] = {
-                            'latitude': data['latitude'],
-                            'longitude': data['longitude']
-                        }
-                        print(f"Added coordinates for {city}: {data['latitude']}, {data['longitude']}", file=sys.stderr)
-                    else:
-                        print(f"Missing latitude/longitude for {city}. Data: {data}", file=sys.stderr)
-                else:
-                    print(f"Data for {city} is not a dictionary: {type(data)}", file=sys.stderr)
-            else:
-                print(f"No data returned for {city}", file=sys.stderr)
-    else:
-        # If it's a generator (batch_enabled=False)
-        print("Processing cities from generator", file=sys.stderr)
+    # Convert generator to dictionary if needed
+    if hasattr(city_data, '__iter__') and not isinstance(city_data, dict):
+        print("Converting generator to dictionary", file=sys.stderr)
+        city_dict = {}
         for city, data in city_data:
+            city_dict[city] = data
+            print(f"Added to dictionary: {city} -> {data}", file=sys.stderr)
+        city_data = city_dict
+    
+    print(f"Final city_data type: {type(city_data)}", file=sys.stderr)
+    print(f"Final city_data: {city_data}", file=sys.stderr)
+    
+    # Check if city_data is empty
+    if not city_data:
+        print("city_data is empty!", file=sys.stderr)
+        # Try to fetch data for each city individually
+        print("Trying to fetch data for each city individually", file=sys.stderr)
+        city_dict = {}
+        for city in cities:
+            data = weather_api.fetch_city_data(city)
             if data:
-                # Check if the data has the expected structure
-                if isinstance(data, dict):
-                    if 'latitude' in data and 'longitude' in data:
-                        coordinates[city] = {
-                            'latitude': data['latitude'],
-                            'longitude': data['longitude']
-                        }
-                        print(f"Added coordinates for {city}: {data['latitude']}, {data['longitude']}", file=sys.stderr)
-                    else:
-                        print(f"Missing latitude/longitude for {city}. Data: {data}", file=sys.stderr)
-                else:
-                    print(f"Data for {city} is not a dictionary: {type(data)}", file=sys.stderr)
-            else:
-                print(f"No data returned for {city}", file=sys.stderr)
+                city_dict[city] = data
+                print(f"Added to dictionary: {city} -> {data}", file=sys.stderr)
+        city_data = city_dict
     
-    print(f"Returning coordinates for {len(coordinates)} cities", file=sys.stderr)
-    
-    # Output the coordinates as JSON to stdout
-    print(json.dumps(coordinates))
-    
-    return coordinates
+    # Now we can safely serialize to JSON
+    print(json.dumps(city_data))
+    return city_data
 
 if __name__ == "__main__":
     # Check if cities were provided as command line arguments
