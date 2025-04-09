@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
-  - City of Valencia
-  - Seville
+  - Warsaw
+  - Tricity
+  - "Wroc\u0142aw"
+  - "\u0141\xF3d\u017A"
+  - "Pozna\u0144"
+  - "Gda\u0144sk"
+  - Szczecin
   enabled: true
   previousBatch:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
-  - City of Valencia
-  - Seville
+  - Warsaw
+  - Tricity
+  - "Wroc\u0142aw"
+  - "\u0141\xF3d\u017A"
+  - "Pozna\u0144"
+  - "Gda\u0144sk"
+  - Szczecin
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

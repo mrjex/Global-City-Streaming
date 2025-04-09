@@ -14,6 +14,8 @@ const KafkaProductionCard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [globeKey, setGlobeKey] = useState<number>(0);
+  const [isGlobeVisible, setIsGlobeVisible] = useState<boolean>(true);
+  const GLOBE_REMOUNT_DELAY = 1200; // Delay in milliseconds for remounting the globe
 
   // Function to fetch cities data
   const fetchCities = async () => {
@@ -32,7 +34,16 @@ const KafkaProductionCard: React.FC = () => {
       }
       const data = await response.json();
       setCities(data);
-      setGlobeKey(prev => prev + 1);
+      
+      // Force a complete remount of the GlobeView component
+      if (displayMode === 'map') {
+        // Temporarily hide the globe
+        setIsGlobeVisible(false);
+        // Use setTimeout to ensure the component is fully unmounted before remounting
+        setTimeout(() => {
+          setIsGlobeVisible(true);
+        }, GLOBE_REMOUNT_DELAY);
+      }
     } catch (err) {
       console.error('Error fetching cities:', err);
       setError('Failed to load cities data');
@@ -55,29 +66,43 @@ const KafkaProductionCard: React.FC = () => {
 
   // Listen for country selection events
   useEffect(() => {
-    const handleCountrySelected = (event: CustomEvent) => {
+    const handleCountrySelected = async (event: CustomEvent) => {
       console.log('Country selected event received:', event.detail);
       if (displayMode === 'list') {
         fetchCities();
       } else {
-        setGlobeKey(prev => prev + 1);
+        // First fetch the latest cities data
+        await fetchCities();
+        // Then force a complete remount of the GlobeView component
+        setIsGlobeVisible(false);
+        setTimeout(() => {
+          setIsGlobeVisible(true);
+        }, GLOBE_REMOUNT_DELAY);
       }
     };
-
+    
     // Add event listener for country selection
     window.addEventListener('countrySelected', handleCountrySelected as EventListener);
     
     // Also listen for the initial country load event
-    const handleInitialCountryLoad = () => {
+    const handleInitialCountryLoad = async () => {
       console.log('Initial country load event received');
       setInitialLoadComplete(true);
       if (displayMode === 'list') {
         fetchCities();
+      } else {
+        // First fetch the latest cities data
+        await fetchCities();
+        // Then force a complete remount of the GlobeView component
+        setIsGlobeVisible(false);
+        setTimeout(() => {
+          setIsGlobeVisible(true);
+        }, GLOBE_REMOUNT_DELAY);
       }
     };
     
     window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
-
+    
     return () => {
       window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
       window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
@@ -135,11 +160,13 @@ const KafkaProductionCard: React.FC = () => {
             {/* Content based on display mode */}
             {displayMode === 'map' ? (
               <div className="w-full h-full">
-                <GlobeView 
-                  key={`globe-${globeKey}`}
-                  cities={cities.static} 
-                  dynamicCities={cities.dynamic} 
-                />
+                {isGlobeVisible && (
+                  <GlobeView 
+                    key={`globe-${globeKey}`}
+                    cities={cities.static} 
+                    dynamicCities={cities.dynamic} 
+                  />
+                )}
               </div>
             ) : (
               <div className="w-full h-full overflow-y-auto p-4 text-white">
