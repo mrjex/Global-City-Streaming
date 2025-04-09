@@ -1,15 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import FlinkTerminals from './FlinkTerminals';
 
-interface FlinkProcessorCardProps {
-  batchSize?: number;
-  windowSize?: number;
-}
-
-const FlinkProcessorCard: React.FC<FlinkProcessorCardProps> = ({
-  batchSize = 100,
-  windowSize = 5
-}) => {
+const FlinkProcessorCard: React.FC = () => {
   const [throughput, setThroughput] = useState(0);
   const previousLogsRef = useRef<string[]>([]);
   const lastUpdateTimeRef = useRef(Date.now());
@@ -104,7 +96,7 @@ const FlinkProcessorCard: React.FC<FlinkProcessorCardProps> = ({
               backgroundSize: '200% 200%',
               animation: 'gradient 5s ease infinite'
             }}>
-              Window Progress (bar chart here)
+              200ms Batch
             </div>
           </div>
           
@@ -118,12 +110,6 @@ const FlinkProcessorCard: React.FC<FlinkProcessorCardProps> = ({
             - Output aggregated average results to PostgreSQL
           </p>
         </div>
-      </div>
-      
-      {/* Stats */}
-      <div className="px-6 py-4 flex justify-between text-gray-300">
-        <div className="italic">{batchSize} ms batch</div>
-        <div className="italic">{windowSize} second window</div>
       </div>
     </div>
   );

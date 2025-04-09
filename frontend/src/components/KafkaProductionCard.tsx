@@ -2,20 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Terminal from './Terminal';
 import GlobeView from './GlobeView';
 
-interface KafkaProductionCardProps {
-  requestInterval?: number;
-  messagesPerSecond?: number;
-}
-
 interface CitiesData {
   static: string[];
   dynamic: string[];
 }
 
-const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
-  requestInterval = 1,
-  messagesPerSecond = 10
-}) => {
+const KafkaProductionCard: React.FC = () => {
   const [displayMode, setDisplayMode] = useState<'map' | 'list'>('map');
   const [cities, setCities] = useState<CitiesData>({ static: [], dynamic: [] });
   const [isLoadingCities, setIsLoadingCities] = useState(false);
@@ -190,12 +182,6 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({
             )}
           </div>
         </div>
-      </div>
-      
-      {/* Stats */}
-      <div className="px-6 py-3 flex justify-between text-gray-300">
-        <div className="italic">Request Interval: {requestInterval} seconds</div>
-        <div className="italic">Messages per second: {messagesPerSecond}</div>
       </div>
     </div>
   );
