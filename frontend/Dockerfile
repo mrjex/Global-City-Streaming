@@ -20,6 +20,9 @@ RUN npm install --production=false && \
 # Copy frontend source files
 COPY frontend/ ./
 
+# Copy shared directory for build time
+COPY shared/ ./shared/
+
 # Copy environment files
 COPY frontend/.env.production ./.env.production
 

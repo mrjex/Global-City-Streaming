@@ -131,7 +131,7 @@ const KafkaProductionCard: React.FC = () => {
             {/* Content based on display mode */}
             {displayMode === 'map' ? (
               <div className="w-full h-full">
-                <GlobeView cities={cities} />
+                <GlobeView cities={cities.static} dynamicCities={cities.dynamic} />
               </div>
             ) : (
               <div className="w-full h-full overflow-y-auto p-4 text-white">

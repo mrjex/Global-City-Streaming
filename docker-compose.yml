@@ -30,6 +30,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./configuration.yml:/app/configuration.yml:ro
+      - ./shared:/app/shared:ro
     depends_on:
       - kafka-producer
       - flink-processor

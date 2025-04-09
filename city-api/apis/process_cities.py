@@ -3,7 +3,8 @@
 #   - The purpose of this 'middleware' layer would be to serve as the
 #     place where the APIs in "/apis" or the .sh scripts invokes
 #     external functionalities. Then, @countryCodeApi.py could also
-#     be rewritten/reframed as a middleware layer.
+#     be rewritten/reframed as a middleware layer. An alternative
+#     idea is to put this file in "/shared/weather"
 
 import sys
 import json
