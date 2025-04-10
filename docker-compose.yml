@@ -98,6 +98,7 @@ services:
     volumes:
       - ./city-api:/mnt:rw
       - .:/app:rw
+      - ./shared:/app/shared:ro
     depends_on:
       - kafka
       - zookeeper
@@ -107,6 +108,7 @@ services:
       ZOOKEEPER_SERVER: "zookeeper:2181"
       PRODUCER_INTERVAL: 100
       WEATHER_API_KEY: ${WEATHER_API_KEY}
+      PYTHONPATH: /app
     networks:
       - app_network
     restart: unless-stopped

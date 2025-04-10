@@ -34,6 +34,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.util.Map;
+import java.util.Collections;
 
 public class Main {
 
@@ -109,7 +110,7 @@ public class Main {
       properties.setProperty("auto.offset.reset", "earliest");
       
       FlinkKafkaConsumer<Weather> consumer = new FlinkKafkaConsumer<>(
-          "weather", 
+          "weather-data", 
           new WeatherDeserializationSchema(), 
           properties
       );
@@ -124,7 +125,7 @@ public class Main {
         System.out.println("    📍 City: " + weather.city);
         System.out.println("    🌡️ Temperature: " + weather.temperature + "°C");
         System.out.println("    ⏰ Timestamp: " + dtf.format(LocalDateTime.now()));
-        System.out.println("    " + "=".repeat(50));
+        System.out.println("    " + String.join("", Collections.nCopies(50, "=")));
         return weather;
       });
 

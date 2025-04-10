@@ -1,6 +1,8 @@
 import os
 import requests
 import sys
+import aiohttp
+import asyncio
 from typing import Optional, Dict, Any, List
 
 class WeatherAPI:
@@ -29,6 +31,26 @@ class WeatherAPI:
             result = self._compose_city_object(data, city)
             return result
             
+        except Exception as e:
+            print(f"Error fetching data for {city}: {str(e)}", file=sys.stderr)
+            return None
+
+    async def fetch_city_data_async(self, city: str, session: aiohttp.ClientSession) -> Optional[Dict[str, Any]]:
+        """
+        Asynchronously fetch weather data for a city.
+        Returns a standardized city object or None if the request fails.
+        """
+        try:
+            query = {'key': self.api_key, 'q': city, 'aqi': 'yes'}
+            async with session.get(self.api_url, params=query) as response:
+                if not response.ok:
+                    print(f"Error: Weather API request failed with status {response.status}", file=sys.stderr)
+                    return None
+                    
+                data = await response.json()
+                result = self._compose_city_object(data, city)
+                return result
+                
         except Exception as e:
             print(f"Error fetching data for {city}: {str(e)}", file=sys.stderr)
             return None
