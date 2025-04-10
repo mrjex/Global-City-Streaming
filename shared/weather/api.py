@@ -39,11 +39,17 @@ class WeatherAPI:
         If batch_enabled is True, returns a dictionary of all cities at once.
         If batch_enabled is False (default), yields each city's data as it's processed.
         """
+        print(f"fetch_cities_batch called with batch_enabled={self.batch_enabled}", file=sys.stderr)
         if self.batch_enabled:
             # Batch mode: process all cities at once and return dict
             results = {}
             for city in cities:
-                results[city] = self.fetch_city_data(city)
+                print(f"Fetching data for {city} in batch mode", file=sys.stderr)
+                data = self.fetch_city_data(city)
+                print(f"Data for {city}: {data}", file=sys.stderr)
+                if data:  # Only add if data is not None
+                    results[city] = data
+            print(f"Batch results: {results}", file=sys.stderr)
             return results
         else:
             # Sequential mode: yield each city's data as it's processed

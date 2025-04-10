@@ -185,8 +185,26 @@ class WeatherProducer:
                 if self.batch_mode:
                     # Batch mode: process all cities at once
                     try:
+                        # Debug logging
+                        log_message(f"WeatherAPI batch_enabled: {self.weather_api.batch_enabled}")
+                        
                         # Fetch all cities in one batch
                         batch_results = self.weather_api.fetch_cities_batch(cities)
+                        
+                        # Debug logging
+                        log_message(f"Batch results type: {type(batch_results)}")
+                        log_message(f"Batch results keys: {list(batch_results.keys())}")
+                        
+                        # Log the entire batch as JSON
+                        cycle_data = {
+                            "timestamp": datetime.datetime.now().isoformat(),
+                            "cities": {
+                                city: {
+                                    "temperature": str(data['temperatureCelsius']) if data else None
+                                } for city, data in batch_results.items()
+                            }
+                        }
+                        log_message(f"Cycle data: {json.dumps(cycle_data, indent=2)}")
                         
                         # Process results and send to Kafka
                         for city, data in batch_results.items():
