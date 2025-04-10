@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Warsaw
-  - Tricity
-  - "Wroc\u0142aw"
-  - "\u0141\xF3d\u017A"
-  - "Pozna\u0144"
-  - "Gda\u0144sk"
-  - Szczecin
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - Warsaw
-  - Tricity
-  - "Wroc\u0142aw"
-  - "\u0141\xF3d\u017A"
-  - "Pozna\u0144"
-  - "Gda\u0144sk"
-  - Szczecin
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
