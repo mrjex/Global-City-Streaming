@@ -32,7 +32,8 @@ RUN pip install --no-cache-dir \
     uvicorn \
     statsmodels \
     scipy \
-    numpy
+    numpy \
+    aiohttp
 
 # Create necessary directories
 RUN mkdir -p \

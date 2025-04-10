@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
+  - City of Gold Coast
+  - Gold Coast
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
+  - City of Gold Coast
+  - Gold Coast
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

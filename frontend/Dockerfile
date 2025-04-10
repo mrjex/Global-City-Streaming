@@ -55,7 +55,7 @@ RUN apk add --no-cache \
 # Create a Python virtual environment and install dependencies
 RUN python3 -m venv /app/venv && \
     . /app/venv/bin/activate && \
-    pip install requests pyyaml
+    pip install requests pyyaml aiohttp
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public
