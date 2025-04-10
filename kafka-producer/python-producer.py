@@ -129,10 +129,13 @@ class WeatherProducer:
         self.producer = None
         self.weather_api = None
         self.running = False
+        self.batch_mode = True  # Default to batch mode
         
     def initialize(self):
         try:
             self.weather_api = WeatherAPI()
+            # Enable batch mode in the WeatherAPI
+            self.weather_api.batch_enabled = self.batch_mode
             return True
         except Exception as e:
             log_message(f"Failed to initialize WeatherAPI: {str(e)}")
@@ -179,24 +182,46 @@ class WeatherProducer:
                     
                 log_message(f"Processing {len(cities)} cities")
                 
-                # Process each city
-                for city in cities:
+                if self.batch_mode:
+                    # Batch mode: process all cities at once
                     try:
-                        city_data = next(self.weather_api.fetch_cities_batch([city]))
-                        if city_data and city_data[1]:
-                            message = {
-                                "city": city_data[0],
-                                "temperature": str(city_data[1]['temperatureCelsius'])
-                            }
-                            
-                            future = self.producer.send(weather_topic, message)
-                            future.get(timeout=5)
-                            log_message(f"Sent data for {city}: {json.dumps(message)}")
-                        else:
-                            log_message(f"No data for {city}")
+                        # Fetch all cities in one batch
+                        batch_results = self.weather_api.fetch_cities_batch(cities)
+                        
+                        # Process results and send to Kafka
+                        for city, data in batch_results.items():
+                            if data:
+                                message = {
+                                    "city": city,
+                                    "temperature": str(data['temperatureCelsius'])
+                                }
+                                
+                                future = self.producer.send(weather_topic, message)
+                                future.get(timeout=5)
+                                log_message(f"Sent data for {city}: {json.dumps(message)}")
+                            else:
+                                log_message(f"No data for {city}")
                     except Exception as e:
-                        log_message(f"Error processing {city}: {str(e)}")
-                        continue
+                        log_message(f"Error processing batch: {str(e)}")
+                else:
+                    # Sequential mode: process each city individually
+                    for city in cities:
+                        try:
+                            city_data = next(self.weather_api.fetch_cities_batch([city]))
+                            if city_data and city_data[1]:
+                                message = {
+                                    "city": city_data[0],
+                                    "temperature": str(city_data[1]['temperatureCelsius'])
+                                }
+                                
+                                future = self.producer.send(weather_topic, message)
+                                future.get(timeout=5)
+                                log_message(f"Sent data for {city}: {json.dumps(message)}")
+                            else:
+                                log_message(f"No data for {city}")
+                        except Exception as e:
+                            log_message(f"Error processing {city}: {str(e)}")
+                            continue
                 
                 self.producer.flush(timeout=5)
                 log_message("Completed processing cycle")
