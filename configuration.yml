@@ -52,7 +52,6 @@ cities:
 - Austin
 - Boston
 - Miami
-- San Fransisco
 - Seattle
 - Denver
 - Bogota
@@ -117,8 +116,8 @@ visualizations:
     equatorChart:
       displayActualTrend: false
       displayLinearTrend: true
-      displayLogarithmicTrend: true
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: continent
-    queryRequirement: Europe
+    queryRequirement: Africa
