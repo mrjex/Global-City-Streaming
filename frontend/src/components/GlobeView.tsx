@@ -295,7 +295,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   }, [cities, dynamicCities, cityCoordinates, renderKey]);
   
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-[101%] h-full">
       <div ref={containerRef} className="w-full h-full" />
       {hoveredCity && (
         <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md">
