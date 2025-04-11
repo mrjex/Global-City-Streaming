@@ -1,14 +1,14 @@
 -- -- - EXECUTION SETTINGS AND METRICS - -- -- 
 
 KAFKA PRODUCER METRICS:
-- Total Cities Processed: 33 (26 static + 7 dynamic)
+- Total Cities Processed: 92 (85 static + 7 dynamic)
 - Request Interval: 0.01 seconds
-- Messages per Second: 100.00 (33 cities / 0.33 seconds cycle)
+- Messages per Second: 100.00 (92 cities / 0.92 seconds cycle)
 
 FLINK PROCESSOR METRICS:
 - Batch Size: 1000 records
-- Batch Interval: 150ms
-- Maximum Theoretical Processing Rate: 6666.67 records/second
+- Batch Interval: 200ms
+- Maximum Theoretical Processing Rate: 5000.00 records/second
 - Actual Processing Rate: 100.00 records/second (limited by producer rate)
 - Sample Duration: 10 seconds
 - Max Retries: 5

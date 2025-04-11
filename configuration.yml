@@ -25,6 +25,65 @@ cities:
 - Juneau
 - Sacramento
 - Tijuana
+- Palermo
+- Naples
+- Milan
+- Budapest
+- Bucharest
+- Sofia
+- Athens
+- Warsaw
+- Prague
+- Zurich
+- Geneva
+- Rotterdam
+- Antwerp
+- Brussels
+- Cairo
+- Addis Ababa
+- Dakar
+- Abuja
+- Luanda
+- Kinshasa
+- Gaborone
+- Pretoria
+- Antananarivo
+- Abu Dabhi
+- Austin
+- Boston
+- Miami
+- San Fransisco
+- Seattle
+- Denver
+- Bogota
+- Lima
+- Santiago
+- Novosibirsk
+- Omsk
+- Tehran
+- Baghdad
+- Ankara
+- Damascus
+- Sao Paulo
+- Caracas
+- San Jose
+- Rio de Janeiro
+- Salvador
+- Brasilia
+- Recife
+- Srinagar
+- Chennai
+- Bangalore
+- Ahmedabad
+- Ulaanbaatar
+- Almaty
+- Ganja
+- Astana
+- Beijing
+- Shanghai
+- Hong Kong
+- Osaka
+- Chengdu
 dynamicCities:
   current:
   - Stockholm
