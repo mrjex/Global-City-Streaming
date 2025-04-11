@@ -90,8 +90,6 @@ dynamicCities:
   - "Malm\xF6"
   - Uppsala
   - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
   enabled: true
   previousBatch:
   - Stockholm
@@ -99,14 +97,12 @@ dynamicCities:
   - "Malm\xF6"
   - Uppsala
   - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
 services:
   cityApi:
-    numberOfCitiesForSelectedCountry: 7
+    numberOfCitiesForSelectedCountry: 5
   flinkProcessor:
-    batchIntervalMs: 100
-    batchSize: 1000
+    batchIntervalMs: 200
+    batchSize: 300
     maxRetries: 5
     sampleDuration: 1
   kafkaProducer:
@@ -120,4 +116,4 @@ visualizations:
       pngOutput: false
   queryConfig:
     queryAttribute: continent
-    queryRequirement: Africa
+    queryRequirement: Asia

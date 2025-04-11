@@ -30,8 +30,9 @@ app.add_middleware(
 KAFKA_NODES = "kafka:9092"
 CONTROL_TOPIC = "city-control"
 
-# Global variable to store dynamic cities
+# Global variables
 dynamic_cities = []
+is_ready = False  # Track if initial configuration is complete
 
 # Initialize Docker client with improved error handling
 def get_docker_client():
@@ -337,6 +338,11 @@ async def api_flink_db_logs():
 async def health_check():
     return {"status": "healthy"}
 
+# New readiness endpoint
+@app.get("/ready")
+async def ready_check():
+    return {"ready": is_ready}
+
 # Add new endpoints for charts
 # @app.get("/api/charts")
 # async def get_charts():
@@ -507,6 +513,7 @@ async def update_config(request: Request):
 @app.post("/api/selected-country")
 async def receive_selected_country(request: Request):
     try:
+        global is_ready
         data = await request.json()
         country = data.get('country')
         print(f"[DEBUG] Processing country: {country}", flush=True)
@@ -599,6 +606,7 @@ async def receive_selected_country(request: Request):
                                 producer.flush()
                                 producer.close()
                                 print(f"[DEBUG] Sent control message: {control_message}", flush=True)
+                                is_ready = True  # Mark as ready after successful configuration
                             except Exception as e:
                                 print(f"[ERROR] Failed to send control message: {str(e)}", flush=True)
                     except Exception as e:

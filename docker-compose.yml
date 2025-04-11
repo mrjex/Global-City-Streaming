@@ -33,10 +33,14 @@ services:
       - ./configuration.yml:/app/configuration.yml:ro
       - ./shared:/app/shared:ro
     depends_on:
-      - kafka-producer
-      - flink-processor
-      - postgres
-      - city-api
+      city-api:
+        condition: service_healthy
+      kafka-producer:
+        condition: service_started
+      flink-processor:
+        condition: service_started
+      postgres:
+        condition: service_started
     restart: unless-stopped
     mem_limit: 256m
 
@@ -100,9 +104,14 @@ services:
       - .:/app:rw
       - ./shared:/app/shared:ro
     depends_on:
-      - kafka
-      - zookeeper
-      - postgres
+      city-api:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      zookeeper:
+        condition: service_started
+      postgres:
+        condition: service_started
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:2181"
@@ -125,8 +134,12 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - kafka
-      - zookeeper
+      city-api:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      zookeeper:
+        condition: service_started
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:2181"
@@ -215,6 +228,12 @@ services:
       - GIPHY_API_KEY=${GIPHY_API_KEY}
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8003/ready"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
 volumes:
   settings:
