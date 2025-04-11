@@ -2,14 +2,6 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-
-// Import Line component with no SSR
-const Line = dynamic(
-  () => import('react-chartjs-2').then((mod) => mod.Line),
-  { ssr: false, loading: () => <div className="text-gray-500 italic text-center">Loading chart...</div> }
-);
-
-// Import and register Chart.js components
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -19,10 +11,18 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartData,
   ChartOptions
 } from 'chart.js';
+import { Line } from 'react-chartjs-2';
 
-// Register Chart.js components
+// Import Line component with no SSR
+const LineComponent = dynamic(
+  () => import('react-chartjs-2').then((mod) => mod.Line),
+  { ssr: false, loading: () => <div className="text-gray-500 italic text-center">Loading chart...</div> }
+);
+
+// Import and register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -42,7 +42,20 @@ interface CityTemperatureData {
 interface TemperatureDataPoint {
   city: string;
   temperature: number;
-  timestamp: string;
+  timestamp: number;
+}
+
+interface AggregatedDataPoint {
+  minTemp: number;
+  maxTemp: number;
+  avgTemp: number;
+  count: number;
+  timestamp: number;
+}
+
+interface ApiResponse {
+  dynamicCities: string[];
+  temperatureData: TemperatureDataPoint[];
 }
 
 interface CityTemperatureChartProps {
@@ -68,6 +81,11 @@ const POLLING_INTERVAL = 1000; // Milliseconds between data fetches
 // Add these constants at the top
 const RANDOMIZATION_CHANCE = 0.2; // 30% chance to randomize any given update
 
+// Add these constants at the top
+const AGGREGATION_WINDOW = 5000; // 5 seconds window for data aggregation
+const MIN_TEMPERATURE = -50; // Minimum expected temperature
+const MAX_TEMPERATURE = 50; // Maximum expected temperature
+
 // Define sophisticated color palette (pastel/jewel tones)
 const CHART_COLORS = [
   'hsla(350, 70%, 70%, 1)', // Soft Rose
@@ -89,6 +107,21 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   const [cityColors, setCityColors] = useState<Record<string, string>>({});
   const [currentDynamicCities, setCurrentDynamicCities] = useState<string[]>([]);
   const lastKnownTemperatures = useRef<Record<string, { temp: number; timestamp: number }>>({});
+
+  // Add new state for aggregated data
+  const [aggregatedData, setAggregatedData] = useState<Record<string, AggregatedDataPoint[]>>({});
+  const lastAggregationTime = useRef<number>(Date.now());
+
+  // Add debug state to track API responses
+  const [debugInfo, setDebugInfo] = useState<{
+    lastApiResponse: any;
+    lastProcessedData: any;
+    errorMessage: string | null;
+  }>({
+    lastApiResponse: null,
+    lastProcessedData: null,
+    errorMessage: null
+  });
 
   // Modify getColorForCity to use city index from dynamic cities list
   const getColorForCity = (city: string) => {
@@ -112,94 +145,132 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     return gradient;
   };
 
+  // Add data aggregation function
+  const aggregateData = (data: TemperatureDataPoint[]) => {
+    console.log('Aggregating data:', data);
+    const currentTime = Date.now();
+    const newAggregatedData: Record<string, AggregatedDataPoint[]> = { ...aggregatedData };
+
+    // Group data by city
+    const cityGroups = data.reduce((acc, point) => {
+      const city = point.city as string;
+      if (!acc[city]) {
+        acc[city] = [];
+      }
+      acc[city].push(point);
+      return acc;
+    }, {} as Record<string, TemperatureDataPoint[]>);
+
+    console.log('Grouped data by city:', cityGroups);
+
+    // Process each city's data
+    Object.entries(cityGroups).forEach(([city, points]) => {
+      if (!newAggregatedData[city]) {
+        newAggregatedData[city] = [];
+      }
+
+      // Calculate aggregated values
+      const temps = points.map(p => p.temperature);
+      const aggregatedPoint: AggregatedDataPoint = {
+        minTemp: Math.min(...temps),
+        maxTemp: Math.max(...temps),
+        avgTemp: temps.reduce((a, b) => a + b, 0) / temps.length,
+        count: temps.length,
+        timestamp: currentTime
+      };
+
+      console.log(`Aggregated point for ${city}:`, aggregatedPoint);
+
+      // Add new aggregated point
+      newAggregatedData[city].push(aggregatedPoint);
+
+      // Keep only the last 4 points
+      if (newAggregatedData[city].length > MAX_DATA_POINTS) {
+        newAggregatedData[city] = newAggregatedData[city].slice(-MAX_DATA_POINTS);
+      }
+    });
+
+    return newAggregatedData;
+  };
+
   useEffect(() => {
     const fetchAndProcessData = async () => {
       try {
+        console.log('Fetching data from /api/logs...');
         const response = await fetch('/api/logs');
-        const data = await response.json();
+        const data = await response.json() as ApiResponse;
         
-        // Safely get dynamic cities with a default empty array
+        console.log('API Response:', data);
+        setDebugInfo(prev => ({ ...prev, lastApiResponse: data }));
+        
         const dynamicCities = data?.dynamicCities || [];
+        console.log('Dynamic cities from API:', dynamicCities);
         
-        // Check if dynamic cities have changed
         if (JSON.stringify(dynamicCities) !== JSON.stringify(currentDynamicCities)) {
-          // Clear old data when cities change
+          console.log('Dynamic cities changed, resetting state');
           setCityData({});
           setCityColors({});
           setCurrentDynamicCities(dynamicCities);
-          startTimeRef.current = Date.now(); // Reset start time
+          setAggregatedData({});
+          startTimeRef.current = Date.now();
         }
-        
-        // Update current time and wrap it within TIME_WINDOW
-        currentTimeRef.current = ((Date.now() - startTimeRef.current) / 1000) % TIME_WINDOW;
-        
+
         if (data && data.temperatureData) {
+          console.log('Temperature data received:', data.temperatureData);
+          
+          // Aggregate the data
+          const newAggregatedData = aggregateData(data.temperatureData);
+          console.log('New aggregated data:', newAggregatedData);
+          setAggregatedData(newAggregatedData);
+
+          // Transform aggregated data for chart display
           setCityData(prevData => {
             const newCityData = { ...prevData };
-            const currentTime = Date.now();
             
+            Object.entries(newAggregatedData).forEach(([city, points]) => {
+              if (!newCityData[city]) {
+                newCityData[city] = {
+                  city: city,
+                  timestamps: FIXED_TIMESTAMPS.slice(),
+                  temperatures: Array(MAX_DATA_POINTS).fill(points[0]?.avgTemp || 0)
+                };
+              } else {
+                // Update temperatures with aggregated values
+                newCityData[city].temperatures = points.map(p => p.avgTemp);
+              }
+            });
+
             // Remove cities not in dynamic list
             Object.keys(newCityData).forEach(city => {
               if (!dynamicCities.includes(city)) {
                 delete newCityData[city];
-                delete lastKnownTemperatures.current[city];
               }
             });
-            
-            // Initialize or update each city's data
-            dynamicCities.forEach(city => {
-              // Find the latest real temperature for this city
-              const cityData = data.temperatureData.find(point => point.city === city);
-              
-              // Skip cities without real temperature data
-              if (!cityData) {
-                return; // Skip this city entirely
-              }
 
-              let currentTemp = cityData.temperature;
-              lastKnownTemperatures.current[city] = {
-                temp: currentTemp,
-                timestamp: currentTime
-              };
-
-              // Apply randomization only for cities with real data
-              if (Math.random() < RANDOMIZATION_CHANCE) {
-                const variance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
-                const randomizedTemp = currentTemp + variance;
-                console.log(`RANDOMIZATION: City ${city} - Real temp: ${currentTemp}, Variance: ${variance.toFixed(2)}, Randomized temp: ${randomizedTemp.toFixed(2)}`);
-                currentTemp = randomizedTemp;
-              }
-
-              if (!newCityData[city]) {
-                // Initialize with all timestamps but same temperature
-                newCityData[city] = {
-                  city: city,
-                  timestamps: FIXED_TIMESTAMPS.slice(),
-                  temperatures: Array(MAX_DATA_POINTS).fill(currentTemp)
-                };
-              } else {
-                // Shift all temperatures left and add new temperature at the end
-                newCityData[city].temperatures = [
-                  ...newCityData[city].temperatures.slice(1),
-                  currentTemp
-                ];
-                // Keep timestamps fixed
-                newCityData[city].timestamps = FIXED_TIMESTAMPS.slice();
-              }
-            });
-            
+            console.log('Transformed city data for chart:', newCityData);
+            setDebugInfo(prev => ({ ...prev, lastProcessedData: newCityData }));
             return newCityData;
           });
+        } else {
+          console.warn('No temperature data received from API');
+          setDebugInfo(prev => ({ 
+            ...prev, 
+            errorMessage: 'No temperature data received from API' 
+          }));
         }
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setDebugInfo(prev => ({ 
+          ...prev, 
+          errorMessage: `Error fetching data: ${error instanceof Error ? error.message : String(error)}` 
+        }));
         setIsLoading(false);
       }
     };
 
     fetchAndProcessData();
-    const interval = setInterval(fetchAndProcessData, POLLING_INTERVAL);
+    const interval = setInterval(fetchAndProcessData, AGGREGATION_WINDOW);
     return () => clearInterval(interval);
   }, [currentDynamicCities]);
 
@@ -209,6 +280,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
   // Calculate dynamic temperature range from current data
   const temperatures = Object.values(cityData).flatMap(city => city.temperatures);
+  console.log('All temperatures for range calculation:', temperatures);
   const minTemp = temperatures.length > 0 ? Math.min(...temperatures) : 0;
   const maxTemp = temperatures.length > 0 ? Math.max(...temperatures) : 30;
   
@@ -218,10 +290,16 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   const dynamicMinTemp = minTemp - padding;
   const dynamicMaxTemp = maxTemp + padding;
 
+  console.log('Temperature range:', { minTemp, maxTemp, dynamicMinTemp, dynamicMaxTemp });
+
   // Prepare data for Chart.js
   const chartData = {
     datasets: Object.entries(cityData).map(([cityName, data]) => {
       const baseColor = getColorForCity(cityName);
+      console.log(`Preparing dataset for ${cityName}:`, {
+        temperatures: data.temperatures,
+        timestamps: data.timestamps
+      });
       return {
         label: cityName,
         data: data.temperatures.map((temp, idx) => ({
@@ -248,6 +326,8 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
       };
     })
   };
+  
+  console.log('Final chart data:', chartData);
   
   // Chart options
   const chartOptions = {
@@ -373,11 +453,23 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
           {isLoading ? (
             <div className="text-gray-500 italic text-center">Loading data...</div>
           ) : (
-            <Line 
-              data={chartData} 
-              options={chartOptions}
-              redraw={false}
-            />
+            <>
+              <LineComponent 
+                data={chartData} 
+                options={chartOptions}
+                redraw={false}
+              />
+              {/* Debug panel */}
+              <div className="mt-4 p-2 bg-gray-800 rounded text-xs text-gray-300 overflow-auto max-h-40">
+                <div className="font-bold">Debug Info:</div>
+                <div>Dynamic Cities: {currentDynamicCities.join(', ') || 'None'}</div>
+                <div>City Data Keys: {Object.keys(cityData).join(', ') || 'None'}</div>
+                <div>Datasets: {chartData.datasets.length}</div>
+                {debugInfo.errorMessage && (
+                  <div className="text-red-400">Error: {debugInfo.errorMessage}</div>
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>

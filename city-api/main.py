@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import subprocess
 from kafka import KafkaProducer
+import re
 
 app = FastAPI()
 
@@ -277,52 +278,98 @@ async def proxy_flink_db_logs():
 
 @app.get("/api/kafka-logs")
 async def get_kafka_logs():
+    print("MY KAFKA LOGS: Endpoint /api/kafka-logs called")
     try:
+        print("MY KAFKA LOGS: Attempting to get Docker client")
         client = get_docker_client()
         if client:
-            container = client.containers.get("kafka-producer")
-            logs = container.logs(tail=1000).decode("utf-8")
-            
-            # Parse logs to extract temperature data
-            temperature_data = []
-            raw_logs = []
-            
-            # Get current dynamic cities from configuration
-            config_path = Path('configuration.yml')
-            dynamic_cities = []
-            if config_path.exists():
-                with open(config_path) as f:
-                    config = yaml.safe_load(f)
-                    dynamic_cities = config.get('dynamicCities', {}).get('current', [])
-            
-            for line in logs.split('\n'):
-                raw_logs.append(line)
-                if "Sent data for" in line:
-                    try:
-                        # Extract JSON data
-                        json_str = line[line.find('{'): line.rfind('}')+1]
-                        data = json.loads(json_str)
-                        
-                        # Only include dynamic cities
-                        if data['city'] in dynamic_cities:
-                            timestamp = line[1:20]  # Extract timestamp [YYYY-MM-DD HH:MM:SS]
-                            temperature_data.append({
-                                'city': data['city'],
-                                'temperature': float(data['temperature']),
-                                'timestamp': timestamp
-                            })
-                    except:
-                        continue
-            
-            return {
-                "logs": "\n".join(raw_logs),
-                "temperatureData": temperature_data,
-                "dynamicCities": dynamic_cities
-            }
+            print("MY KAFKA LOGS: Successfully got Docker client")
+            try:
+                print("MY KAFKA LOGS: Attempting to get kafka-producer container")
+                container = client.containers.get("kafka-producer")
+                print("MY KAFKA LOGS: Successfully got kafka-producer container")
+                logs = container.logs(tail=1000).decode("utf-8")
+                print(f"MY KAFKA LOGS: Retrieved {len(logs)} bytes of logs from container")
+                
+                # Parse logs to extract temperature data
+                temperature_data = []
+                raw_logs = []
+                
+                # Get current dynamic cities from configuration
+                config_path = Path('configuration.yml')
+                dynamic_cities = []
+                if config_path.exists():
+                    with open(config_path) as f:
+                        config = yaml.safe_load(f)
+                        dynamic_cities = config.get('dynamicCities', {}).get('current', [])
+                        print(f"MY KAFKA LOGS: Found {len(dynamic_cities)} dynamic cities in config")
+                        print(f"MY KAFKA LOGS: Dynamic cities are: {dynamic_cities}")
+                
+                print("MY KAFKA LOGS: First 10 lines of raw logs:")
+                for i, line in enumerate(logs.split('\n')[:10]):
+                    print(f"MY KAFKA LOGS: Line {i}: {line}")
+                
+                for line in logs.split('\n'):
+                    raw_logs.append(line)
+                    if "Sent data for" in line:
+                        try:
+                            print(f"MY KAFKA LOGS: Processing line: {line}")
+                            # Extract the JSON part after "Sent data for"
+                            json_start = line.find('{')
+                            if json_start != -1:
+                                json_str = line[json_start:]
+                                print(f"MY KAFKA LOGS: Extracted JSON string: {json_str}")
+                                try:
+                                    data = json.loads(json_str)
+                                    print(f"MY KAFKA LOGS: Parsed JSON data: {data}")
+                                    print(f"MY KAFKA LOGS: JSON keys: {list(data.keys())}")
+                                    
+                                    # Only include dynamic cities
+                                    if data.get('city') in dynamic_cities:
+                                        # Extract timestamp from the log line
+                                        timestamp_match = re.search(r'\[(.*?)\]', line)
+                                        timestamp = timestamp_match.group(1) if timestamp_match else None
+                                        
+                                        if timestamp:
+                                            temperature = data.get('temperatureCelsius')
+                                            if temperature is not None:
+                                                temperature_data.append({
+                                                    'city': data['city'],
+                                                    'temperature': float(temperature),
+                                                    'timestamp': timestamp
+                                                })
+                                                print(f"MY KAFKA LOGS: Added temperature data for {data['city']}: {temperature}°C at {timestamp}")
+                                            else:
+                                                print(f"MY KAFKA LOGS: No temperatureCelsius found in data: {data}")
+                                        else:
+                                            print(f"MY KAFKA LOGS: No timestamp found in line: {line}")
+                                    else:
+                                        print(f"MY KAFKA LOGS: City {data.get('city')} not in dynamic cities list")
+                                except json.JSONDecodeError as e:
+                                    print(f"MY KAFKA LOGS: JSON decode error: {str(e)}")
+                                    print(f"MY KAFKA LOGS: Problematic JSON string: {json_str}")
+                            else:
+                                print(f"MY KAFKA LOGS: No JSON data found in line: {line}")
+                        except Exception as e:
+                            print(f"MY KAFKA LOGS: Error parsing log line: {str(e)}")
+                            print(f"MY KAFKA LOGS: Problematic line: {line}")
+                            continue
+                
+                print(f"MY KAFKA LOGS: Returning {len(temperature_data)} temperature data points")
+                print(f"MY KAFKA LOGS: Temperature data: {temperature_data}")
+                return {
+                    "logs": "\n".join(raw_logs),
+                    "temperatureData": temperature_data,
+                    "dynamicCities": dynamic_cities
+                }
+            except Exception as e:
+                print(f"MY KAFKA LOGS: Error accessing kafka-producer container: {str(e)}")
+                return {"error": f"Error accessing kafka-producer container: {str(e)}"}
         else:
+            print("MY KAFKA LOGS: Failed to get Docker client")
             return {"error": "Docker client initialization failed"}
     except Exception as e:
-        print(f"Error fetching Kafka logs: {str(e)}")
+        print(f"MY KAFKA LOGS: Error in get_kafka_logs: {str(e)}")
         return {"error": str(e)}
 
 # API routes that match frontend expectations

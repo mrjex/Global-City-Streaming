@@ -115,7 +115,7 @@ class WeatherProducer:
                         if data:
                             try:
                                 self.producer.send(weather_topic, value=data)
-                                log_message(f"Sent data for {city}")
+                                log_message(f"Sent data for {city}: {json.dumps(data)}")
                             except Exception as e:
                                 log_message(f"Error sending data for {city}: {str(e)}")
                     
