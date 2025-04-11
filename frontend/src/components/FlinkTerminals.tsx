@@ -63,7 +63,7 @@ const RawDataTerminal: React.FC<{ maxLines: number }> = ({ maxLines }) => {
 
       {/* Terminal Content */}
       <div
-        className="p-4 h-72 font-mono text-sm"
+        className="p-4 h-72 font-mono text-sm terminal-scroll"
         style={{
           backgroundColor: '#1a1b1e',
           overflowY: 'auto'
@@ -154,7 +154,7 @@ const DatabaseTerminal: React.FC<{ maxLines: number }> = ({ maxLines }) => {
 
       {/* Terminal Content */}
       <div
-        className="p-4 h-72 font-mono text-sm"
+        className="p-4 h-72 font-mono text-sm terminal-scroll"
         style={{
           backgroundColor: '#1a1b1e',
           overflowY: 'auto'
@@ -193,6 +193,23 @@ const FlinkTerminals: React.FC<TerminalProps> = ({ maxLines = 15 }) => {
       transition={{ duration: 0.5 }}
       className="w-full max-w-6xl mx-auto p-4"
     >
+      <style>
+        {`
+          .terminal-scroll::-webkit-scrollbar {
+            width: 4px;
+          }
+          .terminal-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+          }
+          .terminal-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+          }
+          .terminal-scroll::-webkit-scrollbar-track {
+            background: transparent;
+          }
+        `}
+      </style>
       <div className="flex space-x-4">
         <RawDataTerminal maxLines={maxLines} />
         <DatabaseTerminal maxLines={maxLines} />

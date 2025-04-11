@@ -85,22 +85,22 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Quezon City
+  - Manila
+  - Davao City
+  - Caloocan
+  - Budta
+  - Malingao
+  - Zamboanga City
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Quezon City
+  - Manila
+  - Davao City
+  - Caloocan
+  - Budta
+  - Malingao
+  - Zamboanga City
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
