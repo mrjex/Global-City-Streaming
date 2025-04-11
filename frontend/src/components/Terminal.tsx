@@ -59,12 +59,29 @@ const Terminal: React.FC<TerminalProps> = ({
 
         {/* Terminal Content */}
         <div
-          className="p-4 h-72 font-mono text-sm"
+          className="p-4 h-72 font-mono text-sm terminal-scroll"
           style={{
             backgroundColor: '#1a1b1e',
-            overflowY: 'hidden'
+            overflowY: 'auto',
           }}
         >
+          <style>
+            {`
+              .terminal-scroll::-webkit-scrollbar {
+                width: 4px;
+              }
+              .terminal-scroll::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 2px;
+              }
+              .terminal-scroll::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.4);
+              }
+              .terminal-scroll::-webkit-scrollbar-track {
+                background: transparent;
+              }
+            `}
+          </style>
           {isLoading ? (
             <div className="text-gray-500 italic">Loading logs...</div>
           ) : logs.length > 0 ? (
