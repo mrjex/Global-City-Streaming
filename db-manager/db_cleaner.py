@@ -60,37 +60,22 @@ def delete_oldest_records(connection, records_to_delete):
     try:
         cursor = connection.cursor()
         
-        # Delete in batches to avoid locking the table for too long
-        batches = (records_to_delete + BATCH_DELETE_SIZE - 1) // BATCH_DELETE_SIZE
-        total_deleted = 0
+        # Delete all records at once
+        cursor.execute("""
+            DELETE FROM weather
+            WHERE id IN (
+                SELECT id FROM weather
+                ORDER BY id ASC
+                LIMIT %s
+            )
+        """, (records_to_delete,))
         
-        for _ in range(batches):
-            batch_size = min(BATCH_DELETE_SIZE, records_to_delete - total_deleted)
-            if batch_size <= 0:
-                break
-                
-            cursor.execute("""
-                DELETE FROM weather
-                WHERE id IN (
-                    SELECT id FROM weather
-                    ORDER BY id ASC
-                    LIMIT %s
-                )
-            """, (batch_size,))
-            
-            deleted = cursor.rowcount
-            total_deleted += deleted
-            connection.commit()
-            
-            logger.info(f"Deleted {deleted} records (batch)")
-            
-            # Short pause between batches to reduce load
-            if total_deleted < records_to_delete:
-                time.sleep(1)
+        deleted = cursor.rowcount
+        connection.commit()
         
         cursor.close()
-        logger.info(f"Total records deleted: {total_deleted}")
-        return total_deleted
+        logger.info(f"Total records deleted: {deleted}")
+        return deleted
     except Exception as e:
         logger.error(f"Error deleting records: {e}")
         connection.rollback()
@@ -115,7 +100,8 @@ def main():
                 
                 # Delete oldest records if above threshold
                 if record_count > MAX_RECORDS:
-                    records_to_delete = record_count - MAX_RECORDS
+                    # Always delete BATCH_DELETE_SIZE records when over threshold
+                    records_to_delete = BATCH_DELETE_SIZE
                     logger.info(f"Record count exceeds maximum ({MAX_RECORDS}). Will delete {records_to_delete} records.")
                     delete_oldest_records(connection, records_to_delete)
                 else:
