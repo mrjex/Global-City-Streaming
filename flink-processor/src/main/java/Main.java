@@ -121,11 +121,10 @@ public class Main {
 
       // Add logging for raw data from Kafka
       kafka.map(weather -> {
-        System.out.println("[" + dtf.format(LocalDateTime.now()) + "] 🌡️ Raw Weather Data Received:");
-        System.out.println("    📍 City: " + weather.city);
-        System.out.println("    🌡️ Temperature: " + weather.temperature + "°C");
-        System.out.println("    ⏰ Timestamp: " + dtf.format(LocalDateTime.now()));
-        System.out.println("    " + String.join("", Collections.nCopies(50, "=")));
+        System.out.println("Raw data received: [" + dtf.format(LocalDateTime.now()) + "] 🌡️ Raw Weather Data Received:");
+        System.out.println("Raw data received:     📍 City: " + weather.city);
+        System.out.println("Raw data received:     🌡️ Temperature: " + weather.temperature + "°C");
+        // System.out.println("Raw data received:     ⏰ Timestamp: " + dtf.format(LocalDateTime.now()));
         return weather;
       });
 
