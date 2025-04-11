@@ -329,7 +329,7 @@ async def get_kafka_logs():
                 print("MY KAFKA LOGS: Attempting to get kafka-producer container")
                 container = client.containers.get("kafka-producer")
                 print("MY KAFKA LOGS: Successfully got kafka-producer container")
-                logs = container.logs(tail=1000).decode("utf-8")
+                logs = container.logs(tail=5000).decode("utf-8")  # Limited to last 5000 lines for better performance
                 print(f"MY KAFKA LOGS: Retrieved {len(logs)} bytes of logs from container")
                 
                 # Parse logs to extract temperature data

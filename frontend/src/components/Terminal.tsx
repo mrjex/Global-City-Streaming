@@ -3,12 +3,10 @@ import { motion } from 'framer-motion';
 
 interface TerminalProps {
   title?: string;
-  maxLines?: number;
 }
 
 const Terminal: React.FC<TerminalProps> = ({ 
-  title = 'Data Production',
-  maxLines = 15
+  title = 'Data Production'
 }) => {
   const [logs, setLogs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +19,7 @@ const Terminal: React.FC<TerminalProps> = ({
         
         if (data && data.logs) {
           const allLogs = data.logs.split('\n').filter(line => line.trim());
-          setLogs(allLogs.slice(-maxLines));
+          setLogs(allLogs);
         }
         setIsLoading(false);
       } catch (error) {
@@ -37,7 +35,15 @@ const Terminal: React.FC<TerminalProps> = ({
     const interval = setInterval(fetchLogs, 1000);
 
     return () => clearInterval(interval);
-  }, [maxLines]);
+  }, []);
+
+  // Auto-scroll to bottom when new logs arrive
+  useEffect(() => {
+    const terminalContent = document.querySelector('.terminal-scroll');
+    if (terminalContent) {
+      terminalContent.scrollTop = terminalContent.scrollHeight;
+    }
+  }, [logs]);
 
   return (
     <motion.div
@@ -54,7 +60,9 @@ const Terminal: React.FC<TerminalProps> = ({
             <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-          <div className="text-gray-400 text-sm mx-auto">{title}</div>
+          <div className="text-gray-400 text-sm mx-auto">
+            {title} {logs.length > 0 && `(${logs.length} entries)`}
+          </div>
         </div>
 
         {/* Terminal Content */}
