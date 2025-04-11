@@ -17,7 +17,6 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
   const [cityCoordinates, setCityCoordinates] = useState<Record<string, { lat: number; lng: number }>>({});
-  const [debugInfo, setDebugInfo] = useState<string>('');
   const [renderKey, setRenderKey] = useState<number>(0);
   
   // Fetch city coordinates
@@ -55,14 +54,10 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       console.log('Valid coordinates:', validCoordinates);
       setCityCoordinates(validCoordinates);
       
-      // Update debug info
-      setDebugInfo(`Cities: ${Object.keys(validCoordinates).join(', ')}`);
-      
       // Force a re-render when coordinates are updated
       setRenderKey(prev => prev + 1);
     } catch (error) {
       console.error('Error fetching city coordinates:', error);
-      setDebugInfo(`Error: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
   
@@ -305,11 +300,6 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       {hoveredCity && (
         <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md">
           {hoveredCity}
-        </div>
-      )}
-      {debugInfo && (
-        <div className="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-xs">
-          {debugInfo}
         </div>
       )}
     </div>
