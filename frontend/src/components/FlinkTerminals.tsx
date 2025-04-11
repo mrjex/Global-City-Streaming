@@ -90,13 +90,8 @@ const RawDataTerminal: React.FC<{ maxLines: number }> = ({ maxLines }) => {
   return (
     <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl w-1/2">
       <div className="bg-gray-800 px-4 py-2 flex items-center">
-        <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
         <div className="text-gray-400 text-sm mx-auto">
-          Raw Data Reception {logs.length > 0 && `(${logs.length} entries)`}
+          Raw Data Reception
         </div>
       </div>
 
@@ -185,13 +180,8 @@ const DatabaseTerminal: React.FC<{ maxLines: number }> = ({ maxLines }) => {
   return (
     <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl w-1/2">
       <div className="bg-gray-800 px-4 py-2 flex items-center">
-        <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
         <div className="text-gray-400 text-sm mx-auto">
-          Database Insertion {logs.length > 0 && `(${logs.length} entries)`}
+          Database Operations
         </div>
       </div>
 

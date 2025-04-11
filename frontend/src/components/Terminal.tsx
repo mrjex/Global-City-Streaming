@@ -55,13 +55,8 @@ const Terminal: React.FC<TerminalProps> = ({
       <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
         {/* Terminal Header */}
         <div className="bg-gray-800 px-4 py-2 flex items-center">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          </div>
           <div className="text-gray-400 text-sm mx-auto">
-            {title} {logs.length > 0 && `(${logs.length} entries)`}
+            {title}
           </div>
         </div>
 

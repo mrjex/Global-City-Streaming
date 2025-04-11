@@ -85,22 +85,22 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Algiers
-  - Oran
-  - Constantine
-  - Batna
-  - "S\xE9tif"
-  - Bab Ezzouar
-  - Djelfa
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - Algiers
-  - Oran
-  - Constantine
-  - Batna
-  - "S\xE9tif"
-  - Bab Ezzouar
-  - Djelfa
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
