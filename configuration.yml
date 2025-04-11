@@ -85,22 +85,22 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Algiers
+  - Oran
+  - Constantine
+  - Batna
+  - "S\xE9tif"
+  - Bab Ezzouar
+  - Djelfa
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - Algiers
+  - Oran
+  - Constantine
+  - Batna
+  - "S\xE9tif"
+  - Bab Ezzouar
+  - Djelfa
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
@@ -116,7 +116,7 @@ visualizations:
     equatorChart:
       displayActualTrend: false
       displayLinearTrend: true
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: continent
