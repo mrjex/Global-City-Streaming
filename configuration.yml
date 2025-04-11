@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
-  - City of Gold Coast
-  - Gold Coast
+  - Shanghai
+  - Beijing
+  - Chengdu
+  - Guangzhou
+  - Shenzhen
+  - Beijing Shi
+  - Tianjin
   enabled: true
   previousBatch:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
-  - City of Gold Coast
-  - Gold Coast
+  - Shanghai
+  - Beijing
+  - Chengdu
+  - Guangzhou
+  - Shenzhen
+  - Beijing Shi
+  - Tianjin
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
@@ -61,5 +61,5 @@ visualizations:
       displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
-    queryAttribute: timeZoneOffset
-    queryRequirement: UTC+2
+    queryAttribute: continent
+    queryRequirement: Europe

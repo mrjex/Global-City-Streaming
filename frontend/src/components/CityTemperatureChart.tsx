@@ -62,10 +62,13 @@ interface CityTemperatureChartProps {
   title?: string;
 }
 
-// Window size in seconds - reduced to show less data points
-const TIME_WINDOW = 4;  // Change to 4 fixed points
+// Update these constants to better reflect our approach
+const TIME_WINDOW = 4;  // Keep 4 seconds window
 const MAX_DATA_POINTS = 4;
 const FIXED_TIMESTAMPS = [1, 2, 3, 4];  // Fixed timestamp positions
+
+// Update polling interval to 1 second
+const POLLING_INTERVAL = 1000; // 1 second between data fetches
 
 // Add these constants at the top with other constants
 const TEMPERATURE_VARIANCE = 0.5; // Maximum temperature change in °C between points
@@ -74,9 +77,6 @@ const REQUIRED_TIMESTAMPS = [0, 1, 2, 3, 4]; // Timestamps we want to ensure are
 
 // Add this constant to control how many points we want across the window
 const POINTS_PER_WINDOW = 5; // One point per second in our 5-second window
-
-// Add polling interval constant
-const POLLING_INTERVAL = 1000; // Milliseconds between data fetches
 
 // Add these constants at the top
 const RANDOMIZATION_CHANCE = 0.2; // 30% chance to randomize any given update
@@ -147,50 +147,39 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
   // Add data aggregation function
   const aggregateData = (data: TemperatureDataPoint[]) => {
-    console.log('Aggregating data:', data);
-    const currentTime = Date.now();
-    const newAggregatedData: Record<string, AggregatedDataPoint[]> = { ...aggregatedData };
-
+    console.log('Aggregating data, received points:', data.length);
+    
     // Group data by city
-    const cityGroups = data.reduce((acc, point) => {
-      const city = point.city as string;
-      if (!acc[city]) {
-        acc[city] = [];
+    const cityGroups: Record<string, TemperatureDataPoint[]> = {};
+    
+    // Group data by city
+    data.forEach(point => {
+      const city = point.city;
+      if (!cityGroups[city]) {
+        cityGroups[city] = [];
       }
-      acc[city].push(point);
-      return acc;
-    }, {} as Record<string, TemperatureDataPoint[]>);
-
-    console.log('Grouped data by city:', cityGroups);
-
-    // Process each city's data
-    Object.entries(cityGroups).forEach(([city, points]) => {
-      if (!newAggregatedData[city]) {
-        newAggregatedData[city] = [];
-      }
-
-      // Calculate aggregated values
-      const temps = points.map(p => p.temperature);
-      const aggregatedPoint: AggregatedDataPoint = {
-        minTemp: Math.min(...temps),
-        maxTemp: Math.max(...temps),
-        avgTemp: temps.reduce((a, b) => a + b, 0) / temps.length,
-        count: temps.length,
-        timestamp: currentTime
-      };
-
-      console.log(`Aggregated point for ${city}:`, aggregatedPoint);
-
-      // Add new aggregated point
-      newAggregatedData[city].push(aggregatedPoint);
-
-      // Keep only the last 4 points
-      if (newAggregatedData[city].length > MAX_DATA_POINTS) {
-        newAggregatedData[city] = newAggregatedData[city].slice(-MAX_DATA_POINTS);
-      }
+      cityGroups[city].push(point);
     });
 
-    return newAggregatedData;
+    console.log('Grouped data by city:', Object.keys(cityGroups));
+
+    // For each city, sample one point per second if available
+    const sampledData: Record<string, TemperatureDataPoint[]> = {};
+    
+    Object.entries(cityGroups).forEach(([city, points]) => {
+      sampledData[city] = [];
+      
+      // Sort points by timestamp (newest first)
+      points.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      
+      // Take the most recent 4 points (or less if not available)
+      const recentPoints = points.slice(0, MAX_DATA_POINTS);
+      
+      sampledData[city] = recentPoints;
+      console.log(`Sampled ${recentPoints.length} recent points for ${city}`);
+    });
+
+    return sampledData;
   };
 
   useEffect(() => {
@@ -211,33 +200,49 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
           setCityData({});
           setCityColors({});
           setCurrentDynamicCities(dynamicCities);
-          setAggregatedData({});
           startTimeRef.current = Date.now();
         }
 
-        if (data && data.temperatureData) {
-          console.log('Temperature data received:', data.temperatureData);
+        if (data && data.temperatureData && data.temperatureData.length > 0) {
+          console.log('Temperature data received:', data.temperatureData.length, 'points');
           
-          // Aggregate the data
-          const newAggregatedData = aggregateData(data.temperatureData);
-          console.log('New aggregated data:', newAggregatedData);
-          setAggregatedData(newAggregatedData);
-
-          // Transform aggregated data for chart display
+          // Sample and process the data
+          const sampledData = aggregateData(data.temperatureData);
+          
+          // Transform sampled data for chart display
           setCityData(prevData => {
-            const newCityData = { ...prevData };
+            const newCityData: Record<string, CityTemperatureData> = { ...prevData };
             
-            Object.entries(newAggregatedData).forEach(([city, points]) => {
-              if (!newCityData[city]) {
-                newCityData[city] = {
-                  city: city,
-                  timestamps: FIXED_TIMESTAMPS.slice(),
-                  temperatures: Array(MAX_DATA_POINTS).fill(points[0]?.avgTemp || 0)
-                };
-              } else {
-                // Update temperatures with aggregated values
-                newCityData[city].temperatures = points.map(p => p.avgTemp);
+            // Process each city
+            Object.entries(sampledData).forEach(([city, points]) => {
+              if (!dynamicCities.includes(city)) {
+                return; // Skip cities not in dynamic list
               }
+              
+              // Convert points to arrays of temperatures with fixed timestamps
+              const temperatures = points.map(p => p.temperature);
+              
+              // Ensure we have exactly 4 points by filling missing values
+              // or trimming excess values
+              const paddedTemperatures = [...temperatures];
+              while (paddedTemperatures.length < MAX_DATA_POINTS) {
+                // If we have at least one point, duplicate the last one
+                if (paddedTemperatures.length > 0) {
+                  paddedTemperatures.push(paddedTemperatures[paddedTemperatures.length - 1]);
+                } else {
+                  // If no points, add a default value
+                  paddedTemperatures.push(20); // Default temp of 20°C
+                }
+              }
+              
+              // Trim to exactly MAX_DATA_POINTS if needed
+              const finalTemperatures = paddedTemperatures.slice(0, MAX_DATA_POINTS);
+              
+              newCityData[city] = {
+                city,
+                timestamps: FIXED_TIMESTAMPS.slice(),
+                temperatures: finalTemperatures
+              };
             });
 
             // Remove cities not in dynamic list
@@ -270,7 +275,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     };
 
     fetchAndProcessData();
-    const interval = setInterval(fetchAndProcessData, AGGREGATION_WINDOW);
+    const interval = setInterval(fetchAndProcessData, POLLING_INTERVAL);
     return () => clearInterval(interval);
   }, [currentDynamicCities]);
 
