@@ -42,7 +42,7 @@ interface CityTemperatureData {
 interface TemperatureDataPoint {
   city: string;
   temperature: number;
-  timestamp: number;
+  timestamp: string;
 }
 
 interface AggregatedDataPoint {
@@ -123,6 +123,161 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     errorMessage: null
   });
 
+  // Add this new state for tracking selected country
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [shouldRefreshData, setShouldRefreshData] = useState<boolean>(true);
+
+  // Add this useEffect to listen for country changes
+  useEffect(() => {
+    const checkSelectedCountry = async () => {
+      try {
+        const response = await fetch('/api/selected-country');
+        const data = await response.json();
+        if (data.country !== selectedCountry) {
+          console.log('Country changed from', selectedCountry, 'to', data.country);
+          setSelectedCountry(data.country);
+          setShouldRefreshData(true); // Trigger a data refresh
+        }
+      } catch (error) {
+        console.error('Error checking selected country:', error);
+      }
+    };
+
+    // Check immediately and set up interval
+    checkSelectedCountry();
+    const countryCheckInterval = setInterval(checkSelectedCountry, 1000);
+    return () => clearInterval(countryCheckInterval);
+  }, [selectedCountry]);
+
+  // Modify the data fetching useEffect
+  useEffect(() => {
+    const fetchAndProcessData = async () => {
+      try {
+        console.log('Fetching data from /api/logs...');
+        const response = await fetch('/api/logs');
+        const data = await response.json() as ApiResponse;
+        
+        console.log('Raw API Response:', data);
+        
+        // Extract dynamic cities
+        const dynamicCities = data?.dynamicCities || [];
+        console.log('Dynamic cities from API:', dynamicCities);
+        
+        // Reset data if country changed
+        if (shouldRefreshData) {
+          console.log('Resetting data due to country change');
+          setCityData({});
+          setCityColors({});
+          setShouldRefreshData(false);
+        }
+        
+        // Update dynamic cities list
+        setCurrentDynamicCities(dynamicCities);
+        
+        if (data?.temperatureData && data.temperatureData.length > 0) {
+          console.log('Processing temperature data:', data.temperatureData.length, 'points');
+          
+          const newCityData: Record<string, CityTemperatureData> = {};
+          
+          // Process each dynamic city
+          dynamicCities.forEach(city => {
+            const cityPoints = data.temperatureData
+              .filter(point => point.city === city)
+              .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+              .slice(0, MAX_DATA_POINTS);
+              
+            if (cityPoints.length > 0) {
+              console.log(`Found ${cityPoints.length} points for ${city}`);
+              newCityData[city] = {
+                city,
+                timestamps: FIXED_TIMESTAMPS.slice(),
+                temperatures: cityPoints.map(p => p.temperature)
+              };
+            }
+          });
+          
+          if (Object.keys(newCityData).length > 0) {
+            console.log('Updating chart with new data:', Object.keys(newCityData));
+            setCityData(prev => ({
+              ...prev,
+              ...newCityData
+            }));
+          }
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    // Set up polling interval
+    const dataFetchInterval = setInterval(fetchAndProcessData, POLLING_INTERVAL);
+    fetchAndProcessData(); // Initial fetch
+    
+    return () => clearInterval(dataFetchInterval);
+  }, [selectedCountry, shouldRefreshData]); // Add shouldRefreshData as dependency
+
+  // Modify the existing data fetching useEffect to depend on selectedCountry
+  useEffect(() => {
+    const fetchAndProcessData = async () => {
+      try {
+        console.log('Fetching data from /api/logs...');
+        const response = await fetch('/api/logs');
+        const data = await response.json() as ApiResponse;
+        
+        console.log('Raw API Response:', data);
+        
+        // Extract and set dynamic cities first
+        const dynamicCities = data?.dynamicCities || [];
+        console.log('Dynamic cities from API:', dynamicCities);
+        
+        // Always update dynamic cities list
+        setCurrentDynamicCities(dynamicCities);
+        
+        if (data?.temperatureData && data.temperatureData.length > 0) {
+          console.log('Temperature data received:', data.temperatureData.length, 'points');
+          
+          // Create entries for ALL dynamic cities, even if they don't have data yet
+          const newCityData: Record<string, CityTemperatureData> = {};
+          
+          // Initialize data structure for all dynamic cities
+          dynamicCities.forEach(city => {
+            console.log(`Processing city: ${city}`);
+            const cityPoints = data.temperatureData.filter(point => point.city === city);
+            console.log(`Found ${cityPoints.length} points for ${city}`);
+            
+            // Sort points by timestamp (newest first)
+            cityPoints.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+            
+            // Take up to MAX_DATA_POINTS recent points
+            const recentPoints = cityPoints.slice(0, MAX_DATA_POINTS);
+            
+            // Always create an entry for the city, even if no data points yet
+            newCityData[city] = {
+              city,
+              timestamps: FIXED_TIMESTAMPS.slice(),
+              temperatures: recentPoints.map(p => p.temperature)
+            };
+            
+            console.log(`Created data entry for ${city}:`, newCityData[city]);
+          });
+          
+          console.log('Final processed city data:', newCityData);
+          setCityData(newCityData);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchAndProcessData();
+    const dataFetchInterval = setInterval(fetchAndProcessData, POLLING_INTERVAL);
+    return () => clearInterval(dataFetchInterval);
+  }, [selectedCountry]); // Add selectedCountry as dependency
+
   // Modify getColorForCity to use city index from dynamic cities list
   const getColorForCity = (city: string) => {
     if (cityColors[city]) return cityColors[city];
@@ -182,109 +337,29 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     return sampledData;
   };
 
-  useEffect(() => {
-    const fetchAndProcessData = async () => {
-      try {
-        console.log('Fetching data from /api/logs...');
-        const response = await fetch('/api/logs');
-        const data = await response.json() as ApiResponse;
-        
-        console.log('API Response:', data);
-        setDebugInfo(prev => ({ ...prev, lastApiResponse: data }));
-        
-        const dynamicCities = data?.dynamicCities || [];
-        console.log('Dynamic cities from API:', dynamicCities);
-        
-        if (JSON.stringify(dynamicCities) !== JSON.stringify(currentDynamicCities)) {
-          console.log('Dynamic cities changed, resetting state');
-          setCityData({});
-          setCityColors({});
-          setCurrentDynamicCities(dynamicCities);
-          startTimeRef.current = Date.now();
-        }
-
-        if (data && data.temperatureData && data.temperatureData.length > 0) {
-          console.log('Temperature data received:', data.temperatureData.length, 'points');
-          
-          // Sample and process the data
-          const sampledData = aggregateData(data.temperatureData);
-          
-          // Transform sampled data for chart display
-          setCityData(prevData => {
-            const newCityData: Record<string, CityTemperatureData> = { ...prevData };
-            
-            // Process each city
-            Object.entries(sampledData).forEach(([city, points]) => {
-              if (!dynamicCities.includes(city)) {
-                return; // Skip cities not in dynamic list
-              }
-              
-              // Convert points to arrays of temperatures with fixed timestamps
-              const temperatures = points.map(p => p.temperature);
-              
-              // Ensure we have exactly 4 points by filling missing values
-              // or trimming excess values
-              const paddedTemperatures = [...temperatures];
-              while (paddedTemperatures.length < MAX_DATA_POINTS) {
-                // If we have at least one point, duplicate the last one
-                if (paddedTemperatures.length > 0) {
-                  paddedTemperatures.push(paddedTemperatures[paddedTemperatures.length - 1]);
-                } else {
-                  // If no points, add a default value
-                  paddedTemperatures.push(20); // Default temp of 20°C
-                }
-              }
-              
-              // Trim to exactly MAX_DATA_POINTS if needed
-              const finalTemperatures = paddedTemperatures.slice(0, MAX_DATA_POINTS);
-              
-              newCityData[city] = {
-                city,
-                timestamps: FIXED_TIMESTAMPS.slice(),
-                temperatures: finalTemperatures
-              };
-            });
-
-            // Remove cities not in dynamic list
-            Object.keys(newCityData).forEach(city => {
-              if (!dynamicCities.includes(city)) {
-                delete newCityData[city];
-              }
-            });
-
-            console.log('Transformed city data for chart:', newCityData);
-            setDebugInfo(prev => ({ ...prev, lastProcessedData: newCityData }));
-            return newCityData;
-          });
-        } else {
-          console.warn('No temperature data received from API');
-          setDebugInfo(prev => ({ 
-            ...prev, 
-            errorMessage: 'No temperature data received from API' 
-          }));
-        }
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setDebugInfo(prev => ({ 
-          ...prev, 
-          errorMessage: `Error fetching data: ${error instanceof Error ? error.message : String(error)}` 
-        }));
-        setIsLoading(false);
-      }
-    };
-
-    fetchAndProcessData();
-    const interval = setInterval(fetchAndProcessData, POLLING_INTERVAL);
-    return () => clearInterval(interval);
-  }, [currentDynamicCities]);
+  // Add this function to filter data for relevant cities
+  const filterAndGroupData = (data: TemperatureDataPoint[], dynamicCities: string[]) => {
+    // Only include data for the dynamic cities
+    const relevantData = data.filter(point => dynamicCities.includes(point.city));
+    console.log(`Filtered ${data.length} points to ${relevantData.length} relevant points for dynamic cities`);
+    
+    // Group by city
+    const cityGroups: Record<string, TemperatureDataPoint[]> = {};
+    dynamicCities.forEach(city => {
+      cityGroups[city] = relevantData.filter(point => point.city === city);
+      console.log(`Found ${cityGroups[city].length} data points for ${city}`);
+    });
+    
+    return cityGroups;
+  };
 
   // Set fixed window bounds
   const maxTime = TIME_WINDOW;
   const minTime = 0;
 
   // Calculate dynamic temperature range from current data
-  const temperatures = Object.values(cityData).flatMap(city => city.temperatures);
+  const temperatures = Object.values(cityData as Record<string, CityTemperatureData>)
+    .flatMap(city => city.temperatures);
   console.log('All temperatures for range calculation:', temperatures);
   const minTemp = temperatures.length > 0 ? Math.min(...temperatures) : 0;
   const maxTemp = temperatures.length > 0 ? Math.max(...temperatures) : 30;
@@ -297,39 +372,35 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
   console.log('Temperature range:', { minTemp, maxTemp, dynamicMinTemp, dynamicMaxTemp });
 
-  // Prepare data for Chart.js
+  // Update the chartData preparation
   const chartData = {
-    datasets: Object.entries(cityData).map(([cityName, data]) => {
-      const baseColor = getColorForCity(cityName);
-      console.log(`Preparing dataset for ${cityName}:`, {
-        temperatures: data.temperatures,
-        timestamps: data.timestamps
-      });
-      return {
-        label: cityName,
-        data: data.temperatures.map((temp, idx) => ({
-          x: data.timestamps[idx],
-          y: temp
-        })),
-        borderColor: baseColor,
-        backgroundColor: (context: any) => {
-          const ctx = context.chart.ctx;
-          return createGradient(ctx, baseColor);
-        },
-        borderWidth: 3,
-        pointRadius: 6,
-        pointBackgroundColor: baseColor,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        tension: 0.4,
-        cubicInterpolationMode: 'monotone',
-        fill: true, // Enable fill for gradient
-        shadowColor: 'rgba(0, 0, 0, 0.3)',
-        shadowBlur: 10,
-        shadowOffsetX: 0,
-        shadowOffsetY: 4
-      };
-    })
+    datasets: Object.entries(cityData)
+      .filter(([_, data]) => data.temperatures && data.temperatures.length > 0)
+      .map(([cityName, data]) => {
+        const baseColor = getColorForCity(cityName);
+        console.log(`Creating dataset for ${cityName} with ${data.temperatures.length} points`);
+        
+        return {
+          label: cityName,
+          data: data.temperatures.map((temp, idx) => ({
+            x: data.timestamps[idx],
+            y: temp
+          })),
+          borderColor: baseColor,
+          backgroundColor: (context: any) => {
+            const ctx = context.chart.ctx;
+            return createGradient(ctx, baseColor);
+          },
+          borderWidth: 3,
+          pointRadius: 6,
+          pointBackgroundColor: baseColor,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          tension: 0.4,
+          cubicInterpolationMode: 'monotone',
+          fill: true
+        };
+      })
   };
   
   console.log('Final chart data:', chartData);
