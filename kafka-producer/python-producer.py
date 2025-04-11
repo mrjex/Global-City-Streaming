@@ -58,16 +58,49 @@ class WeatherProducer:
         self.weather_api = WeatherAPI()
         self.session = None
         self.cities = load_cities_from_config()
+        self.cities_lock = threading.Lock()
+        
+        # Start control message consumer in a separate thread
+        self.control_consumer_thread = threading.Thread(target=self._run_control_consumer)
+        self.control_consumer_thread.daemon = True
+        self.control_consumer_thread.start()
+
+    def _run_control_consumer(self):
+        """Run the control message consumer in a separate thread"""
+        try:
+            consumer = KafkaConsumer(
+                control_topic,
+                bootstrap_servers=kafka_nodes,
+                value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+                api_version=(0, 10, 1)
+            )
+            
+            log_message("Started control message consumer")
+            
+            for message in consumer:
+                try:
+                    control_data = message.value
+                    if control_data.get('action') == 'UPDATE_CITIES':
+                        new_cities = control_data.get('data', {}).get('cities', [])
+                        with self.cities_lock:
+                            self.cities = new_cities
+                        log_message(f"Updated cities list from control message: {new_cities}")
+                except Exception as e:
+                    log_message(f"Error processing control message: {str(e)}")
+                    
+        except Exception as e:
+            log_message(f"Control consumer error: {str(e)}")
 
     async def initialize(self):
         """Initialize the producer and create an aiohttp session"""
         self.session = aiohttp.ClientSession()
         if not self.cities:
             log_message("No cities loaded from configuration, using default list")
-            self.cities = [
-                "London", "New York", "Tokyo", "Paris", "Sydney",
-                "Berlin", "Moscow", "Dubai", "Singapore", "Rio de Janeiro"
-            ]
+            with self.cities_lock:
+                self.cities = [
+                    "London", "New York", "Tokyo", "Paris", "Sydney",
+                    "Berlin", "Moscow", "Dubai", "Singapore", "Rio de Janeiro"
+                ]
 
     async def close(self):
         """Close the aiohttp session"""
@@ -98,8 +131,12 @@ class WeatherProducer:
                 try:
                     start_time = datetime.datetime.now()
                     
+                    # Get current cities list thread-safely
+                    with self.cities_lock:
+                        current_cities = self.cities.copy()
+                    
                     # Process all cities concurrently
-                    batch_results = await self.process_cities_batch(self.cities)
+                    batch_results = await self.process_cities_batch(current_cities)
                     
                     # Create cycle data with timestamp
                     cycle_data = {

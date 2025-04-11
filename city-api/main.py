@@ -12,7 +12,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from pathlib import Path
 import subprocess
-from kafka import KafkaProducer
+from kafka import KafkaProducer, KafkaConsumer
 import re
 
 app = FastAPI()
@@ -29,6 +29,9 @@ app.add_middleware(
 # Kafka configuration
 KAFKA_NODES = "kafka:9092"
 CONTROL_TOPIC = "city-control"
+
+# Global variable to store dynamic cities
+dynamic_cities = []
 
 # Initialize Docker client with improved error handling
 def get_docker_client():
@@ -82,6 +85,44 @@ def get_kafka_producer():
         bootstrap_servers=KAFKA_NODES,
         value_serializer=lambda x: json.dumps(x).encode('utf-8')
     )
+
+# Initialize Kafka consumer for control messages
+def get_kafka_consumer():
+    return KafkaConsumer(
+        CONTROL_TOPIC,
+        bootstrap_servers=KAFKA_NODES,
+        value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+        auto_offset_reset='earliest',
+        enable_auto_commit=True
+    )
+
+# Function to start control message consumer in a background thread
+def start_control_consumer():
+    def consume_messages():
+        consumer = get_kafka_consumer()
+        print("[DEBUG] Started control message consumer")
+        try:
+            for message in consumer:
+                try:
+                    control_data = message.value
+                    if control_data.get('action') == 'UPDATE_CITIES':
+                        global dynamic_cities
+                        new_cities = control_data.get('data', {}).get('cities', [])
+                        dynamic_cities = new_cities
+                        print(f"[DEBUG] Updated dynamic cities list: {dynamic_cities}")
+                except Exception as e:
+                    print(f"[ERROR] Error processing control message: {str(e)}")
+        except Exception as e:
+            print(f"[ERROR] Control consumer error: {str(e)}")
+    
+    import threading
+    consumer_thread = threading.Thread(target=consume_messages, daemon=True)
+    consumer_thread.start()
+
+# Start the control consumer when the app starts
+@app.on_event("startup")
+async def startup_event():
+    start_control_consumer()
 
 # Function to update dynamic cities in configuration
 def update_dynamic_cities(cities, is_first_batch):
@@ -295,15 +336,9 @@ async def get_kafka_logs():
                 temperature_data = []
                 raw_logs = []
                 
-                # Get current dynamic cities from configuration
-                config_path = Path('configuration.yml')
-                dynamic_cities = []
-                if config_path.exists():
-                    with open(config_path) as f:
-                        config = yaml.safe_load(f)
-                        dynamic_cities = config.get('dynamicCities', {}).get('current', [])
-                        print(f"MY KAFKA LOGS: Found {len(dynamic_cities)} dynamic cities in config")
-                        print(f"MY KAFKA LOGS: Dynamic cities are: {dynamic_cities}")
+                # Use the in-memory dynamic cities list
+                print(f"MY KAFKA LOGS: Found {len(dynamic_cities)} dynamic cities in memory")
+                print(f"MY KAFKA LOGS: Dynamic cities are: {dynamic_cities}")
                 
                 print("MY KAFKA LOGS: First 10 lines of raw logs:")
                 for i, line in enumerate(logs.split('\n')[:10]):
