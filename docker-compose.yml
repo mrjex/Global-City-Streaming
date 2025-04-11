@@ -158,6 +158,27 @@ services:
       - postgres_data:/var/lib/postgresql/data
     mem_limit: 256m
 
+  db-manager:
+    build:
+      context: .
+      dockerfile: db-manager/Dockerfile
+    container_name: db-manager
+    networks:
+      - app_network
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - MAX_RECORDS=2500
+      - CHECK_INTERVAL=60
+      - BATCH_DELETE_SIZE=1000
+    restart: unless-stopped
+    mem_limit: 128m
+
   city-api:
     build:
       context: .
