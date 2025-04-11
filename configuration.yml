@@ -85,22 +85,22 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - "Reykjav\xEDk"
+  - "Reykjav\xEDkurborg"
+  - "Hafnarfjar\xF0arkaupsta\xF0ur"
+  - "Keflav\xEDk"
+  - "Akureyrarb\xE6r"
+  - Akureyri
+  - "Gar\xF0ab\xE6r"
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
-  - "\xD6rebro"
-  - "Link\xF6ping"
+  - "Reykjav\xEDk"
+  - "Reykjav\xEDkurborg"
+  - "Hafnarfjar\xF0arkaupsta\xF0ur"
+  - "Keflav\xEDk"
+  - "Akureyrarb\xE6r"
+  - Akureyri
+  - "Gar\xF0ab\xE6r"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
