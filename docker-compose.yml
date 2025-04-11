@@ -150,13 +150,20 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+      # PostgreSQL memory configuration
+      POSTGRES_SHARED_BUFFERS: 1GB
+      POSTGRES_WORK_MEM: 16MB
+      POSTGRES_MAINTENANCE_WORK_MEM: 256MB
+      POSTGRES_EFFECTIVE_CACHE_SIZE: 3GB
     ports:
       - "5438:5432"
     networks:
       - app_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    mem_limit: 256m
+    mem_limit: 5g
+    # Add some swap to handle spikes
+    memswap_limit: 6g
 
   db-manager:
     build:
@@ -173,11 +180,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-      - MAX_RECORDS=2700
+      - MAX_RECORDS=10000000
       - CHECK_INTERVAL=60
-      - BATCH_DELETE_SIZE=1000
+      - BATCH_DELETE_SIZE=100000
     restart: unless-stopped
-    mem_limit: 128m
+    mem_limit: 2560m
 
   city-api:
     build:
