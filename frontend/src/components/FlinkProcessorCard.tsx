@@ -3,10 +3,33 @@ import FlinkTerminals from './FlinkTerminals';
 
 const FlinkProcessorCard: React.FC = () => {
   const [throughput, setThroughput] = useState(0);
+  const [config, setConfig] = useState<{
+    batchIntervalMs: number;
+    sampleDuration: number;
+  }>({ batchIntervalMs: 200, sampleDuration: 15 }); // Default values
   const previousLogsRef = useRef<string[]>([]);
   const lastUpdateTimeRef = useRef(Date.now());
   const throughputHistoryRef = useRef<number[]>([]);
   const MAX_HISTORY = 5; // Keep last 5 measurements
+
+  // Load configuration
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        
+        setConfig({
+          batchIntervalMs: config.services.flinkProcessor.batchIntervalMs,
+          sampleDuration: config.services.flinkProcessor.sampleDuration
+        });
+      } catch (error) {
+        console.error('Error loading configuration:', error);
+      }
+    };
+    
+    fetchConfig();
+  }, []);
 
   // Function to fetch logs and count them
   const fetchAndCountLogs = async () => {
@@ -96,13 +119,13 @@ const FlinkProcessorCard: React.FC = () => {
               backgroundSize: '200% 200%',
               animation: 'gradient 5s ease infinite'
             }}>
-              200ms Batch
+              {config.batchIntervalMs}ms Batch
             </div>
           </div>
           
           <h4 className="text-sm font-medium mb-2 text-white">Aggregation Formula:</h4>
           <p className="text-sm font-mono">
-            For each 15-second window:<br />
+            For each {config.sampleDuration}-second window:<br />
             - Group data by city<br />
             - Calculate sum of metrics for each city<br />
             - Compute the average of the summed metrics<br />

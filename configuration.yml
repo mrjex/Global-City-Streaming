@@ -50,7 +50,7 @@ services:
     batchIntervalMs: 200
     batchSize: 1000
     maxRetries: 5
-    sampleDuration: 15
+    sampleDuration: 10
   kafkaProducer:
     requestInterval: 0.01
 visualizations:
