@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Shanghai
-  - Beijing
-  - Chengdu
-  - Guangzhou
-  - Shenzhen
-  - Beijing Shi
-  - Tianjin
+  - Greater Rio de Janeiro
+  - "S\xE3o Paulo"
+  - Rio de Janeiro
+  - "Bras\xEDlia"
+  - Fortaleza
+  - Salvador
+  - Belo Horizonte
   enabled: true
   previousBatch:
-  - Shanghai
-  - Beijing
-  - Chengdu
-  - Guangzhou
-  - Shenzhen
-  - Beijing Shi
-  - Tianjin
+  - Greater Rio de Janeiro
+  - "S\xE3o Paulo"
+  - Rio de Janeiro
+  - "Bras\xEDlia"
+  - Fortaleza
+  - Salvador
+  - Belo Horizonte
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

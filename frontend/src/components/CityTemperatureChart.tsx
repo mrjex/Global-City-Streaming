@@ -205,19 +205,161 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
         log('=== Starting data fetch cycle ===');
         const response = await fetch('/api/logs');
-        const data = await response.json();
+        const rawData = await response.json();
 
         // Log raw data received
-        log('Raw data received from API:', data);
+        log('Raw data received from API:', rawData);
 
-        // Validate the data structure
+        // Parse the logs string into proper data structure
+        let data;
+        try {
+          // The logs might contain multiple log entries
+          const logsContent = rawData.logs.trim();
+          log('Processing logs content:', logsContent);
+          
+          // Try to extract a JSON object containing cities data
+          if (logsContent.includes('"cities"')) {
+            log('Found cities data in logs');
+            
+            // Try different regex patterns to extract the JSON
+            // This pattern looks for a JSON object with cities field
+            const citiesMatch = logsContent.match(/({[\s\S]*"cities"[\s\S]*})/);
+            
+            if (citiesMatch && citiesMatch[1]) {
+              try {
+                // Clean up the JSON string
+                let citiesJson = citiesMatch[1]
+                  .replace(/\n/g, '')
+                  .replace(/\r/g, '')
+                  .trim();
+                
+                log('Attempting to parse cities JSON:', citiesJson);
+                const parsedData = JSON.parse(citiesJson);
+                
+                if (parsedData.cities) {
+                  log('Successfully parsed cities data:', parsedData);
+                  
+                  // Transform the data into the expected format
+                  const dynamicCities = Object.keys(parsedData.cities);
+                  const temperatureData = dynamicCities.map(city => ({
+                    city: city,
+                    temperature: parsedData.cities[city].temperatureCelsius,
+                    timestamp: new Date().toISOString()
+                  }));
+                  
+                  data = {
+                    temperatureData,
+                    dynamicCities
+                  };
+                }
+              } catch (parseError) {
+                log('Error parsing cities JSON:', parseError);
+              }
+            }
+          }
+          
+          // If we couldn't parse cities data, try looking for individual city log entries
+          if (!data && logsContent.includes('Sent data for')) {
+            log('Looking for individual city log entries');
+            
+            // Extract all city data entries using regex
+            // Match the format we see in the logs: [2025-04-11 13:02:38] Sent data for Stockholm: {"city": "Stockholm", ...}
+            const cityEntries = logsContent.match(/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] Sent data for .+?: ({.+?})/g);
+            
+            if (cityEntries && cityEntries.length > 0) {
+              log(`Found ${cityEntries.length} city entries`);
+              
+              const temperatureData: TemperatureDataPoint[] = [];
+              const dynamicCities: string[] = [];
+              
+              // Process each city entry
+              cityEntries.forEach(entry => {
+                try {
+                  // Extract the JSON part
+                  const jsonMatch = entry.match(/({.+?})/);
+                  if (jsonMatch && jsonMatch[1]) {
+                    const cityJson = jsonMatch[1];
+                    log('Extracted city JSON:', cityJson);
+                    const parsedCity = JSON.parse(cityJson);
+                    
+                    if (parsedCity.city && typeof parsedCity.temperatureCelsius === 'number') {
+                      temperatureData.push({
+                        city: parsedCity.city,
+                        temperature: parsedCity.temperatureCelsius,
+                        timestamp: new Date().toISOString()
+                      });
+                      
+                      if (!dynamicCities.includes(parsedCity.city)) {
+                        dynamicCities.push(parsedCity.city);
+                      }
+                    }
+                  }
+                } catch (entryError) {
+                  log(`Error parsing city entry: ${entry}`, entryError);
+                }
+              });
+              
+              if (temperatureData.length > 0) {
+                log(`Successfully parsed ${temperatureData.length} temperature data points for ${dynamicCities.length} cities`);
+                data = { temperatureData, dynamicCities };
+              }
+            }
+          }
+          
+          // If we still don't have data, try looking for single city data
+          if (!data) {
+            log('Trying to parse single city data');
+            
+            // Look for a pattern that resembles a city data JSON
+            const cityMatch = logsContent.match(/{[\s\S]*?"city"[\s\S]*?}/);
+            
+            if (cityMatch) {
+              try {
+                const cityJson = cityMatch[0];
+                log('Attempting to parse single city JSON:', cityJson);
+                
+                const parsedCity = JSON.parse(cityJson);
+                
+                if (parsedCity.city && typeof parsedCity.temperatureCelsius === 'number') {
+                  log('Successfully parsed single city data:', parsedCity);
+                  
+                  data = {
+                    temperatureData: [{
+                      city: parsedCity.city,
+                      temperature: parsedCity.temperatureCelsius,
+                      timestamp: new Date().toISOString()
+                    }],
+                    dynamicCities: [parsedCity.city]
+                  };
+                }
+              } catch (singleCityError) {
+                log('Error parsing single city data:', singleCityError);
+              }
+            }
+          }
+          
+          // If we couldn't parse the data in any format, log the issue
+          if (!data) {
+            log('Could not extract valid JSON from logs');
+            log('Raw logs:', logsContent);
+            setIsLoading(false);
+            return;
+          }
+        } catch (error) {
+          log('Error in overall parsing process:', error);
+          setIsLoading(false);
+          return;
+        }
+
+        // Validate the transformed data structure
         if (!isValidTemperatureData(data)) {
-          log('Invalid or incomplete data received. Data structure:', {
+          log('Invalid or incomplete transformed data. Data structure:', {
             hasTemperatureData: Boolean(data?.temperatureData),
             temperatureDataLength: data?.temperatureData?.length,
             hasDynamicCities: Boolean(data?.dynamicCities),
             dynamicCitiesLength: data?.dynamicCities?.length
           });
+          setIsLoading(false);
           return;
         }
 
@@ -242,6 +384,7 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
         // Only process data if we have it for all cities
         if (hasAllCityData) {
+          log('Processing data for all cities');
           setCityData(prevData => {
             const newCityData = { ...prevData };
             const currentTime = Date.now();
@@ -279,11 +422,19 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
               }
             });
             
+            log('New city data:', newCityData);
             return newCityData;
           });
+
+          // Update current dynamic cities
+          setCurrentDynamicCities(data.dynamicCities);
+          log('Updated current dynamic cities:', data.dynamicCities);
+        } else {
+          log('Not processing data - missing data for some cities');
         }
 
         setIsLoading(false);
+        log('Loading state set to false');
       } catch (error) {
         log('Error in data fetch cycle', error);
         setIsLoading(false);
