@@ -27,22 +27,22 @@ cities:
 - Tijuana
 dynamicCities:
   current:
-  - Greater Rio de Janeiro
-  - "S\xE3o Paulo"
-  - Rio de Janeiro
-  - "Bras\xEDlia"
-  - Fortaleza
-  - Salvador
-  - Belo Horizonte
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
+  - Nantes
+  - Montpellier
   enabled: true
   previousBatch:
-  - Greater Rio de Janeiro
-  - "S\xE3o Paulo"
-  - Rio de Janeiro
-  - "Bras\xEDlia"
-  - Fortaleza
-  - Salvador
-  - Belo Horizonte
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
+  - Nantes
+  - Montpellier
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7

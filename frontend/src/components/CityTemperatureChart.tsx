@@ -403,21 +403,30 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
               const latestPoint = cityPoints[0];
               
               if (latestPoint && typeof latestPoint.temperature === 'number') {
+                // Apply randomization with probability RANDOMIZATION_CHANCE
+                let temperature = latestPoint.temperature;
+                if (Math.random() < RANDOMIZATION_CHANCE) {
+                  // Generate random variance between -TEMPERATURE_VARIANCE and +TEMPERATURE_VARIANCE
+                  const randomVariance = (Math.random() * 2 - 1) * TEMPERATURE_VARIANCE;
+                  temperature += randomVariance;
+                  log(`Randomized temperature for ${city}: ${latestPoint.temperature.toFixed(1)} → ${temperature.toFixed(1)}`);
+                }
+                
                 if (!newCityData[city]) {
                   // Initialize new city data
                   newCityData[city] = {
                     city,
                     timestamps: FIXED_TIMESTAMPS.slice(),
-                    temperatures: Array(MAX_DATA_POINTS).fill(latestPoint.temperature)
+                    temperatures: Array(MAX_DATA_POINTS).fill(temperature)
                   };
-                  log(`Initialized data for ${city} with temperature ${latestPoint.temperature}`);
+                  log(`Initialized data for ${city} with temperature ${temperature}`);
                 } else {
                   // Update existing city data
                   newCityData[city].temperatures = [
                     ...newCityData[city].temperatures.slice(1),
-                    latestPoint.temperature
+                    temperature
                   ];
-                  log(`Updated data for ${city} with new temperature ${latestPoint.temperature}`);
+                  log(`Updated data for ${city} with new temperature ${temperature}`);
                 }
               }
             });
@@ -452,15 +461,34 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
 
   // Calculate dynamic temperature range from current data
   const temperatures = Object.values(cityData).flatMap(city => city.temperatures);
-  const minTemp = temperatures.length > 0 ? Math.min(...temperatures) : 0;
-  const maxTemp = temperatures.length > 0 ? Math.max(...temperatures) : 30;
   
-  // Add padding to the range (10% of the range on each side)
-  const range = maxTemp - minTemp;
-  const padding = range * 0.1;
-  const dynamicMinTemp = minTemp - padding;
-  const dynamicMaxTemp = maxTemp + padding;
-
+  // Only proceed with calculations if we have data
+  let minTemp, maxTemp;
+  
+  if (temperatures.length > 0) {
+    // Find the actual min and max values
+    minTemp = Math.min(...temperatures);
+    maxTemp = Math.max(...temperatures);
+    
+    // Ensure there's always some range to display (prevent flat line)
+    if (minTemp === maxTemp) {
+      minTemp -= 1;
+      maxTemp += 1;
+    } else {
+      // Add padding as a percentage of the actual range
+      const range = maxTemp - minTemp;
+      const paddingAmount = range * 0.1; // 10% padding
+      minTemp -= paddingAmount;
+      maxTemp += paddingAmount;
+    }
+  }
+  
+  log('Temperature range calculation:', { 
+    dataPoints: temperatures.length,
+    minTemp,
+    maxTemp
+  });
+  
   // Prepare data for Chart.js
   const chartData = {
     datasets: Object.entries(cityData).map(([cityName, data]) => {
@@ -497,20 +525,12 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 750, // Longer animation duration
-      easing: 'easeInOutQuart', // Smooth easing function
+      duration: 1500, // Longer animation duration for smoother transitions
+      easing: 'easeOutQuart', // Smooth easing function
       animations: {
-        numbers: {
-          type: 'number',
-          duration: 750,
-        },
-        x: {
-          type: 'number',
-          duration: 750,
-        },
         y: {
-          type: 'number',
-          duration: 750,
+          easing: 'easeInOutCubic',
+          duration: 2000, // Even longer for y-axis to prevent jerky movements
         }
       }
     },
@@ -566,15 +586,17 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
           text: 'Temperature (°C)',
           color: '#ddd'
         },
-        min: dynamicMinTemp,
-        max: dynamicMaxTemp,
+        // Use suggestedMin and suggestedMax instead of strict min/max
+        // This allows Chart.js to adapt while still following our guidance
+        suggestedMin: minTemp,
+        suggestedMax: maxTemp,
         ticks: {
           color: '#ddd',
-          stepSize: Math.max(1, Math.ceil((dynamicMaxTemp - dynamicMinTemp) / 5))
+          callback: (value: number) => value.toFixed(1) + '°C'
         },
         grid: {
           color: '#444',
-          drawOnChartArea: false // Only show grid at axes
+          drawOnChartArea: true
         }
       }
     },
