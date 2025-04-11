@@ -1,10 +1,5 @@
 .env
 
-# Dev shell scripts
-dev-rebuild.sh
-droplet-ssh-connect.sh
-droplet-management.sh
-
 # Python cache files
 __pycache__/
 *.py[cod]

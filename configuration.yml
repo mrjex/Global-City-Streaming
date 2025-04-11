@@ -85,30 +85,30 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - "Reykjav\xEDk"
-  - "Reykjav\xEDkurborg"
-  - "Hafnarfjar\xF0arkaupsta\xF0ur"
-  - "Keflav\xEDk"
-  - "Akureyrarb\xE6r"
-  - Akureyri
-  - "Gar\xF0ab\xE6r"
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
   enabled: true
   previousBatch:
-  - "Reykjav\xEDk"
-  - "Reykjav\xEDkurborg"
-  - "Hafnarfjar\xF0arkaupsta\xF0ur"
-  - "Keflav\xEDk"
-  - "Akureyrarb\xE6r"
-  - Akureyri
-  - "Gar\xF0ab\xE6r"
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
+  - "\xD6rebro"
+  - "Link\xF6ping"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 7
   flinkProcessor:
-    batchIntervalMs: 200
+    batchIntervalMs: 100
     batchSize: 1000
     maxRetries: 5
-    sampleDuration: 10
+    sampleDuration: 1
   kafkaProducer:
     requestInterval: 0.01
 visualizations:

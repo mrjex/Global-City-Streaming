@@ -7,10 +7,10 @@ KAFKA PRODUCER METRICS:
 
 FLINK PROCESSOR METRICS:
 - Batch Size: 1000 records
-- Batch Interval: 200ms
-- Maximum Theoretical Processing Rate: 5000.00 records/second
+- Batch Interval: 100ms
+- Maximum Theoretical Processing Rate: 10000.00 records/second
 - Actual Processing Rate: 100.00 records/second (limited by producer rate)
-- Sample Duration: 10 seconds
+- Sample Duration: 1 seconds
 - Max Retries: 5
 
 POSTGRES DATABASE:

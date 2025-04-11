@@ -112,9 +112,10 @@ services:
     networks:
       - app_network
     restart: unless-stopped
-    mem_limit: 1g
-    cpu_shares: 1024
-    cpu_quota: 100000
+    mem_limit: 5g
+    memswap_limit: 6g
+    cpu_shares: 2048
+    cpu_quota: 400000
 
   flink-processor:
     build:
@@ -130,12 +131,21 @@ services:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:2181"
       PRODUCER_INTERVAL: 100
+      # Flink specific configurations
+      FLINK_ENV_JAVA_OPTS: "-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication -XX:+AggressiveOpts"
+      FLINK_ENV_JAVA_OPTS_JM: "-Xmx4g -Xms4g"
+      FLINK_ENV_JAVA_OPTS_TM: "-Xmx4g -Xms4g"
+      FLINK_MAX_PARALLELISM: "8"
+      FLINK_PARALLELISM: "4"
     volumes:
       - .:/app:rw
     networks:
       - app_network
     restart: unless-stopped
-    mem_limit: 512m
+    mem_limit: 5g
+    memswap_limit: 6g
+    cpu_shares: 2048
+    cpu_quota: 400000
     ulimits:
       nofile:
         soft: 65536
