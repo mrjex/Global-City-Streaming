@@ -194,6 +194,29 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     return gradient;
   };
 
+  // Create line gradient function - using multiple color stops for smoother transition
+  const createLineGradient = (ctx: CanvasRenderingContext2D, color: string) => {
+    const gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
+    
+    // Extract HSL values from the color string
+    const hslMatch = color.match(/hsla\((\d+),\s*(\d+)%,\s*(\d+)%/);
+    if (hslMatch) {
+      const [_, h, s, l] = hslMatch.map(Number);
+      
+      // Create a more sophisticated gradient with multiple stops
+      gradient.addColorStop(0, `hsla(${h}, ${s}%, ${Math.min(l + 10, 100)}%, 1)`);
+      gradient.addColorStop(0.3, `hsla(${h}, ${s}%, ${l}%, 1)`);
+      gradient.addColorStop(0.7, `hsla(${h}, ${s}%, ${l}%, 0.9)`);
+      gradient.addColorStop(1, `hsla(${h}, ${s}%, ${Math.max(l - 10, 0)}%, 0.8)`);
+    } else {
+      // Fallback if color parsing fails
+      gradient.addColorStop(0, color);
+      gradient.addColorStop(1, color.replace('1)', '0.8)'));
+    }
+    
+    return gradient;
+  };
+
   useEffect(() => {
     const fetchAndProcessData = async () => {
       try {
@@ -493,15 +516,22 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   const chartData = {
     datasets: Object.entries(cityData).map(([cityName, data]) => {
       const baseColor = getColorForCity(cityName);
+      const ctx = document.createElement('canvas').getContext('2d');
+      
       return {
         label: cityName,
         data: data.temperatures.map((temp, idx) => ({
           x: data.timestamps[idx],
           y: temp
         })),
-        borderColor: baseColor,
+        borderColor: (context: any) => {
+          const chart = context.chart;
+          const {ctx} = chart;
+          return createLineGradient(ctx, baseColor);
+        },
         backgroundColor: (context: any) => {
-          const ctx = context.chart.ctx;
+          const chart = context.chart;
+          const {ctx} = chart;
           return createGradient(ctx, baseColor);
         },
         borderWidth: 3,
@@ -509,13 +539,13 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
         pointBackgroundColor: baseColor,
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
-        tension: 0.4,
+        tension: 0.5,
         cubicInterpolationMode: 'monotone',
-        fill: true, // Enable fill for gradient
-        shadowColor: 'rgba(0, 0, 0, 0.3)',
-        shadowBlur: 10,
+        fill: true,
+        shadowColor: 'rgba(0, 0, 0, 0.4)',
+        shadowBlur: 15,
         shadowOffsetX: 0,
-        shadowOffsetY: 4
+        shadowOffsetY: 6
       };
     })
   };
@@ -536,13 +566,17 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
     },
     elements: {
       line: {
-        tension: 0.4,
+        tension: 0.5,
         cubicInterpolationMode: 'monotone',
         // Add shadow to lines
-        shadowColor: 'rgba(0, 0, 0, 0.3)',
-        shadowBlur: 10,
+        shadowColor: 'rgba(0, 0, 0, 0.4)',
+        shadowBlur: 15,
         shadowOffsetX: 0,
-        shadowOffsetY: 4
+        shadowOffsetY: 6,
+        // Smoother cap and join styles
+        capBezierPoints: true,
+        borderCapStyle: 'round',
+        borderJoinStyle: 'round'
       },
       point: {
         radius: 6,  // Larger points
