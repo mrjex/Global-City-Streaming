@@ -31,7 +31,7 @@ const Terminal: React.FC<TerminalProps> = ({
     // Initial fetch
     fetchLogs();
 
-    // Poll for updates every second
+    // Poll for updates every 3 seconds
     const interval = setInterval(fetchLogs, 1000);
 
     return () => clearInterval(interval);
