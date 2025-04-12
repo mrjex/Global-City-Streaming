@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Terminal from './Terminal';
-import CitiesListView from './CitiesListView';
+import CityTemperatureChart from './CityTemperatureChart';
 
 interface CitiesData {
   static: string[];
@@ -72,12 +72,10 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({ showListOnly 
         <Terminal maxLines={10} />
       </div>
       
-      {/* Cities List View Component */}
-      <CitiesListView 
-        cities={cities}
-        isLoadingCities={isLoadingCities}
-        error={error}
-      />
+      {/* Temperature Chart Component */}
+      <div className="px-4 py-2">
+        <CityTemperatureChart title="Real-time Temperature Data" />
+      </div>
     </div>
   );
 };

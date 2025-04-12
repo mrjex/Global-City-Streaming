@@ -313,14 +313,69 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     };
   }, [cities, dynamicCities, cityCoordinates, renderKey]);
   
-  return (
-    <div className="relative w-[101%] h-full">
-      <div ref={containerRef} className="w-full h-full" />
-      {hoveredCity && (
-        <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md">
-          {hoveredCity}
+  // Add new function to render the cities list
+  const renderCitiesList = () => {
+    return (
+      <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg p-4">
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
+            Dynamic Cities ({dynamicCities.length})
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {dynamicCities.map((city, index) => (
+              <div 
+                key={`dynamic-${index}`} 
+                className={`
+                  bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white 
+                  backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200
+                  ${hoveredCity === city ? 'ring-2 ring-yellow-400' : ''}
+                `}
+              >
+                {city}
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+        
+        <div>
+          <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
+            Static Cities ({cities.length})
+          </h3>
+          <div className="flex flex-wrap gap-2 max-h-[calc(100%-8rem)] overflow-y-auto">
+            {cities.map((city, index) => (
+              <div 
+                key={`static-${index}`} 
+                className={`
+                  bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white 
+                  backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200
+                  ${hoveredCity === city ? 'ring-2 ring-red-400' : ''}
+                `}
+              >
+                {city}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex gap-4 w-full h-full">
+      {/* Cities List */}
+      <div className="w-1/4 min-w-[250px]">
+        {renderCitiesList()}
+      </div>
+      
+      {/* Globe */}
+      <div className="flex-1 relative">
+        <div ref={containerRef} className="w-full h-full" />
+        {hoveredCity && (
+          <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-md">
+            {hoveredCity}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

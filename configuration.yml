@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Riyadh
-  - Jeddah
-  - Mecca
-  - Medina
-  - Sultanah
+  - Mexico City
+  - Guadalajara metropolitan area
+  - Ecatepec de Morelos
+  - Tijuana
+  - "Iztapalapa de Cuitl\xE1huac"
   enabled: true
   previousBatch:
-  - Riyadh
-  - Jeddah
-  - Mecca
-  - Medina
-  - Sultanah
+  - Mexico City
+  - Guadalajara metropolitan area
+  - Ecatepec de Morelos
+  - Tijuana
+  - "Iztapalapa de Cuitl\xE1huac"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
