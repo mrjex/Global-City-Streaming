@@ -68,12 +68,12 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({ showListOnly 
       </div>
       
       {/* Terminal Component */}
-      <div className="px-4 py-2">
+      <div className="px-4 pb-1">
         <Terminal maxLines={10} />
       </div>
       
       {/* Temperature Chart Component */}
-      <div className="px-4 py-2">
+      <div className="px-4 pt-1 pb-2">
         <CityTemperatureChart />
       </div>
     </div>

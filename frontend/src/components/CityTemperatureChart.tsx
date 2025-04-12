@@ -659,7 +659,7 @@ const CityTemperatureChart = () => {
   return (
     <div className="w-full max-w-6xl mx-auto p-4">
       <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
-        <div className="p-4" style={{ backgroundColor: '#1a1b1e', height: '460px' }}>
+        <div className="p-4" style={{ backgroundColor: '#1a1b1e', height: '320px' }}>
           {isLoading ? (
             <div className="text-gray-500 italic text-center">Loading data...</div>
           ) : (
