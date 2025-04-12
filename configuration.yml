@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Oslo
-  - Bergen
-  - Trondheim
-  - Stavanger
-  - Stavanger town
+  - Riyadh
+  - Jeddah
+  - Mecca
+  - Medina
+  - Sultanah
   enabled: true
   previousBatch:
-  - Oslo
-  - Bergen
-  - Trondheim
-  - Stavanger
-  - Stavanger town
+  - Riyadh
+  - Jeddah
+  - Mecca
+  - Medina
+  - Sultanah
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
