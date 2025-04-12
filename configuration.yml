@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - "Bogot\xE1"
+  - "Medell\xEDn"
+  - Cali
+  - Barranquilla
+  - Cartagena
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - "Bogot\xE1"
+  - "Medell\xEDn"
+  - Cali
+  - Barranquilla
+  - Cartagena
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

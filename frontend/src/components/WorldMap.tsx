@@ -4,7 +4,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { GeoPath, GeoProjection } from 'd3-geo';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
-import CityTemperatures from './CityTemperatures';
+import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+import { scaleLinear } from 'd3-scale';
+import ReactTooltip from 'react-tooltip';
+import { motion } from 'framer-motion';
+import CityTemperaturesGrid from './CityTemperaturesGrid';
 
 interface WorldMapProps {
   onCountrySelect: (countryName: string) => void;
@@ -230,7 +234,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
           }}
         />
       </div>
-      <CityTemperatures cities={cityData} country={selectedCountry} country_code={countryCode} />
+      <CityTemperaturesGrid cities={cityData} country={selectedCountry} country_code={countryCode} />
     </div>
   );
 };

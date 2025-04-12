@@ -8,13 +8,13 @@ interface City {
   temperature: number | null;
 }
 
-interface CityTemperaturesProps {
+interface CityTemperaturesGridProps {
   cities: City[];
   country: string | null;
   country_code?: string;
 }
 
-const CityTemperatures: React.FC<CityTemperaturesProps> = ({ cities, country, country_code }) => {
+const CityTemperaturesGrid: React.FC<CityTemperaturesGridProps> = ({ cities, country, country_code }) => {
   if (!country || cities.length === 0) {
     return null;
   }
@@ -77,4 +77,4 @@ const CityTemperatures: React.FC<CityTemperaturesProps> = ({ cities, country, co
   );
 };
 
-export default CityTemperatures; 
+export default CityTemperaturesGrid; 
