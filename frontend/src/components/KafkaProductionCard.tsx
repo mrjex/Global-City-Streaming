@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Terminal from './Terminal';
-import GlobeView from './GlobeView';
 
 interface CitiesData {
   static: string[];
@@ -8,14 +7,10 @@ interface CitiesData {
 }
 
 const KafkaProductionCard: React.FC = () => {
-  const [displayMode, setDisplayMode] = useState<'map' | 'list'>('map');
+  const [displayMode, setDisplayMode] = useState<'map' | 'list'>('list');
   const [cities, setCities] = useState<CitiesData>({ static: [], dynamic: [] });
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-  const [globeKey, setGlobeKey] = useState<number>(0);
-  const [isGlobeVisible, setIsGlobeVisible] = useState<boolean>(true);
-  const GLOBE_REMOUNT_DELAY = 1200; // Delay in milliseconds for remounting the globe
 
   // Function to fetch cities data
   const fetchCities = async () => {
@@ -34,16 +29,6 @@ const KafkaProductionCard: React.FC = () => {
       }
       const data = await response.json();
       setCities(data);
-      
-      // Force a complete remount of the GlobeView component
-      if (displayMode === 'map') {
-        // Temporarily hide the globe
-        setIsGlobeVisible(false);
-        // Use setTimeout to ensure the component is fully unmounted before remounting
-        setTimeout(() => {
-          setIsGlobeVisible(true);
-        }, GLOBE_REMOUNT_DELAY);
-      }
     } catch (err) {
       console.error('Error fetching cities:', err);
       setError('Failed to load cities data');
@@ -64,51 +49,6 @@ const KafkaProductionCard: React.FC = () => {
     }
   }, [displayMode]);
 
-  // Listen for country selection events
-  useEffect(() => {
-    const handleCountrySelected = async (event: CustomEvent) => {
-      console.log('Country selected event received:', event.detail);
-      if (displayMode === 'list') {
-        fetchCities();
-      } else {
-        // First fetch the latest cities data
-        await fetchCities();
-        // Then force a complete remount of the GlobeView component
-        setIsGlobeVisible(false);
-        setTimeout(() => {
-          setIsGlobeVisible(true);
-        }, GLOBE_REMOUNT_DELAY);
-      }
-    };
-    
-    // Add event listener for country selection
-    window.addEventListener('countrySelected', handleCountrySelected as EventListener);
-    
-    // Also listen for the initial country load event
-    const handleInitialCountryLoad = async () => {
-      console.log('Initial country load event received');
-      setInitialLoadComplete(true);
-      if (displayMode === 'list') {
-        fetchCities();
-      } else {
-        // First fetch the latest cities data
-        await fetchCities();
-        // Then force a complete remount of the GlobeView component
-        setIsGlobeVisible(false);
-        setTimeout(() => {
-          setIsGlobeVisible(true);
-        }, GLOBE_REMOUNT_DELAY);
-      }
-    };
-    
-    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
-    
-    return () => {
-      window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
-      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
-    };
-  }, [displayMode]);
-
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-2xl mb-8">
       {/* Card Header */}
@@ -121,33 +61,9 @@ const KafkaProductionCard: React.FC = () => {
         <Terminal maxLines={10} />
       </div>
       
-      {/* Gradient Window with Toggle */}
+      {/* Cities List */}
       <div className="px-4 py-2">
         <div className="relative">
-          {/* Toggle Buttons */}
-          <div className="absolute top-2 right-2 flex space-x-2 z-10">
-            <button 
-              onClick={() => setDisplayMode('map')}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
-                displayMode === 'map' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-              }`}
-            >
-              Map
-            </button>
-            <button 
-              onClick={() => setDisplayMode('list')}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
-                displayMode === 'list' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-              }`}
-            >
-              List
-            </button>
-          </div>
-          
           {/* Content Window */}
           <div 
             className="h-64 rounded-lg overflow-hidden relative"
@@ -157,64 +73,51 @@ const KafkaProductionCard: React.FC = () => {
               animation: 'gradient 15s ease infinite'
             }}
           >
-            {/* Content based on display mode */}
-            {displayMode === 'map' ? (
-              <div className="w-full h-full">
-                {isGlobeVisible && (
-                  <GlobeView 
-                    key={`globe-${globeKey}`}
-                    cities={cities.static} 
-                    dynamicCities={cities.dynamic} 
-                  />
-                )}
-              </div>
-            ) : (
-              <div className="w-full h-full overflow-y-auto p-4 text-white">
-                {isLoadingCities ? (
-                  <div className="flex items-center justify-center h-full">
-                    <span className="text-gray-400">Loading cities...</span>
-                  </div>
-                ) : error ? (
-                  <div className="text-red-400">{error}</div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-4 h-full">
-                    {/* Dynamic Cities (smaller list) */}
-                    <div className="border-r border-white border-opacity-20 pr-2">
-                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
-                        Dynamic Cities ({cities.dynamic.length})
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {cities.dynamic.map((city, index) => (
-                          <div 
-                            key={`dynamic-${index}`} 
-                            className="bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200"
-                          >
-                            {city}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Static Cities (larger list) */}
-                    <div className="pl-2">
-                      <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
-                        Static Cities ({cities.static.length})
-                      </h3>
-                      <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                        {cities.static.map((city, index) => (
-                          <div 
-                            key={`static-${index}`} 
-                            className="bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200"
-                          >
-                            {city}
-                          </div>
-                        ))}
-                      </div>
+            <div className="w-full h-full overflow-y-auto p-4 text-white">
+              {isLoadingCities ? (
+                <div className="flex items-center justify-center h-full">
+                  <span className="text-gray-400">Loading cities...</span>
+                </div>
+              ) : error ? (
+                <div className="text-red-400">{error}</div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 h-full">
+                  {/* Dynamic Cities (smaller list) */}
+                  <div className="border-r border-white border-opacity-20 pr-2">
+                    <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
+                      Dynamic Cities ({cities.dynamic.length})
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {cities.dynamic.map((city, index) => (
+                        <div 
+                          key={`dynamic-${index}`} 
+                          className="bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200"
+                        >
+                          {city}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                )}
-              </div>
-            )}
+                  
+                  {/* Static Cities (larger list) */}
+                  <div className="pl-2">
+                    <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
+                      Static Cities ({cities.static.length})
+                    </h3>
+                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                      {cities.static.map((city, index) => (
+                        <div 
+                          key={`static-${index}`} 
+                          className="bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white backdrop-blur-sm hover:bg-opacity-60 transition-all duration-200"
+                        >
+                          {city}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

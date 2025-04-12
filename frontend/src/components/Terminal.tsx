@@ -2,28 +2,43 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface TerminalProps {
+  maxLines?: number;
   title?: string;
 }
 
 const Terminal: React.FC<TerminalProps> = ({ 
+  maxLines = 1000,
   title = 'Data Production'
 }) => {
   const [logs, setLogs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
         const response = await fetch('/api/logs');
+        if (!response.ok) {
+          throw new Error('Failed to fetch logs');
+        }
+        
         const data = await response.json();
         
         if (data && data.logs) {
-          const allLogs = data.logs.split('\n').filter(line => line.trim());
+          // Split logs into lines and filter out empty lines
+          const allLogs = data.logs.split('\n')
+            .filter(line => line.trim())
+            .slice(-maxLines); // Only keep the last maxLines
           setLogs(allLogs);
+          setError(null);
+        } else {
+          setLogs([]);
+          setError('No logs available');
         }
-        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching logs:', error);
+        setError('Failed to fetch logs. Please check container status.');
+      } finally {
         setIsLoading(false);
       }
     };
@@ -31,11 +46,11 @@ const Terminal: React.FC<TerminalProps> = ({
     // Initial fetch
     fetchLogs();
 
-    // Poll for updates every 3 seconds
+    // Poll for updates every second
     const interval = setInterval(fetchLogs, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [maxLines]);
 
   // Auto-scroll to bottom when new logs arrive
   useEffect(() => {
@@ -87,10 +102,12 @@ const Terminal: React.FC<TerminalProps> = ({
           </style>
           {isLoading ? (
             <div className="text-gray-500 italic">Loading logs...</div>
+          ) : error ? (
+            <div className="text-red-400 italic">{error}</div>
           ) : logs.length > 0 ? (
             logs.map((log, index) => (
               <motion.div
-                key={`${index}-${log}`}
+                key={`${index}-${log.slice(0, 20)}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}

@@ -10,7 +10,7 @@ FLINK PROCESSOR METRICS:
 - Batch Interval: 200ms
 - Maximum Theoretical Processing Rate: 1500.00 records/second
 - Actual Processing Rate: 100.00 records/second (limited by producer rate)
-- Sample Duration: 1 seconds
+- Sample Duration: 5 seconds
 - Max Retries: 5
 
 POSTGRES DATABASE:
