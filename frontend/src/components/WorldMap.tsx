@@ -58,11 +58,11 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
   }, []); // Empty dependency array means this runs once on mount
 
   // Define colors
-  const defaultColor = '#a8d5e5';  // Light blue
-  const hoverColor = '#62b3d0';    // Darker blue
-  const selectedColor = '#2988bc'; // Deep blue
-  const strokeColor = '#ffffff';   // White borders
-  const oceanColor = '#f8f9fa';    // Light gray background
+  const defaultColor = '#1a365d';  // Deep blue
+  const hoverColor = '#2b4c7e';    // Lighter blue
+  const selectedColor = '#3182ce'; // Bright blue
+  const strokeColor = '#2d3748';   // Dark gray borders
+  const oceanColor = '#0f172a';    // Dark background
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -74,11 +74,28 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
     // Clear existing content
     svg.selectAll('*').remove();
 
-    // Add ocean background
+    // Add gradient definition
+    const gradient = svg.append('defs')
+      .append('linearGradient')
+      .attr('id', 'ocean-gradient')
+      .attr('x1', '0%')
+      .attr('y1', '0%')
+      .attr('x2', '100%')
+      .attr('y2', '100%');
+
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', '#0f172a');
+
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', '#1e293b');
+
+    // Add ocean background with gradient
     svg.append('rect')
       .attr('width', width)
       .attr('height', height)
-      .attr('fill', oceanColor);
+      .attr('fill', 'url(#ocean-gradient)');
 
     // Create projection with smoother appearance
     const projection: GeoProjection = d3.geoMercator()
@@ -120,13 +137,14 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
         .attr('stroke-width', 0.5)
         .attr('shape-rendering', 'geometricPrecision')
         .style('cursor', 'pointer')
-        .style('transition', 'all 0.3s ease')
+        .style('transition', 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)')
+        .style('filter', 'drop-shadow(0 4px 3px rgb(0 0 0 / 0.07))')
         .on('mouseover', function(this: SVGPathElement, event: MouseEvent, d: Feature<Geometry, CountryProperties>) {
           const path = d3.select(this);
           if (d.properties.name !== selectedCountry) {
             path.attr('fill', hoverColor)
               .attr('stroke-width', 1)
-              .style('filter', 'brightness(1.1)');
+              .style('filter', 'drop-shadow(0 4px 3px rgb(0 0 0 / 0.1)) brightness(1.2)');
           }
         })
         .on('mouseout', function(this: SVGPathElement, event: MouseEvent, d: Feature<Geometry, CountryProperties>) {
@@ -218,19 +236,18 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
   }, [onCountrySelect, selectedCountry]);
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="world-map-container relative">
+    <div className="flex flex-col items-center space-y-8 p-8 bg-gradient-to-b from-gray-900 to-black min-h-screen">
+      <div className="world-map-container relative w-full max-w-[960px]">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-blue-500/5 rounded-xl"></div>
         <svg
           ref={svgRef}
           width="960"
           height="500"
           viewBox="0 0 960 500"
+          className="w-full h-auto rounded-xl backdrop-blur-sm"
           style={{
-            maxWidth: '100%',
-            height: 'auto',
-            backgroundColor: oceanColor,
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            backgroundColor: 'transparent',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
           }}
         />
       </div>

@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - "Bogot\xE1"
-  - "Medell\xEDn"
-  - Cali
-  - Barranquilla
-  - Cartagena
+  - Greater Rio de Janeiro
+  - "S\xE3o Paulo"
+  - Rio de Janeiro
+  - "Bras\xEDlia"
+  - Fortaleza
   enabled: true
   previousBatch:
-  - "Bogot\xE1"
-  - "Medell\xEDn"
-  - Cali
-  - Barranquilla
-  - Cartagena
+  - Greater Rio de Janeiro
+  - "S\xE3o Paulo"
+  - Rio de Janeiro
+  - "Bras\xEDlia"
+  - Fortaleza
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
