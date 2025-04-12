@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { databaseCountEmitter } from './NavbarCounter';
 
 export default function DatabaseCounter() {
   const [count, setCount] = useState<number>(0);
@@ -21,6 +22,8 @@ export default function DatabaseCounter() {
           throw new Error(data.error);
         }
         setCount(data.count);
+        // Emit the count update to all listeners
+        databaseCountEmitter.emit(data.count);
         setError(null);
         setRetryCount(0); // Reset retry count on success
       } catch (error) {
