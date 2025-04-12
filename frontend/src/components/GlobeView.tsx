@@ -207,21 +207,33 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     scene.add(markerGroup);
     
     // Debug city coordinates
-    console.log('Cities to display:', [...cities, ...dynamicCities]);
+    console.log('Creating markers for cities:', { static: cities, dynamic: dynamicCities });
     console.log('Available coordinates:', cityCoordinates);
     
-    // Create markers for all cities with coordinates
-    for (const city of [...cities, ...dynamicCities]) {
+    // First add static cities
+    for (const city of cities) {
       if (cityCoordinates[city]) {
         const { lat, lng } = cityCoordinates[city];
-        console.log(`Creating marker for ${city} at coordinates: lat=${lat}, lng=${lng}`);
         const position = latLngToVector3(lat, lng, earthRadius + 0.11);
-        const isDynamic = dynamicCities.includes(city);
-        const marker = createCityMarker(city, position, isDynamic);
+        const marker = createCityMarker(city, position, false);
         markerGroup.add(marker);
         markers.push(marker);
-      } else {
-        console.warn(`No coordinates found for city: ${city}`);
+      }
+    }
+    
+    // Then add dynamic cities with different height and color
+    for (const city of dynamicCities) {
+      if (cityCoordinates[city]) {
+        const { lat, lng } = cityCoordinates[city];
+        const position = latLngToVector3(lat, lng, earthRadius + 0.13); // Higher position for better visibility
+        const marker = createCityMarker(city, position, true);
+        
+        // Make dynamic markers slightly larger
+        marker.scale.set(1.2, 1.2, 1.2);
+        
+        // Add to scene
+        markerGroup.add(marker);
+        markers.push(marker);
       }
     }
     
@@ -268,13 +280,20 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       
       earth.rotation.y += 0.001;
       atmosphere.rotation.y += 0.001;
-      markerGroup.rotation.y += 0.001; // Rotate markers with the Earth
+      markerGroup.rotation.y += 0.001;
       
-      // Pulsate markers
+      // Pulsate markers with different effects for static and dynamic
       const time = Date.now() * 0.001;
       markers.forEach(marker => {
-        const scale = 1 + Math.sin(time * 2) * 0.2;
-        marker.scale.set(scale, scale, scale);
+        if (marker.userData.city && dynamicCities.includes(marker.userData.city)) {
+          // More pronounced pulsing for dynamic cities
+          const scale = 1.2 + Math.sin(time * 3) * 0.3;
+          marker.scale.set(scale, scale, scale);
+        } else {
+          // Subtle pulsing for static cities
+          const scale = 1 + Math.sin(time * 2) * 0.2;
+          marker.scale.set(scale, scale, scale);
+        }
       });
       
       controls.update();

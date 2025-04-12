@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Oslo
+  - Bergen
+  - Trondheim
+  - Stavanger
+  - Stavanger town
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Oslo
+  - Bergen
+  - Trondheim
+  - Stavanger
+  - Stavanger town
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

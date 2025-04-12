@@ -8,19 +8,13 @@ const CITY_API_URL = process.env.CITY_API_URL || 'http://city-api:8003';
 
 export async function GET() {
   try {
-    console.log('Fetching raw logs from Flink processor');
-    
     try {
       const response = await fetch(`${CITY_API_URL}/proxy/flink/logs/raw`, {
         cache: 'no-store'
       });
       
-      console.log('Response status:', response.status, response.statusText);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('Response length:', data.logs.length);
-        
         return new NextResponse(data.logs, {
           headers: {
             'Content-Type': 'text/plain',

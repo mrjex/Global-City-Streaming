@@ -7,7 +7,6 @@ const CITY_API_URL = process.env.CITY_API_URL || 'http://city-api:8003';
 
 export async function GET() {
   try {
-    console.log('Fetching logs from city-api');
     const response = await fetch(`${CITY_API_URL}/api/kafka-logs`, {
       cache: 'no-store',
       headers: {
@@ -33,8 +32,6 @@ export async function GET() {
     // Ensure logs is always a string, even if empty
     const logs = data.logs || '';
     const temperatureData = data.temperatureData || [];
-    
-    console.log(`Fetched ${logs.split('\n').length} log lines`);
     
     return NextResponse.json(
       { 

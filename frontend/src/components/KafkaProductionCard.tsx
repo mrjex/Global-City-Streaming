@@ -6,8 +6,11 @@ interface CitiesData {
   dynamic: string[];
 }
 
-const KafkaProductionCard: React.FC = () => {
-  const [displayMode, setDisplayMode] = useState<'map' | 'list'>('list');
+interface KafkaProductionCardProps {
+  showListOnly?: boolean;
+}
+
+const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({ showListOnly = false }) => {
   const [cities, setCities] = useState<CitiesData>({ static: [], dynamic: [] });
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,12 +45,19 @@ const KafkaProductionCard: React.FC = () => {
     fetchCities();
   }, []);
 
-  // Fetch when display mode changes to list
+  // Listen for country selection events
   useEffect(() => {
-    if (displayMode === 'list') {
+    const handleCountrySelected = async (event: CustomEvent) => {
+      console.log('Country selected event received:', event.detail);
       fetchCities();
-    }
-  }, [displayMode]);
+    };
+    
+    window.addEventListener('countrySelected', handleCountrySelected as EventListener);
+    
+    return () => {
+      window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
+    };
+  }, []);
 
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-2xl mb-8">
@@ -61,19 +71,11 @@ const KafkaProductionCard: React.FC = () => {
         <Terminal maxLines={10} />
       </div>
       
-      {/* Cities List */}
+      {/* Cities List View */}
       <div className="px-4 py-2">
         <div className="relative">
-          {/* Content Window */}
-          <div 
-            className="h-64 rounded-lg overflow-hidden relative"
-            style={{
-              background: 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)',
-              backgroundSize: '200% 200%',
-              animation: 'gradient 15s ease infinite'
-            }}
-          >
-            <div className="w-full h-full overflow-y-auto p-4 text-white">
+          <div className="rounded-lg overflow-hidden">
+            <div className="w-full p-4 text-white">
               {isLoadingCities ? (
                 <div className="flex items-center justify-center h-full">
                   <span className="text-gray-400">Loading cities...</span>
@@ -81,8 +83,8 @@ const KafkaProductionCard: React.FC = () => {
               ) : error ? (
                 <div className="text-red-400">{error}</div>
               ) : (
-                <div className="grid grid-cols-2 gap-4 h-full">
-                  {/* Dynamic Cities (smaller list) */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Dynamic Cities */}
                   <div className="border-r border-white border-opacity-20 pr-2">
                     <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
                       Dynamic Cities ({cities.dynamic.length})
@@ -99,7 +101,7 @@ const KafkaProductionCard: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Static Cities (larger list) */}
+                  {/* Static Cities */}
                   <div className="pl-2">
                     <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
                       Static Cities ({cities.static.length})

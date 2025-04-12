@@ -19,35 +19,129 @@ interface CitiesData {
 export default function Home(): ReactElement {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [cities, setCities] = useState<CitiesData>({ static: [], dynamic: [] });
+  const [isLoadingCities, setIsLoadingCities] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isGlobeVisible, setIsGlobeVisible] = useState<boolean>(true);
+  const GLOBE_REMOUNT_DELAY = 1200;
 
-  const handleCountrySelect = (countryName: string) => {
-    setSelectedCountry(countryName);
-    console.log(`Selected country: ${countryName}`);
+  // Function to fetch cities data
+  const fetchCities = async () => {
+    console.log('🔄 Fetching cities...');
+    setIsLoadingCities(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/cities', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch cities');
+      }
+      const data = await response.json();
+      console.log('📍 Received cities data:', {
+        staticCount: data.static?.length || 0,
+        dynamicCount: data.dynamic?.length || 0,
+        static: data.static,
+        dynamic: data.dynamic
+      });
+      setCities(data);
+      
+      // Force a complete remount of the GlobeView component
+      console.log('🔄 Remounting GlobeView...');
+      setIsGlobeVisible(false);
+      setTimeout(() => {
+        console.log('✅ GlobeView remounted');
+        setIsGlobeVisible(true);
+      }, GLOBE_REMOUNT_DELAY);
+    } catch (err) {
+      console.error('❌ Error fetching cities:', err);
+      setError('Failed to load cities data');
+    } finally {
+      setIsLoadingCities(false);
+    }
   };
 
-  // Fetch cities data
+  // Listen for initial country load and country changes
   useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const response = await fetch('/api/cities', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch cities');
-        }
-        const data = await response.json();
-        setCities(data);
-      } catch (err) {
-        console.error('Error fetching cities:', err);
-      }
+    console.log('🎯 Setting up event listeners for country changes');
+    
+    const handleInitialCountryLoad = async (event: CustomEvent) => {
+      const { country, data } = event.detail;
+      console.log('🚀 Initial country loaded:', {
+        country,
+        hasData: !!data,
+        timestamp: new Date().toISOString()
+      });
+      setSelectedCountry(country);
+      await fetchCities();
     };
 
-    fetchCities();
+    const handleCountryChange = async (event: CustomEvent) => {
+      const { country, data } = event.detail;
+      console.log('🔄 Country changed:', {
+        from: selectedCountry,
+        to: country,
+        hasData: !!data,
+        timestamp: new Date().toISOString()
+      });
+      setSelectedCountry(country);
+      await fetchCities();
+    };
+
+    // Add event listeners
+    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+    window.addEventListener('countrySelected', handleCountryChange as EventListener);
+
+    return () => {
+      console.log('♻️ Cleaning up event listeners');
+      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+      window.removeEventListener('countrySelected', handleCountryChange as EventListener);
+    };
   }, []);
+
+  const handleCountrySelect = async (countryName: string) => {
+    console.log('🎯 Country selection initiated:', {
+      country: countryName,
+      timestamp: new Date().toISOString()
+    });
+    setSelectedCountry(countryName);
+    
+    try {
+      // Update the selected country
+      console.log('📡 Sending country update request...');
+      const response = await fetch('/api/selected-country', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ country: countryName }),
+      });
+      
+      const data = await response.json();
+      console.log('📥 Country update response:', {
+        success: data.success,
+        hasData: !!data,
+        timestamp: new Date().toISOString()
+      });
+
+      if (data.success) {
+        // Dispatch custom event for GlobeView
+        console.log('📢 Dispatching countrySelected event');
+        const event = new CustomEvent('countrySelected', { 
+          detail: { country: countryName, data } 
+        });
+        window.dispatchEvent(event);
+        
+        // Then fetch new cities
+        await fetchCities();
+      }
+    } catch (error) {
+      console.error('❌ Error updating country:', error);
+    }
+  };
 
   return (
     <main className="min-h-screen p-8">
@@ -73,14 +167,19 @@ export default function Home(): ReactElement {
             <h2 className="text-xl font-bold text-white">Real-time Cities Monitored</h2>
           </div>
           <div className="h-[600px]">
-            <GlobeView cities={cities.static} dynamicCities={cities.dynamic} />
+            {isGlobeVisible && !isLoadingCities && (
+              <GlobeView 
+                cities={cities.static} 
+                dynamicCities={cities.dynamic}
+              />
+            )}
           </div>
         </div>
       </div>
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <KafkaProductionCard />
+          <KafkaProductionCard showListOnly={true} />
         </div>
         <div>
           <FlinkProcessorCard />
