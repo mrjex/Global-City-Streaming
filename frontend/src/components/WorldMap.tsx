@@ -237,6 +237,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
 
   return (
     <div className="flex flex-col items-center space-y-8 p-8 bg-gradient-to-b from-gray-900 to-black min-h-screen">
+      <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+        Select a Country
+      </h1>
       <div className="world-map-container relative w-full max-w-[960px]">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-blue-500/5 rounded-xl"></div>
         <svg

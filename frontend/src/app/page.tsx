@@ -148,12 +148,6 @@ export default function Home(): ReactElement {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <WorldMap onCountrySelect={handleCountrySelect} />
-          
-          {selectedCountry && (
-            <div className="mt-4 p-4 bg-gray-100 rounded">
-              <h2 className="text-xl font-semibold">Selected Country: {selectedCountry}</h2>
-            </div>
-          )}
         </div>
 
         <div>
