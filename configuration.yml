@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
+  - Buenos Aires
+  - La Matanza Partido
+  - "C\xF3rdoba"
+  - Rosario
+  - La Plata Partido
   enabled: true
   previousBatch:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
+  - Buenos Aires
+  - La Matanza Partido
+  - "C\xF3rdoba"
+  - Rosario
+  - La Plata Partido
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

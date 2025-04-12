@@ -144,47 +144,75 @@ export default function Home(): ReactElement {
   };
 
   return (
-    <main className="min-h-screen p-8">
+    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black p-8">
+      {/* Top Section: World Map and City Video */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <WorldMap onCountrySelect={handleCountrySelect} />
-        </div>
-
-        <div>
-          <CityVideo selectedCountry={selectedCountry} />
-        </div>
-      </div>
-
-      <div className="mt-8 w-full">
-        <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
-          <div className="bg-gray-800 px-6 py-3">
-            <h2 className="text-xl font-bold text-white">Real-time Cities Monitored</h2>
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 rounded-2xl transform transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-1"></div>
+          <div className="relative bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-700/50 shadow-xl overflow-hidden">
+            <WorldMap onCountrySelect={handleCountrySelect} />
           </div>
-          <div className="h-[600px]">
-            {isGlobeVisible && !isLoadingCities && (
-              <GlobeView 
-                cities={cities.static} 
-                dynamicCities={cities.dynamic}
-              />
-            )}
+        </div>
+
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-purple-500/10 rounded-2xl transform transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-1"></div>
+          <div className="relative bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-700/50 shadow-xl overflow-hidden">
+            <CityVideo selectedCountry={selectedCountry} />
           </div>
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <KafkaProductionCard showListOnly={true} />
+      {/* Globe View Section */}
+      <div className="mt-12">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 rounded-2xl transform transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-1"></div>
+          <div className="relative bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-700/50 shadow-xl overflow-hidden">
+            <div className="px-8 py-4 border-b border-gray-700/50">
+              <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+                Real-time Cities Monitored
+              </h2>
+            </div>
+            <div className="h-[600px]">
+              {isGlobeVisible && !isLoadingCities && (
+                <GlobeView 
+                  cities={cities.static} 
+                  dynamicCities={cities.dynamic}
+                />
+              )}
+            </div>
+          </div>
         </div>
-        <div>
-          <FlinkProcessorCard />
+      </div>
+
+      {/* Kafka and Flink Cards Section */}
+      <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-purple-500/10 rounded-2xl transform transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-1"></div>
+          <div className="relative bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-700/50 shadow-xl overflow-hidden">
+            <KafkaProductionCard showListOnly={true} />
+          </div>
+        </div>
+        
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 rounded-2xl transform transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-1"></div>
+          <div className="relative bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-700/50 shadow-xl overflow-hidden">
+            <FlinkProcessorCard />
+          </div>
         </div>
       </div>
       
-      <div className="mt-8 space-y-8">
-        <div className="flex justify-center">
-          <DatabaseCounter />
+      {/* Database Counter Section */}
+      <div className="mt-12">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-purple-500/10 rounded-2xl transform transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-1"></div>
+          <div className="relative bg-gray-900/80 backdrop-blur-lg rounded-2xl border border-gray-700/50 shadow-xl overflow-hidden p-8">
+            <div className="flex justify-center">
+              <DatabaseCounter />
+            </div>
+          </div>
         </div>
       </div>
+
       <Footer />
     </main>
   );
