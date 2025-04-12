@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Buenos Aires
-  - La Matanza Partido
-  - "C\xF3rdoba"
-  - Rosario
-  - La Plata Partido
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
   enabled: true
   previousBatch:
-  - Buenos Aires
-  - La Matanza Partido
-  - "C\xF3rdoba"
-  - Rosario
-  - La Plata Partido
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
