@@ -65,12 +65,9 @@ const EquatorChart: React.FC<EquatorChartProps> = ({
                 },
                 coloraxis: {
                   colorbar: {
-                    title: 'Temperature (°C)',
-                    titleside: 'right',
                     thickness: 15,
                     len: 0.75,
-                    tickfont: { color: '#ddd' },
-                    titlefont: { color: '#ddd' }
+                    tickfont: { color: '#ddd' }
                   }
                 }
               }}
@@ -78,7 +75,16 @@ const EquatorChart: React.FC<EquatorChartProps> = ({
                 responsive: true,
                 displayModeBar: true,
                 displaylogo: false,
-                modeBarButtonsToRemove: ['lasso2d', 'select2d']
+                modeBarButtonsToRemove: [
+                  'lasso2d',
+                  'select2d',
+                  'zoom2d',
+                  'pan2d',
+                  'zoomIn2d',
+                  'zoomOut2d',
+                  'autoScale2d',
+                  'resetScale2d'
+                ]
               }}
               className="w-full h-[400px]"
             />

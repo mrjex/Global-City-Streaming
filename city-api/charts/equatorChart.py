@@ -110,11 +110,10 @@ def plotEquatorChart():
             cmax=highestCityTemperature,  # Maximum temperature
             line=dict(width=dataPointOutlizeWidth, color='DarkSlateGrey'),
             colorbar=dict(
-                title="Temperature (Celsius)",
-                titleside="right",
                 tickmode='array',
                 ticktext=[f"{i}°C" for i in range(0, highestCityTemperature + 1, 10)],
-                tickvals=[i for i in range(0, highestCityTemperature + 1, 10)]
+                tickvals=[i for i in range(0, highestCityTemperature + 1, 10)],
+                title=None  # Remove the title while keeping the colorbar
             )
         ),
         hovertext=[city['city'] for city in jsonData],
