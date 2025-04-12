@@ -187,7 +187,6 @@ export default function Home(): ReactElement {
       </div>
       
       <div className="mt-8 space-y-8">
-        <CityTemperatureChart title="City Temperature Trends" />
         <div className="flex justify-center">
           <DatabaseCounter />
         </div>

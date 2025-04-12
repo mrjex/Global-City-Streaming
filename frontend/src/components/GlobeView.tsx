@@ -316,7 +316,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   // Add new function to render the cities list
   const renderCitiesList = () => {
     return (
-      <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg p-4">
+      <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg p-4 h-full">
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
             Dynamic Cities ({dynamicCities.length})
@@ -337,11 +337,19 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
           </div>
         </div>
         
-        <div>
+        <div className="h-[calc(100%-8rem)]">
           <h3 className="text-sm font-semibold text-white mb-2 bg-black bg-opacity-30 px-2 py-1 rounded">
             Static Cities ({cities.length})
           </h3>
-          <div className="flex flex-wrap gap-2 max-h-[calc(100%-8rem)] overflow-y-auto">
+          <div className="flex flex-wrap gap-2 h-[calc(100%-3rem)] overflow-y-auto pr-2
+                        [&::-webkit-scrollbar]:w-2
+                        [&::-webkit-scrollbar-track]:rounded-full
+                        [&::-webkit-scrollbar-track]:bg-black/20
+                        [&::-webkit-scrollbar-thumb]:rounded-full
+                        [&::-webkit-scrollbar-thumb]:bg-gray-500/50
+                        hover:[&::-webkit-scrollbar-thumb]:bg-gray-400/50
+                        [&::-webkit-scrollbar-thumb:hover]:bg-gray-400
+                        transition-all duration-200">
             {cities.map((city, index) => (
               <div 
                 key={`static-${index}`} 

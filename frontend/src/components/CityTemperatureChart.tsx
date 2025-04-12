@@ -45,10 +45,6 @@ interface TemperatureDataPoint {
   timestamp: string;
 }
 
-interface CityTemperatureChartProps {
-  title?: string;
-}
-
 // Window size in seconds - reduced to show less data points
 const TIME_WINDOW = 4;  // Change to 4 fixed points
 const MAX_DATA_POINTS = 4;
@@ -88,9 +84,7 @@ const log = (message: string, data?: any) => {
   }
 };
 
-const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
-  title = 'Dynamic City Temperatures'
-}) => {
+const CityTemperatureChart = () => {
   const [cityData, setCityData] = useState<Record<string, CityTemperatureData>>({});
   const [isLoading, setIsLoading] = useState(true);
   const startTimeRef = useRef<number>(Date.now());
@@ -665,9 +659,6 @@ const CityTemperatureChart: React.FC<CityTemperatureChartProps> = ({
   return (
     <div className="w-full max-w-6xl mx-auto p-4">
       <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
-        <div className="bg-gray-800 px-4 py-2">
-          <div className="text-gray-400 text-sm text-center">{title}</div>
-        </div>
         <div className="p-4" style={{ backgroundColor: '#1a1b1e', height: '460px' }}>
           {isLoading ? (
             <div className="text-gray-500 italic text-center">Loading data...</div>

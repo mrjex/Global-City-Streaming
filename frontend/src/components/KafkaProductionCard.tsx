@@ -74,7 +74,7 @@ const KafkaProductionCard: React.FC<KafkaProductionCardProps> = ({ showListOnly 
       
       {/* Temperature Chart Component */}
       <div className="px-4 py-2">
-        <CityTemperatureChart title="Real-time Temperature Data" />
+        <CityTemperatureChart />
       </div>
     </div>
   );

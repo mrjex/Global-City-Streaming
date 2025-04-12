@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Mexico City
-  - Guadalajara metropolitan area
-  - Ecatepec de Morelos
-  - Tijuana
-  - "Iztapalapa de Cuitl\xE1huac"
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
   enabled: true
   previousBatch:
-  - Mexico City
-  - Guadalajara metropolitan area
-  - Ecatepec de Morelos
-  - Tijuana
-  - "Iztapalapa de Cuitl\xE1huac"
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
