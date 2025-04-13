@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config
-  namespace: city-streaming
+  namespace: global-city-streaming
 data:
   PRODUCER_INTERVAL: "100"
   MAX_RECORDS: "2000"

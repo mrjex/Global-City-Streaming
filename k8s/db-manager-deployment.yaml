@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: db-manager
-  namespace: city-streaming
+  namespace: global-city-streaming
 spec:
   replicas: 1
   selector:

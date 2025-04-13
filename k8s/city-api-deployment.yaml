@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: city-api
-  namespace: city-streaming
+  namespace: global-city-streaming
 spec:
   ports:
   - port: 8003
@@ -15,7 +15,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: city-api
-  namespace: city-streaming
+  namespace: global-city-streaming
 spec:
   replicas: 2
   selector:

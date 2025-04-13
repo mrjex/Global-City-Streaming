@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend
-  namespace: city-streaming
+  namespace: global-city-streaming
 spec:
   type: LoadBalancer
   ports:
@@ -16,7 +16,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: city-streaming
+  namespace: global-city-streaming
 spec:
   replicas: 2
   selector:
@@ -74,7 +74,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: api-keys
-  namespace: city-streaming
+  namespace: global-city-streaming
 type: Opaque
 data:
   weather-api-key: YOUR_BASE64_ENCODED_API_KEY  # Replace with your actual base64 encoded API key 
