@@ -97,7 +97,7 @@ spec:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: standard-rwx
+      storageClassName: kafka-zk-storage
       resources:
         requests:
           storage: 10Gi
@@ -105,7 +105,7 @@ spec:
       name: log
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: standard-rwx
+      storageClassName: kafka-zk-storage
       resources:
         requests:
           storage: 10Gi
@@ -196,7 +196,15 @@ spec:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: standard-rwx
+      storageClassName: kafka-zk-storage
+      resources:
+        requests:
+          storage: 10Gi
+  - metadata:
+      name: log
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: kafka-zk-storage
       resources:
         requests:
           storage: 10Gi
@@ -204,10 +212,13 @@ spec:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: standard-rwx
-provisioner: kubernetes.io/gce-pd
+  name: kafka-zk-storage
+provisioner: dobs.csi.digitalocean.com
 parameters:
-  type: pd-standard
+  type: gp3
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+reclaimPolicy: Delete
 mountOptions:
   - dir_mode=0777
   - file_mode=0777
