@@ -38,7 +38,17 @@ spec:
       initContainers:
       - name: volume-permissions
         image: busybox
-        command: ["sh", "-c", "mkdir -p /var/lib/zookeeper/data /var/lib/zookeeper/log && chmod -R 777 /var/lib/zookeeper && chown -R 1000:1000 /var/lib/zookeeper"]
+        command:
+        - sh
+        - -c
+        - |
+          # Create directories if they don't exist
+          mkdir -p /var/lib/zookeeper/data /var/lib/zookeeper/log
+          # Set permissions only on mounted directories
+          chown -R 1000:1000 /var/lib/zookeeper/data
+          chown -R 1000:1000 /var/lib/zookeeper/log
+          chmod -R 755 /var/lib/zookeeper/data
+          chmod -R 755 /var/lib/zookeeper/log
         volumeMounts:
         - name: data
           mountPath: /var/lib/zookeeper/data
@@ -101,14 +111,6 @@ spec:
       resources:
         requests:
           storage: 10Gi
-  - metadata:
-      name: log
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: kafka-zk-storage
-      resources:
-        requests:
-          storage: 10Gi
 ---
 apiVersion: v1
 kind: Service
@@ -146,7 +148,15 @@ spec:
       initContainers:
       - name: volume-permissions
         image: busybox
-        command: ["sh", "-c", "mkdir -p /bitnami/kafka && chmod -R 777 /bitnami && chown -R 1001:1001 /bitnami"]
+        command:
+        - sh
+        - -c
+        - |
+          # Create directory if it doesn't exist
+          mkdir -p /bitnami/kafka
+          # Set permissions only on mounted directory
+          chown -R 1001:1001 /bitnami/kafka
+          chmod -R 755 /bitnami/kafka
         volumeMounts:
         - name: data
           mountPath: /bitnami/kafka
@@ -194,14 +204,6 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: kafka-zk-storage
-      resources:
-        requests:
-          storage: 10Gi
-  - metadata:
-      name: log
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: kafka-zk-storage
