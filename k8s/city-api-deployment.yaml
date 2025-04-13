@@ -26,14 +26,29 @@ spec:
       labels:
         app: city-api
     spec:
+      initContainers:
+      - name: copy-files
+        image: busybox
+        command: ['sh', '-c', 'mkdir -p /app/shared && cp -r /source/* /app/shared/']
+        volumeMounts:
+        - name: shared-source
+          mountPath: /source
+        - name: shared-volume
+          mountPath: /app/shared
       containers:
       - name: city-api
         image: joel030303/city-api:latest
         ports:
         - containerPort: 8003
         env:
+        - name: KAFKA_SERVER
+          value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
+        - name: ZOOKEEPER_SERVER
+          value: "zookeeper-0.zookeeper.global-city-streaming.svc.cluster.local:2181"
         - name: PYTHONPATH
-          value: "/app/city-api"
+          value: "/app:/app/shared"
+        - name: PORT
+          value: "8003"
         - name: GEODB_CITIES_API_KEY
           valueFrom:
             secretKeyRef:
@@ -54,15 +69,21 @@ spec:
           mountPath: /app/configuration.yml
           subPath: configuration.yml
           readOnly: true
-        - name: generated-artifacts
-          mountPath: /app/city-api/generated-artifacts
+        - name: shared-volume
+          mountPath: /app/shared
         resources:
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            cpu: "2"
+            memory: "5Gi"
           requests:
-            memory: "256Mi"
-            cpu: "250m"
+            cpu: "1"
+            memory: "2Gi"
+        startupProbe:
+          httpGet:
+            path: /ready
+            port: 8003
+          failureThreshold: 30
+          periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /ready
@@ -79,5 +100,8 @@ spec:
       - name: config-volume
         configMap:
           name: app-config-yml
-      - name: generated-artifacts
+      - name: shared-volume
         emptyDir: {}
+      - name: shared-source
+        configMap:
+          name: shared-files

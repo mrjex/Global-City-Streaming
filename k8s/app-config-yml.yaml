@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-yml
+  namespace: global-city-streaming
+data:
+  configuration.yml: |
+    cities:
+    - London
+    - Stockholm
+    - Toronto
+    - Moscow
+    - Madrid
+    - Reykjavik
+    - Helsinki
+    - Rome
+    - Venice
+    - Lisbon
+    - Paris
+    - Amsterdam
+    - Chernobyl
+    - Nairobi
+    - Dubai
+    - Bali
+    - Tokyo
+    - Bangkok
+    - Seoul
+    - Buenos Aires
+    - Mexico City
+    - Honolulu
+    - Papeete
+    - Juneau
+    - Sacramento
+    - Tijuana
+    - Palermo
+    - Naples
+    - Milan
+    - Budapest
+    - Bucharest
+    - Sofia
+    - Athens
+    - Warsaw
+    - Prague
+    - Zurich
+    - Geneva
+    - Rotterdam
+    - Antwerp
+    - Brussels
+    - Cairo
+    - Addis Ababa
+    - Dakar
+    - Abuja
+    - Luanda
+    - Kinshasa
+    - Gaborone
+    - Pretoria
+    - Antananarivo
+    - Abu Dabhi
+    - Austin
+    - Boston
+    - Miami
+    - Seattle
+    - Denver
+    - Bogota
+    - Lima
+    - Santiago
+    - Novosibirsk
+    - Omsk
+    - Tehran
+    - Baghdad
+    - Ankara
+    - Damascus
+    - Sao Paulo
+    - Caracas
+    - San Jose
+    - Rio de Janeiro
+    - Salvador
+    - Brasilia
+    - Recife
+    - Srinagar
+    - Chennai
+    - Bangalore
+    - Ahmedabad
+    - Ulaanbaatar
+    - Almaty
+    - Ganja
+    - Astana
+    - Beijing
+    - Shanghai
+    - Hong Kong
+    - Osaka
+    - Chengdu
+    dynamicCities:
+      current:
+      - Bangkok
+      - Bangkok
+      - Chiang Mai
+      - Phrae
+      - Nonthaburi
+      enabled: true
+      previousBatch:
+      - Bangkok
+      - Bangkok
+      - Chiang Mai
+      - Phrae
+      - Nonthaburi
+    services:
+      cityApi:
+        numberOfCitiesForSelectedCountry: 5
+      flinkProcessor:
+        batchIntervalMs: 200
+        batchSize: 300
+        maxRetries: 5
+        sampleDuration: 5
+      kafkaProducer:
+        requestInterval: 0.01
+    visualizations:
+      charts:
+        equatorChart:
+          displayActualTrend: false
+          displayLinearTrend: true
+          displayLogarithmicTrend: true
+          pngOutput: false
+      queryConfig:
+        queryAttribute: continent
+        queryRequirement: Asia 

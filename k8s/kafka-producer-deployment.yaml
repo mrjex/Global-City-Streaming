@@ -26,6 +26,15 @@ spec:
       labels:
         app: kafka-producer
     spec:
+      initContainers:
+      - name: copy-files
+        image: busybox
+        command: ['sh', '-c', 'mkdir -p /app/shared && cp -r /source/* /app/shared/']
+        volumeMounts:
+        - name: shared-source
+          mountPath: /source
+        - name: shared-volume
+          mountPath: /app/shared
       containers:
       - name: kafka-producer
         image: joel030303/kafka-producer:latest
@@ -47,20 +56,27 @@ spec:
               name: api-keys
               key: weather-api-key
         - name: PYTHONPATH
-          value: "/app"
+          value: "/app:/app/shared"
         volumeMounts:
         - name: config-volume
           mountPath: /app/configuration.yml
           subPath: configuration.yml
           readOnly: true
+        - name: shared-volume
+          mountPath: /app/shared
         resources:
           limits:
+            cpu: "2"
             memory: "5Gi"
-            cpu: "2000m"
           requests:
+            cpu: "1"
             memory: "2Gi"
-            cpu: "1000m"
       volumes:
       - name: config-volume
         configMap:
           name: app-config-yml
+      - name: shared-volume
+        emptyDir: {}
+      - name: shared-source
+        configMap:
+          name: shared-files
