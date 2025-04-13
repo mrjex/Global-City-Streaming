@@ -47,6 +47,24 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/zookeeper/data
+      - name: init-config
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          echo "Creating JAAS config for Zookeeper..."
+          mkdir -p /etc/kafka/secrets
+          cat > /etc/kafka/secrets/zookeeper_jaas.conf << EOF
+          Server {
+              org.apache.zookeeper.server.auth.DigestLoginModule required
+              user_admin="admin-secret";
+          };
+          EOF
+          chmod 644 /etc/kafka/secrets/zookeeper_jaas.conf
+        volumeMounts:
+        - name: secrets
+          mountPath: /etc/kafka/secrets
       containers:
       - name: zookeeper
         image: confluentinc/cp-zookeeper:7.3.2
@@ -77,7 +95,7 @@ spec:
         - name: ZOOKEEPER_SERVERS
           value: "zookeeper-0.zookeeper.global-city-streaming.svc.cluster.local:2888:3888"
         - name: KAFKA_OPTS
-          value: "-Djava.security.auth.login.config=/etc/kafka/secrets/zookeeper_jaas.conf"
+          value: "-Djava.security.auth.login.config=/etc/kafka/secrets/zookeeper_jaas.conf -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider"
         resources:
           requests:
             cpu: 250m
@@ -154,15 +172,16 @@ spec:
         - sh
         - -c
         - |
-          echo "Creating JAAS config..."
+          echo "Creating JAAS config for Kafka..."
           mkdir -p /etc/kafka/secrets
-          cat > /etc/kafka/secrets/zookeeper_jaas.conf << EOF
-          Server {
-              org.apache.kafka.common.security.plain.PlainLoginModule required
+          cat > /etc/kafka/secrets/kafka_jaas.conf << EOF
+          Client {
+              org.apache.zookeeper.server.auth.DigestLoginModule required
               username="admin"
               password="admin-secret";
           };
           EOF
+          chmod 644 /etc/kafka/secrets/kafka_jaas.conf
         volumeMounts:
         - name: secrets
           mountPath: /etc/kafka/secrets
@@ -194,6 +213,8 @@ spec:
           value: "true"
         - name: KAFKA_HEAP_OPTS
           value: "-Xmx512m -Xms256m"
+        - name: KAFKA_OPTS
+          value: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf"
         resources:
           requests:
             cpu: 500m
