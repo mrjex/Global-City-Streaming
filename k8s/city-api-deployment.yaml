@@ -13,15 +13,6 @@ spec:
       labels:
         app: city-api
     spec:
-      initContainers:
-      - name: copy-files
-        image: busybox
-        command: ['sh', '-c', 'cp -r /src/* /app/']
-        volumeMounts:
-        - name: app-code
-          mountPath: /src
-        - name: shared-files
-          mountPath: /app
       containers:
       - name: city-api
         image: city-api:latest
@@ -41,12 +32,9 @@ spec:
         - name: KAFKA_BOOTSTRAP_SERVERS
           value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
         volumeMounts:
-        - name: shared-files
+        - name: app-code
           mountPath: /app
       volumes:
       - name: app-code
-        hostPath:
-          path: /root/Global-City-Streaming/city-api
-          type: Directory
-      - name: shared-files
-        emptyDir: {}
+        configMap:
+          name: city-api-code
