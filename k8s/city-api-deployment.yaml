@@ -17,7 +17,7 @@ metadata:
   name: city-api
   namespace: global-city-streaming
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: city-api
@@ -49,6 +49,13 @@ spec:
             secretKeyRef:
               name: api-keys
               key: giphy-api-key
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configuration.yml
+          subPath: configuration.yml
+          readOnly: true
+        - name: generated-artifacts
+          mountPath: /app/city-api/generated-artifacts
         resources:
           limits:
             memory: "512Mi"
@@ -56,3 +63,21 @@ spec:
           requests:
             memory: "256Mi"
             cpu: "250m"
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8003
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /ready
+            port: 8003
+          initialDelaySeconds: 15
+          periodSeconds: 10
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config-yml
+      - name: generated-artifacts
+        emptyDir: {}

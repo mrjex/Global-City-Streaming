@@ -33,9 +33,9 @@ spec:
         - containerPort: 8000
         env:
         - name: KAFKA_SERVER
-          value: "kafka:9092"
+          value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
         - name: ZOOKEEPER_SERVER
-          value: "zookeeper:2181"
+          value: "zookeeper-0.zookeeper.global-city-streaming.svc.cluster.local:2181"
         - name: PRODUCER_INTERVAL
           valueFrom:
             configMapKeyRef:
@@ -46,6 +46,13 @@ spec:
             secretKeyRef:
               name: api-keys
               key: weather-api-key
+        - name: PYTHONPATH
+          value: "/app"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configuration.yml
+          subPath: configuration.yml
+          readOnly: true
         resources:
           limits:
             memory: "5Gi"
@@ -53,3 +60,7 @@ spec:
           requests:
             memory: "2Gi"
             cpu: "1000m"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config-yml
