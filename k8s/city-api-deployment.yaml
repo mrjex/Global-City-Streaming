@@ -27,7 +27,7 @@ spec:
         image: city-api:latest
         imagePullPolicy: Never
         command: ["uvicorn"]
-        args: ["city_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+        args: ["main:app", "--host", "0.0.0.0", "--port", "8000"]
         resources:
           requests:
             cpu: 100m
@@ -46,7 +46,7 @@ spec:
       volumes:
       - name: app-code
         hostPath:
-          path: /root/Global-City-Streaming/city_api
+          path: /root/Global-City-Streaming/city-api
           type: Directory
       - name: shared-files
         emptyDir: {}
