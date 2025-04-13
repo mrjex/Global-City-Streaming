@@ -31,6 +31,19 @@ spec:
       labels:
         app: zookeeper
     spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+      initContainers:
+      - name: volume-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /var/lib/zookeeper"]
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/zookeeper/data
+        - name: log
+          mountPath: /var/lib/zookeeper/log
       containers:
       - name: zookeeper
         image: confluentinc/cp-zookeeper:7.3.2
@@ -52,33 +65,50 @@ spec:
           value: "2"
         - name: KAFKA_HEAP_OPTS
           value: "-Xmx512m -Xms256m"
+        - name: ZOOKEEPER_MAX_CLIENT_CNXNS
+          value: "60"
+        - name: ZOOKEEPER_4LW_COMMANDS_WHITELIST
+          value: "*"
+        - name: ZOOKEEPER_SERVER_ID
+          value: "1"
+        - name: ZOOKEEPER_SERVERS
+          value: "zookeeper:2888:3888"
+        - name: KAFKA_OPTS
+          value: "-Djava.security.auth.login.config=/etc/kafka/secrets/zookeeper_jaas.conf"
         resources:
-          limits:
-            memory: "768Mi"
-            cpu: "500m"
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 768Mi
         volumeMounts:
         - name: data
           mountPath: /var/lib/zookeeper/data
         - name: log
           mountPath: /var/lib/zookeeper/log
+        - name: secrets
+          mountPath: /etc/kafka/secrets
+      volumes:
+      - name: secrets
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard-rwx
       resources:
         requests:
-          storage: 5Gi
+          storage: 10Gi
   - metadata:
       name: log
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard-rwx
       resources:
         requests:
-          storage: 5Gi
+          storage: 10Gi
 ---
 apiVersion: v1
 kind: Service
@@ -109,46 +139,77 @@ spec:
       labels:
         app: kafka
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        runAsGroup: 1001
+      initContainers:
+      - name: volume-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1001:1001 /bitnami"]
+        volumeMounts:
+        - name: data
+          mountPath: /bitnami/kafka
       containers:
       - name: kafka
         image: bitnami/kafka:3.5
         ports:
         - containerPort: 9092
-          name: kafka
         env:
-        - name: KAFKA_BROKER_ID
-          value: "1"
-        - name: KAFKA_ZOOKEEPER_CONNECT
-          value: "zookeeper:2181"
-        - name: KAFKA_LISTENERS
-          value: "PLAINTEXT://:9092"
-        - name: KAFKA_ADVERTISED_LISTENERS
-          value: "PLAINTEXT://kafka:9092"
+        - name: BITNAMI_DEBUG
+          value: "true"
         - name: ALLOW_PLAINTEXT_LISTENER
           value: "yes"
-        - name: KAFKA_NUM_PARTITIONS
-          value: "3"
-        - name: KAFKA_DEFAULT_REPLICATION_FACTOR
+        - name: KAFKA_ENABLE_KRAFT
+          value: "no"
+        - name: KAFKA_CFG_BROKER_ID
           value: "1"
-        - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+        - name: KAFKA_CFG_ZOOKEEPER_CONNECT
+          value: "zookeeper:2181"
+        - name: KAFKA_CFG_LISTENERS
+          value: "PLAINTEXT://:9092"
+        - name: KAFKA_CFG_ADVERTISED_LISTENERS
+          value: "PLAINTEXT://kafka:9092"
+        - name: KAFKA_CFG_NUM_PARTITIONS
+          value: "3"
+        - name: KAFKA_CFG_DEFAULT_REPLICATION_FACTOR
+          value: "1"
+        - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
           value: "true"
         - name: KAFKA_HEAP_OPTS
           value: "-Xmx512m -Xms256m"
         resources:
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
           requests:
-            memory: "512Mi"
-            cpu: "500m"
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
         volumeMounts:
         - name: data
           mountPath: /bitnami/kafka
+      volumes:
+      - name: secrets
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard-rwx
       resources:
         requests:
-          storage: 10Gi 
+          storage: 10Gi
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: standard-rwx
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard
+mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=1000
+  - gid=1000 

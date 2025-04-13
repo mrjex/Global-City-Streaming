@@ -27,9 +27,19 @@ spec:
       labels:
         app: postgres
     spec:
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+      initContainers:
+      - name: remove-lost-found
+        image: busybox
+        command: ["sh", "-c", "rm -rf /var/lib/postgresql/data/lost+found"]
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
       containers:
       - name: postgres
-        image: joel030303/postgres:latest  # You should specify your custom postgres image here
+        image: postgres:15-alpine
         ports:
         - containerPort: 5432
           name: postgres
@@ -44,23 +54,15 @@ spec:
             secretKeyRef:
               name: postgres-secret
               key: password
-        - name: POSTGRES_DB
-          value: postgres
-        - name: POSTGRES_SHARED_BUFFERS
-          value: "1GB"
-        - name: POSTGRES_WORK_MEM
-          value: "16MB"
-        - name: POSTGRES_MAINTENANCE_WORK_MEM
-          value: "256MB"
-        - name: POSTGRES_EFFECTIVE_CACHE_SIZE
-          value: "3GB"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         resources:
           limits:
-            memory: "5Gi"
-            cpu: "2000m"
-          requests:
-            memory: "2Gi"
+            memory: "1Gi"
             cpu: "1000m"
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
         volumeMounts:
         - name: data
           mountPath: /var/lib/postgresql/data
@@ -71,7 +73,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 20Gi
+          storage: 10Gi
 ---
 apiVersion: v1
 kind: Secret
