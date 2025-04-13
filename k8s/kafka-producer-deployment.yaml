@@ -29,7 +29,7 @@ spec:
       initContainers:
       - name: copy-files
         image: busybox
-        command: ['sh', '-c', 'mkdir -p /app/shared && cp -r /source/* /app/shared/']
+        command: ['sh', '-c', 'mkdir -p /app/shared/weather && cp /source/__init__.py /source/utils.py /app/shared/ && cp /source/weather.__init__.py /app/shared/weather/__init__.py && cp /source/weather.api.py /app/shared/weather/api.py && mkdir -p /app/shared/monitoring && cp /source/monitoring.exec-settings.txt /app/shared/monitoring/exec-settings.txt']
         volumeMounts:
         - name: shared-source
           mountPath: /source
