@@ -13,10 +13,21 @@ spec:
       labels:
         app: city-api
     spec:
+      initContainers:
+      - name: copy-files
+        image: busybox
+        command: ['sh', '-c', 'cp -r /src/* /app/']
+        volumeMounts:
+        - name: app-code
+          mountPath: /src
+        - name: shared-files
+          mountPath: /app
       containers:
       - name: city-api
         image: city-api:latest
         imagePullPolicy: Never
+        command: ["uvicorn"]
+        args: ["city_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
         resources:
           requests:
             cpu: 100m
@@ -30,10 +41,12 @@ spec:
         - name: KAFKA_BOOTSTRAP_SERVERS
           value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
         volumeMounts:
-        - name: app-code
+        - name: shared-files
           mountPath: /app
       volumes:
       - name: app-code
         hostPath:
-          path: /app/city_api
+          path: /root/Global-City-Streaming/city_api
           type: Directory
+      - name: shared-files
+        emptyDir: {}
