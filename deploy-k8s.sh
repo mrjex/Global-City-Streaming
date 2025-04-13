@@ -75,13 +75,13 @@ check_pods_ready() {
 }
 
 # Check if Zookeeper is ready
-check_pods_ready "zookeeper"
+check_pods_ready "zookeeper-[0-9]"
 
 # Check if Kafka is ready
-check_pods_ready "kafka"
+check_pods_ready "kafka-[0-9]"
 
 # Check if PostgreSQL is ready
-check_pods_ready "postgres"
+check_pods_ready "postgres-[0-9]"
 
 # Deploy the remaining applications
 echo -e "${YELLOW}Deploying application components...${NC}"

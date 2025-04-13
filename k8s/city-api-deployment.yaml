@@ -1,16 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: city-api
-  namespace: global-city-streaming
-spec:
-  ports:
-  - port: 8003
-    targetPort: 8003
-    name: http
-  selector:
-    app: city-api
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,82 +13,27 @@ spec:
       labels:
         app: city-api
     spec:
-      initContainers:
-      - name: copy-files
-        image: busybox
-        command: ['sh', '-c', 'mkdir -p /app/shared/weather && cp /source/__init__.py /source/utils.py /app/shared/ && cp /source/weather.__init__.py /app/shared/weather/__init__.py && cp /source/weather.api.py /app/shared/weather/api.py && mkdir -p /app/shared/monitoring && cp /source/monitoring.exec-settings.txt /app/shared/monitoring/exec-settings.txt']
-        volumeMounts:
-        - name: shared-source
-          mountPath: /source
-        - name: shared-volume
-          mountPath: /app/shared
       containers:
       - name: city-api
-        image: joel030303/city-api:latest
-        ports:
-        - containerPort: 8003
-        env:
-        - name: KAFKA_SERVER
-          value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
-        - name: ZOOKEEPER_SERVER
-          value: "zookeeper-0.zookeeper.global-city-streaming.svc.cluster.local:2181"
-        - name: PYTHONPATH
-          value: "/app:/app/shared"
-        - name: PORT
-          value: "8003"
-        - name: GEODB_CITIES_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: api-keys
-              key: geodb-cities-api-key
-        - name: WEATHER_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: api-keys
-              key: weather-api-key
-        - name: GIPHY_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: api-keys
-              key: giphy-api-key
-        volumeMounts:
-        - name: config-volume
-          mountPath: /app/configuration.yml
-          subPath: configuration.yml
-          readOnly: true
-        - name: shared-volume
-          mountPath: /app/shared
+        image: city-api:latest
+        imagePullPolicy: Never
         resources:
-          limits:
-            cpu: "2"
-            memory: "5Gi"
           requests:
-            cpu: "1"
-            memory: "2Gi"
-        startupProbe:
-          httpGet:
-            path: /ready
-            port: 8003
-          failureThreshold: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8003
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /ready
-            port: 8003
-          initialDelaySeconds: 15
-          periodSeconds: 10
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 200m
+            memory: 512Mi
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
       volumes:
-      - name: config-volume
-        configMap:
-          name: app-config-yml
-      - name: shared-volume
-        emptyDir: {}
-      - name: shared-source
-        configMap:
-          name: shared-files
+      - name: app-code
+        hostPath:
+          path: /app/city_api
+          type: Directory
