@@ -64,15 +64,18 @@ const POLLING_INTERVAL = 1000; // Milliseconds between data fetches
 // Add these constants at the top
 const RANDOMIZATION_CHANCE = 0.2; // 30% chance to randomize any given update
 
-// Define sophisticated color palette (pastel/jewel tones)
+// Define sophisticated color palette (jewel tones with slight transparency for elegance)
 const CHART_COLORS = [
-  'hsla(350, 70%, 70%, 1)', // Soft Rose
-  'hsla(190, 75%, 60%, 1)', // Soft Azure
-  'hsla(150, 65%, 65%, 1)', // Mint Green
-  'hsla(280, 60%, 70%, 1)', // Lavender
-  'hsla(35, 80%, 75%, 1)',  // Peach
-  'hsla(210, 70%, 65%, 1)', // Sky Blue
-  'hsla(320, 65%, 65%, 1)'  // Pink Orchid
+  'hsla(354, 85%, 65%, 0.95)',  // Elegant Ruby Red
+  'hsla(190, 90%, 65%, 0.95)',  // Azure Blue
+  'hsla(145, 65%, 60%, 0.95)',  // Emerald Green
+  'hsla(280, 75%, 65%, 0.95)',  // Royal Purple
+  'hsla(35, 85%, 65%, 0.95)',   // Amber Gold
+  'hsla(320, 70%, 65%, 0.95)',  // Rose Pink
+  'hsla(220, 85%, 65%, 0.95)',  // Sapphire Blue
+  'hsla(170, 75%, 60%, 0.95)',  // Turquoise
+  'hsla(45, 90%, 65%, 0.95)',   // Golden Yellow
+  'hsla(300, 70%, 65%, 0.95)'   // Amethyst Purple
 ];
 
 // Add this at the top with other constants
@@ -179,12 +182,13 @@ const CityTemperatureChart = () => {
     return newColor;
   };
 
-  // Create gradient background function
+  // Create gradient background function with enhanced opacity control
   const createGradient = (ctx: CanvasRenderingContext2D, color: string) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    const transparentColor = color.replace('1)', '0.1)');
-    gradient.addColorStop(0, transparentColor);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    const baseColor = color.replace('0.95)', '');  // Remove existing opacity
+    gradient.addColorStop(0, baseColor + '0.2)');  // More transparent at top
+    gradient.addColorStop(0.5, baseColor + '0.1)');  // Very subtle in middle
+    gradient.addColorStop(1, baseColor + '0.05)');  // Almost transparent at bottom
     return gradient;
   };
 

@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Bangkok
+  - Bangkok
+  - Chiang Mai
+  - Phrae
+  - Nonthaburi
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Bangkok
+  - Bangkok
+  - Chiang Mai
+  - Phrae
+  - Nonthaburi
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
