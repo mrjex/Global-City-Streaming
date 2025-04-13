@@ -591,10 +591,12 @@ const CityTemperatureChart = () => {
     scales: {
       x: {
         type: 'linear' as const,
+        display: true,
         title: {
           display: true,
           text: 'Time (seconds)',
-          color: '#ddd'
+          color: '#ddd',
+          font: { size: 12 }
         },
         min: 1,
         max: 4,
@@ -604,27 +606,33 @@ const CityTemperatureChart = () => {
           callback: (value: number) => value.toFixed(0)
         },
         grid: {
-          color: '#444',
-          drawOnChartArea: false
+          color: 'rgba(70, 70, 70, 0.1)',
+          drawBorder: false
         }
       },
       y: {
+        type: 'linear' as const,
+        display: true,
+        position: 'left',
         title: {
           display: true,
           text: 'Temperature (°C)',
-          color: '#ddd'
+          color: '#ddd',
+          font: { size: 12 }
         },
-        // Use suggestedMin and suggestedMax instead of strict min/max
-        // This allows Chart.js to adapt while still following our guidance
-        suggestedMin: minTemp,
-        suggestedMax: maxTemp,
+        min: minTemp,
+        max: maxTemp,
+        bounds: 'data',
+        beginAtZero: false,
         ticks: {
           color: '#ddd',
-          callback: (value: number) => value.toFixed(1) + '°C'
+          callback: (value: number) => value.toFixed(1) + '°C',
+          stepSize: Math.max(1, Math.floor((maxTemp - minTemp) / 8)),
+          precision: 1
         },
         grid: {
-          color: '#444',
-          drawOnChartArea: true
+          display: false,  // This will hide the grid lines
+          drawBorder: false
         }
       }
     },
