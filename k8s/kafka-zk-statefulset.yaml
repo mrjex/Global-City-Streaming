@@ -38,7 +38,7 @@ spec:
       initContainers:
       - name: volume-permissions
         image: busybox
-        command: ["sh", "-c", "chown -R 1000:1000 /var/lib/zookeeper"]
+        command: ["sh", "-c", "mkdir -p /var/lib/zookeeper/data /var/lib/zookeeper/log && chmod -R 777 /var/lib/zookeeper && chown -R 1000:1000 /var/lib/zookeeper"]
         volumeMounts:
         - name: data
           mountPath: /var/lib/zookeeper/data
@@ -146,7 +146,7 @@ spec:
       initContainers:
       - name: volume-permissions
         image: busybox
-        command: ["sh", "-c", "chown -R 1001:1001 /bitnami"]
+        command: ["sh", "-c", "mkdir -p /bitnami/kafka && chmod -R 777 /bitnami && chown -R 1001:1001 /bitnami"]
         volumeMounts:
         - name: data
           mountPath: /bitnami/kafka
@@ -218,9 +218,4 @@ parameters:
   type: gp3
 volumeBindingMode: Immediate
 allowVolumeExpansion: true
-reclaimPolicy: Delete
-mountOptions:
-  - dir_mode=0777
-  - file_mode=0777
-  - uid=1000
-  - gid=1000 
+reclaimPolicy: Delete 
