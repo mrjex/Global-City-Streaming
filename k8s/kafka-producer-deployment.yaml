@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-producer
+  namespace: city-streaming
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  selector:
+    app: kafka-producer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-producer
+  namespace: city-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-producer
+  template:
+    metadata:
+      labels:
+        app: kafka-producer
+    spec:
+      containers:
+      - name: kafka-producer
+        image: joel030303/kafka-producer:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: KAFKA_SERVER
+          value: "kafka:9092"
+        - name: ZOOKEEPER_SERVER
+          value: "zookeeper:2181"
+        - name: PRODUCER_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: PRODUCER_INTERVAL
+        - name: WEATHER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys
+              key: weather-api-key
+        resources:
+          limits:
+            memory: "5Gi"
+            cpu: "2000m"
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"

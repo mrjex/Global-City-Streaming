@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-manager
+  namespace: city-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-manager
+  template:
+    metadata:
+      labels:
+        app: db-manager
+    spec:
+      containers:
+      - name: db-manager
+        image: joel030303/db-manager:latest
+        env:
+        - name: POSTGRES_HOST
+          value: "postgres"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: POSTGRES_DB
+          value: "postgres"
+        - name: MAX_RECORDS
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MAX_RECORDS
+        - name: CHECK_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: CHECK_INTERVAL
+        - name: BATCH_DELETE_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: BATCH_DELETE_SIZE
+        resources:
+          limits:
+            memory: "2560Mi"
+            cpu: "1000m"
+          requests:
+            memory: "1Gi"
+            cpu: "500m"

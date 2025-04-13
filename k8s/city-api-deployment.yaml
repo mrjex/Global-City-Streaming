@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: city-api
+  namespace: city-streaming
+spec:
+  ports:
+  - port: 8003
+    targetPort: 8003
+    name: http
+  selector:
+    app: city-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: city-api
+  namespace: city-streaming
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: city-api
+  template:
+    metadata:
+      labels:
+        app: city-api
+    spec:
+      containers:
+      - name: city-api
+        image: joel030303/city-api:latest
+        ports:
+        - containerPort: 8003
+        env:
+        - name: PYTHONPATH
+          value: "/app/city-api"
+        - name: GEODB_CITIES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys
+              key: geodb-cities-api-key
+        - name: WEATHER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys
+              key: weather-api-key
+        - name: GIPHY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys
+              key: giphy-api-key
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
