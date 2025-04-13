@@ -479,25 +479,12 @@ const CityTemperatureChart = () => {
   // Calculate dynamic temperature range from current data
   const temperatures = Object.values(cityData).flatMap(city => city.temperatures);
   
-  // Only proceed with calculations if we have data
+  // Calculate temperature range with fixed padding
   let minTemp, maxTemp;
-  
   if (temperatures.length > 0) {
-    // Find the actual min and max values
-    minTemp = Math.min(...temperatures);
-    maxTemp = Math.max(...temperatures);
-    
-    // Ensure there's always some range to display (prevent flat line)
-    if (minTemp === maxTemp) {
-      minTemp -= 1;
-      maxTemp += 1;
-    } else {
-      // Add padding as a percentage of the actual range
-      const range = maxTemp - minTemp;
-      const paddingAmount = range * 0.1; // 10% padding
-      minTemp -= paddingAmount;
-      maxTemp += paddingAmount;
-    }
+    const FIXED_PADDING = 1; // 1°C fixed padding
+    minTemp = Math.min(...temperatures) - FIXED_PADDING;
+    maxTemp = Math.max(...temperatures) + FIXED_PADDING;
   }
   
   log('Temperature range calculation:', { 
@@ -627,11 +614,11 @@ const CityTemperatureChart = () => {
         ticks: {
           color: '#ddd',
           callback: (value: number) => value.toFixed(1) + '°C',
-          stepSize: Math.max(1, Math.floor((maxTemp - minTemp) / 8)),
+          count: 4,  // This will aim for 4 ticks (3-5 labels)
           precision: 1
         },
         grid: {
-          display: false,  // This will hide the grid lines
+          display: false,
           drawBorder: false
         }
       }
