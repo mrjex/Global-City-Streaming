@@ -14,55 +14,6 @@ spec:
         app: city-api
     spec:
       serviceAccountName: city-api-sa
-      initContainers:
-      - name: init-config
-        image: busybox
-        command: ['/bin/sh', '-c']
-        args:
-        - |
-          # Create target directories
-          mkdir -p /target/city_api/config
-          mkdir -p /target/shared/weather
-          
-          # Copy files from ConfigMap
-          cp -L /app-code/* /target/city_api/ || true
-          
-          # Copy files from shared-files
-          cp -L /shared-files/country-codes.json /target/city_api/config/
-          cp -L /shared-files/countryCities.sh /target/city_api/
-          cp -L /shared-files/utils.py /target/shared/
-          cp -L /shared-files/weather.api.py /target/shared/weather/api.py
-          cp -L /shared-files/weather.city_coordinates.py /target/shared/weather/city_coordinates.py
-          cp -L /shared-files/weather.__init__.py /target/shared/weather/__init__.py
-          cp -L /shared-files/__init__.py /target/shared/
-          
-          # Create __init__.py files if they don't exist
-          touch /target/shared/__init__.py
-          touch /target/shared/weather/__init__.py
-          
-          # Ensure files are executable
-          chmod +x /target/city_api/countryCities.sh
-          chmod +x /target/shared/weather/city_coordinates.py
-          
-          # List contents for debugging
-          echo "Contents of /target/city_api:"
-          ls -la /target/city_api/
-          echo "Contents of /target/shared/weather:"
-          ls -la /target/shared/weather/
-          
-          # Ensure files are readable
-          chmod -R 644 /target/shared/weather/*
-          chmod -R 644 /target/city_api/*
-          find /target -type d -exec chmod 755 {} \;
-          chmod +x /target/city_api/countryCities.sh
-          chmod +x /target/shared/weather/city_coordinates.py
-        volumeMounts:
-        - name: shared-files
-          mountPath: /shared-files
-        - name: app-code
-          mountPath: /app-code
-        - name: config-dir
-          mountPath: /target
       containers:
       - name: city-api
         image: joel030303/city-api:latest
@@ -100,21 +51,44 @@ spec:
               name: api-keys
               key: geodb-cities-api-key
         volumeMounts:
-        - name: config-dir
-          mountPath: /app
+        # Mount city-api files
+        - name: app-files
+          mountPath: /app/city-api/config/configuration.yml
+          subPath: city-api/config/configuration.yml
+        - name: app-files
+          mountPath: /app/city-api/config/city-edits.yml
+          subPath: city-api/config/city-edits.yml
+        - name: app-files
+          mountPath: /app/city-api/config/country-codes.json
+          subPath: city-api/config/country-codes.json
+        - name: app-files
+          mountPath: /app/city-api/countryCities.sh
+          subPath: city-api/countryCities.sh
+        # Mount shared files
+        - name: app-files
+          mountPath: /app/shared/__init__.py
+          subPath: shared/__init__.py
+        - name: app-files
+          mountPath: /app/shared/utils.py
+          subPath: shared/utils.py
+        - name: app-files
+          mountPath: /app/shared/weather/__init__.py
+          subPath: shared/weather/__init__.py
+        - name: app-files
+          mountPath: /app/shared/weather/api.py
+          subPath: shared/weather/api.py
+        - name: app-files
+          mountPath: /app/shared/weather/city_coordinates.py
+          subPath: shared/weather/city_coordinates.py
+        # Mount configuration
         - name: app-config
           mountPath: /app/configuration.yml
           subPath: configuration.yml
       volumes:
-      - name: app-code
+      - name: app-files
         configMap:
-          name: city-api-code
+          name: app-files
+          defaultMode: 0755
       - name: app-config
         configMap:
           name: app-config-yml
-      - name: shared-files
-        configMap:
-          name: shared-files
-          defaultMode: 0755
-      - name: config-dir
-        emptyDir: {}
