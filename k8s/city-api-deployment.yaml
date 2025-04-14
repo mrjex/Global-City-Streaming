@@ -31,6 +31,9 @@ spec:
           cp /shared-files/countryCities.sh /target/city-api/
           chmod +x /target/city-api/countryCities.sh
           
+          # Create __init__.py to make it a proper Python package
+          touch /target/city-api/__init__.py
+          
           # List contents for debugging
           echo "Contents of /target/city-api:"
           ls -la /target/city-api/
@@ -49,9 +52,8 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8003
-        command: ["uvicorn"]
-        args: ["main:app", "--host", "0.0.0.0", "--port", "8003"]
-        workingDir: /app/city-api
+        command: ["python", "-m", "uvicorn"]
+        args: ["--app-dir", "/app", "city_api.main:app", "--host", "0.0.0.0", "--port", "8003"]
         resources:
           requests:
             cpu: 100m
@@ -61,7 +63,7 @@ spec:
             memory: 512Mi
         env:
         - name: PYTHONPATH
-          value: /app/city-api
+          value: /app
         - name: PORT
           value: "8003"
         - name: KAFKA_BOOTSTRAP_SERVERS
@@ -82,7 +84,7 @@ spec:
               key: geodb-cities-api-key
         volumeMounts:
         - name: config-dir
-          mountPath: /app/city-api
+          mountPath: /app/city_api
         - name: app-config
           mountPath: /app/configuration.yml
           subPath: configuration.yml
