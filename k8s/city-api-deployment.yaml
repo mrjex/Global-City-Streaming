@@ -30,20 +30,19 @@ spec:
           # Copy files from shared-files
           cp -L /shared-files/country-codes.json /target/city_api/config/
           cp -L /shared-files/countryCities.sh /target/city_api/
-          cp -L /shared-files/* /target/shared/weather/ || true
+          cp -L /shared-files/utils.py /target/shared/
+          cp -L /shared-files/weather.api.py /target/shared/weather/api.py
+          cp -L /shared-files/weather.city_coordinates.py /target/shared/weather/city_coordinates.py
+          cp -L /shared-files/weather.__init__.py /target/shared/weather/__init__.py
+          cp -L /shared-files/__init__.py /target/shared/
           
-          # Create __init__.py files
+          # Create __init__.py files if they don't exist
           touch /target/shared/__init__.py
           touch /target/shared/weather/__init__.py
           
-          # Fix file names (remove dots)
-          cd /target/shared/weather
-          mv weather.api.py api.py || true
-          mv weather.city_coordinates.py city_coordinates.py || true
-          mv weather.__init__.py __init__.py || true
-          
           # Ensure files are executable
           chmod +x /target/city_api/countryCities.sh
+          chmod +x /target/shared/weather/city_coordinates.py
           
           # List contents for debugging
           echo "Contents of /target/city_api:"
@@ -56,6 +55,7 @@ spec:
           chmod -R 644 /target/city_api/*
           find /target -type d -exec chmod 755 {} \;
           chmod +x /target/city_api/countryCities.sh
+          chmod +x /target/shared/weather/city_coordinates.py
         volumeMounts:
         - name: shared-files
           mountPath: /shared-files
