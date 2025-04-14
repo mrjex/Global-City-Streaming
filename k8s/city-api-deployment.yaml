@@ -107,10 +107,10 @@ spec:
       volumes:
       - name: shared-files
         configMap:
-          name: shared-files
+          name: {{ include "city-api.fullname" . }}-shared-files
       - name: city-api-files
         configMap:
-          name: city-api-files
+          name: {{ include "city-api.fullname" . }}-city-api-files
       - name: config-dir
         emptyDir: {}
       - name: app-config
