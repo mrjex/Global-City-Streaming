@@ -48,7 +48,8 @@ spec:
         ports:
         - containerPort: 8003
         command: ["uvicorn"]
-        args: ["city-api.main:app", "--host", "0.0.0.0", "--port", "8003"]
+        args: ["main:app", "--host", "0.0.0.0", "--port", "8003"]
+        workingDir: /app/city-api
         resources:
           requests:
             cpu: 100m
@@ -58,7 +59,7 @@ spec:
             memory: 512Mi
         env:
         - name: PYTHONPATH
-          value: /app
+          value: /app/city-api
         - name: PORT
           value: "8003"
         - name: KAFKA_BOOTSTRAP_SERVERS
