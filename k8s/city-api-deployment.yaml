@@ -21,24 +21,27 @@ spec:
         args:
         - |
           # Create target directories
-          mkdir -p /target/city-api/config
-          
-          # Copy files from ConfigMap
-          cp -L /app-code/* /target/city-api/ || true
-          
-          # Copy files from shared-files
-          cp /shared-files/country-codes.json /target/city-api/config/
-          cp /shared-files/countryCities.sh /target/city-api/
-          chmod +x /target/city-api/countryCities.sh
+          mkdir -p /target/city_api/config
           
           # Create __init__.py to make it a proper Python package
-          touch /target/city-api/__init__.py
+          touch /target/__init__.py
+          touch /target/city_api/__init__.py
+          
+          # Copy files from ConfigMap
+          cp -L /app-code/* /target/city_api/ || true
+          
+          # Copy files from shared-files
+          cp /shared-files/country-codes.json /target/city_api/config/
+          cp /shared-files/countryCities.sh /target/city_api/
+          chmod +x /target/city_api/countryCities.sh
           
           # List contents for debugging
-          echo "Contents of /target/city-api:"
-          ls -la /target/city-api/
+          echo "Contents of /target:"
+          ls -la /target/
+          echo "Contents of /target/city_api:"
+          ls -la /target/city_api/
           echo "Contents of main.py:"
-          cat /target/city-api/main.py || echo "main.py not found"
+          cat /target/city_api/main.py || echo "main.py not found"
         volumeMounts:
         - name: shared-files
           mountPath: /shared-files
@@ -53,7 +56,7 @@ spec:
         ports:
         - containerPort: 8003
         command: ["python", "-m", "uvicorn"]
-        args: ["--app-dir", "/app", "city_api.main:app", "--host", "0.0.0.0", "--port", "8003"]
+        args: ["city_api.main:app", "--host", "0.0.0.0", "--port", "8003"]
         resources:
           requests:
             cpu: 100m
@@ -84,7 +87,7 @@ spec:
               key: geodb-cities-api-key
         volumeMounts:
         - name: config-dir
-          mountPath: /app/city_api
+          mountPath: /app
         - name: app-config
           mountPath: /app/configuration.yml
           subPath: configuration.yml
