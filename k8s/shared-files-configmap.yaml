@@ -186,4 +186,185 @@ data:
             sys.exit(1)
         
         cities = sys.argv[1:]
-        get_city_coordinates(cities) 
+        get_city_coordinates(cities)
+  country-codes.json: |
+    {
+      "afghanistan": "AF",
+      "albania": "AL",
+      "algeria": "DZ",
+      "andorra": "AD",
+      "angola": "AO",
+      "argentina": "AR",
+      "armenia": "AM",
+      "australia": "AU",
+      "austria": "AT",
+      "azerbaijan": "AZ",
+      "bahrain": "BH",
+      "bangladesh": "BD",
+      "belarus": "BY",
+      "belgium": "BE",
+      "bhutan": "BT",
+      "bolivia": "BO",
+      "bosnia and herzegovina": "BA",
+      "brazil": "BR",
+      "bulgaria": "BG",
+      "cambodia": "KH",
+      "cameroon": "CM",
+      "canada": "CA",
+      "chile": "CL",
+      "china": "CN",
+      "colombia": "CO",
+      "croatia": "HR",
+      "cuba": "CU",
+      "cyprus": "CY",
+      "czech republic": "CZ",
+      "czechia": "CZ",
+      "denmark": "DK",
+      "ecuador": "EC",
+      "egypt": "EG",
+      "england": "GB",
+      "estonia": "EE",
+      "ethiopia": "ET",
+      "finland": "FI",
+      "france": "FR",
+      "georgia": "GE",
+      "germany": "DE",
+      "greece": "GR",
+      "holland": "NL",
+      "hungary": "HU",
+      "iceland": "IS",
+      "india": "IN",
+      "indonesia": "ID",
+      "iran": "IR",
+      "iraq": "IQ",
+      "ireland": "IE",
+      "israel": "IL",
+      "italy": "IT",
+      "japan": "JP",
+      "jordan": "JO",
+      "kazakhstan": "KZ",
+      "kenya": "KE",
+      "kuwait": "KW",
+      "latvia": "LV",
+      "lebanon": "LB",
+      "libya": "LY",
+      "liechtenstein": "LI",
+      "lithuania": "LT",
+      "luxembourg": "LU",
+      "madagascar": "MG",
+      "malaysia": "MY",
+      "maldives": "MV",
+      "malta": "MT",
+      "mexico": "MX",
+      "monaco": "MC",
+      "mongolia": "MN",
+      "montenegro": "ME",
+      "morocco": "MA",
+      "nepal": "NP",
+      "netherlands": "NL",
+      "new zealand": "NZ",
+      "nigeria": "NG",
+      "north korea": "KP",
+      "north macedonia": "MK",
+      "norway": "NO",
+      "oman": "OM",
+      "pakistan": "PK",
+      "panama": "PA",
+      "paraguay": "PY",
+      "peru": "PE",
+      "philippines": "PH",
+      "poland": "PL",
+      "portugal": "PT",
+      "qatar": "QA",
+      "romania": "RO",
+      "russia": "RU",
+      "saudi arabia": "SA",
+      "serbia": "RS",
+      "singapore": "SG",
+      "slovakia": "SK",
+      "slovenia": "SI",
+      "south africa": "ZA",
+      "south korea": "KR",
+      "spain": "ES",
+      "sri lanka": "LK",
+      "sweden": "SE",
+      "switzerland": "CH",
+      "syria": "SY",
+      "taiwan": "TW",
+      "tajikistan": "TJ",
+      "thailand": "TH",
+      "tunisia": "TN",
+      "turkey": "TR",
+      "turkmenistan": "TM",
+      "uae": "AE",
+      "uk": "GB",
+      "ukraine": "UA",
+      "united arab emirates": "AE",
+      "united kingdom": "GB",
+      "united states": "US",
+      "usa": "US",
+      "uruguay": "UY",
+      "uzbekistan": "UZ",
+      "vatican city": "VA",
+      "venezuela": "VE",
+      "vietnam": "VN",
+      "yemen": "YE"
+    }
+  countryCities.sh: |
+    #!/bin/bash
+
+    # Debug output redirected to stderr so it doesn't interfere with JSON output
+    debug() {
+        echo "$1" >&2
+    }
+
+    debug "=== SCRIPT START ==="
+    debug "Testing basic output"
+    debug "Current directory: $(pwd)"
+    debug "Script arguments: $@"
+
+    # Step 1: Get the country code for the given country
+    COUNTRY="$1"
+    debug "Input country: $COUNTRY"
+
+    # Get country code from JSON file
+    debug "Getting country code..."
+    COUNTRY_CODE=$(echo "$COUNTRY" | tr '[:upper:]' '[:lower:]' | xargs | jq -r --arg country "$COUNTRY" '. | to_entries | .[] | select(.key | ascii_downcase == ($country | ascii_downcase)) | .value' /app/city-api/config/country-codes.json)
+    debug "Extracted country code: '$COUNTRY_CODE'"
+
+    if [ -z "$COUNTRY_CODE" ]; then
+        debug "Error: Failed to get country code"
+        exit 1
+    fi
+
+    # Get number of cities from configuration
+    debug "Getting number of cities from configuration..."
+    CITIES_LIMIT=$(yq '.services.cityApi.numberOfCitiesForSelectedCountry' /app/configuration.yml)
+    debug "Number of cities to fetch: $CITIES_LIMIT"
+
+    # Store the curl response in a variable
+    debug "Making API request for country code: $COUNTRY_CODE..."
+    RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY_CODE&limit=$CITIES_LIMIT&sort=-population&types=CITY" \
+      -H "X-RapidAPI-Host: wft-geo-db.p.rapidapi.com" \
+      -H "X-RapidAPI-Key: $GEODB_CITIES_API_KEY")
+
+    debug "Raw API Response:"
+    debug "$RESPONSE"
+
+    # Extract cities into an array and get count
+    debug "Extracting cities..."
+    CITIES=$(echo "$RESPONSE" | jq -r '.data[].city' | tr '\n' '|')
+    CITY_COUNT=$(echo "$CITIES" | tr '|' '\n' | grep -v '^$' | wc -l)
+    debug "Found $CITY_COUNT cities to process"
+
+    # Get the capital city (first city in response)
+    CAPITAL_CITY=$(echo "$RESPONSE" | jq -r '.data[0].city')
+    debug "Capital city: $CAPITAL_CITY"
+
+    # Get the description for this capital city from the JSON file
+    DESCRIPTION_KEY="$COUNTRY, $CAPITAL_CITY"
+    debug "Looking up description for key: $DESCRIPTION_KEY"
+
+    # First try to get description from city-edits.yml
+    CAPITAL_DESCRIPTION=$(yq ".countries[\"$DESCRIPTION_KEY\"].description" /app/city-api/config/city-edits.yml)
+    debug "Description from yml: $CAPITAL_DESCRIPTION" 

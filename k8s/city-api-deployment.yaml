@@ -45,6 +45,11 @@ spec:
             secretKeyRef:
               name: api-keys
               key: weather-api-key
+        - name: GEODB_CITIES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys
+              key: geodb-cities-api-key
         volumeMounts:
         - name: app-code
           mountPath: /app/city-api
@@ -54,6 +59,12 @@ spec:
         - name: shared-files
           mountPath: /app/shared/weather
           subPath: weather
+        - name: shared-files
+          mountPath: /app/city-api/countryCities.sh
+          subPath: countryCities.sh
+        - name: shared-files
+          mountPath: /app/city-api/config/country-codes.json
+          subPath: country-codes.json
       volumes:
       - name: app-code
         configMap:
@@ -64,3 +75,4 @@ spec:
       - name: shared-files
         configMap:
           name: shared-files
+          defaultMode: 0755  # This makes the script executable
