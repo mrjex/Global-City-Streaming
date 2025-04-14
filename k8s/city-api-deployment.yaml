@@ -17,11 +17,10 @@ spec:
       containers:
       - name: city-api
         image: joel030303/city-api:latest
-        imagePullPolicy: Always
-        command: ["uvicorn"]
-        args: ["city-api.main:app", "--host", "0.0.0.0", "--port", "8003"]
         ports:
         - containerPort: 8003
+        command: ["uvicorn"]
+        args: ["city-api.main:app", "--host", "0.0.0.0", "--port", "8003"]
         resources:
           requests:
             cpu: 100m
@@ -31,31 +30,19 @@ spec:
             memory: 512Mi
         env:
         - name: PYTHONPATH
-          value: "/app"
+          value: /app
         - name: PORT
           value: "8003"
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
+          value: kafka-0.kafka.global-city-streaming.svc.cluster.local:9092
         - name: KUBERNETES_NAMESPACE
-          value: "global-city-streaming"
-        - name: KUBERNETES_SERVICE_HOST
           valueFrom:
             fieldRef:
-              fieldPath: status.hostIP
-        - name: KUBERNETES_SERVICE_PORT
-          value: "443"
+              fieldPath: metadata.namespace
         volumeMounts:
         - name: app-code
           mountPath: /app/city-api
-        - name: docker-sock
-          mountPath: /var/run/docker.sock
-        securityContext:
-          privileged: true
       volumes:
       - name: app-code
         configMap:
           name: city-api-code
-      - name: docker-sock
-        hostPath:
-          path: /var/run/docker.sock
-          type: Socket
