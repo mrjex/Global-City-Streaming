@@ -23,11 +23,18 @@ spec:
         command: ['/bin/sh', '-c']
         args:
         - |
+          echo "Starting initialization..."
+          
           # Create directories
           mkdir -p /setup/city_api/config
           mkdir -p /setup/shared/weather
           
+          echo "Created directories. Listing source files:"
+          ls -la /shared/
+          ls -la /city-api/
+          
           # Set up shared module
+          echo "Setting up shared module..."
           cp /shared/__init__.py /setup/shared/
           cp /shared/utils.py /setup/shared/
           cp /shared/weather.__init__.py /setup/shared/weather/__init__.py
@@ -35,6 +42,7 @@ spec:
           cp /shared/weather.city_coordinates.py /setup/shared/weather/city_coordinates.py
           
           # Set up city-api module
+          echo "Setting up city-api module..."
           cp /city-api/__init__.py /setup/city_api/
           cp /city-api/main.py /setup/city_api/
           cp /city-api/config.configuration.yml /setup/city_api/config/configuration.yml
@@ -42,7 +50,12 @@ spec:
           cp /city-api/config.country-codes.json /setup/city_api/config/country-codes.json
           
           # Set permissions
+          echo "Setting permissions..."
+          chown -R 1000:1000 /setup
           chmod -R 755 /setup
+          
+          echo "Final directory structure:"
+          ls -R /setup
         volumeMounts:
         - name: shared-code
           mountPath: /shared
@@ -56,8 +69,15 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.port }}
-        command: ["python", "-m", "uvicorn"]
-        args: ["city_api.main:app", "--host", "0.0.0.0", "--port", "{{ .Values.service.port }}"]
+        command: ['/bin/sh', '-c']
+        args:
+        - |
+          echo "Container starting..."
+          echo "Python path: $PYTHONPATH"
+          echo "Directory contents:"
+          ls -R /app
+          echo "Starting uvicorn..."
+          python -m uvicorn city_api.main:app --host 0.0.0.0 --port {{ .Values.service.port }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         env:
