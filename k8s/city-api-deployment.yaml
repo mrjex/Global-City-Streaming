@@ -20,35 +20,40 @@ spec:
         command: ['/bin/sh', '-c']
         args:
         - |
+          # Create base directories
           mkdir -p /target/city-api/config
           mkdir -p /target/shared/weather
           
-          # Create directories and copy files
-          cp /config-files/city-api.config.* /target/city-api/config/
-          cp /config-files/city-api.countryCities.sh /target/city-api/
+          # Debug: List available files
+          echo "Available files in /config-files:"
+          ls -la /config-files
           
+          # Copy and rename files for city-api
+          cp /config-files/city-api.config.configuration.yml /target/city-api/config/configuration.yml
+          cp /config-files/city-api.config.city-edits.yml /target/city-api/config/city-edits.yml
+          cp /config-files/city-api.config.country-codes.json /target/city-api/config/country-codes.json
+          cp /config-files/city-api.countryCities.sh /target/city-api/countryCities.sh
+          
+          # Copy and rename files for shared module
           cp /config-files/shared.init.py /target/shared/__init__.py
           cp /config-files/shared.utils.py /target/shared/utils.py
           cp /config-files/shared.weather.init.py /target/shared/weather/__init__.py
           cp /config-files/shared.weather.api.py /target/shared/weather/api.py
           cp /config-files/shared.weather.city_coordinates.py /target/shared/weather/city_coordinates.py
           
-          # Fix file names
-          cd /target/city-api/config
-          mv city-api.config.configuration.yml configuration.yml
-          mv city-api.config.city-edits.yml city-edits.yml
-          mv city-api.config.country-codes.json country-codes.json
-          
-          # Make scripts executable
-          chmod +x /target/city-api/countryCities.sh
-          chmod +x /target/shared/weather/city_coordinates.py
+          # Debug: List target directories
+          echo "Contents of /target/city-api:"
+          ls -la /target/city-api
+          echo "Contents of /target/city-api/config:"
+          ls -la /target/city-api/config
+          echo "Contents of /target/shared/weather:"
+          ls -la /target/shared/weather
           
           # Set permissions
-          chmod -R 644 /target/shared/weather/*
-          chmod -R 644 /target/city-api/config/*
           find /target -type d -exec chmod 755 {} \;
-          chmod +x /target/city-api/countryCities.sh
-          chmod +x /target/shared/weather/city_coordinates.py
+          find /target -type f -exec chmod 644 {} \;
+          chmod +x /target/city-api/countryCities.sh || echo "Warning: Could not chmod countryCities.sh"
+          chmod +x /target/shared/weather/city_coordinates.py || echo "Warning: Could not chmod city_coordinates.py"
         volumeMounts:
         - name: app-files
           mountPath: /config-files
