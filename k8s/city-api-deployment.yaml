@@ -20,15 +20,15 @@ spec:
         command: ['/bin/sh', '-c']
         args:
         - |
-          mkdir -p /app/city-api/config
-          cp /shared-files/country-codes.json /app/city-api/config/
-          cp /shared-files/countryCities.sh /app/city-api/
-          chmod +x /app/city-api/countryCities.sh
+          mkdir -p /config/city-api/config
+          cp /shared-files/country-codes.json /config/city-api/config/
+          cp /shared-files/countryCities.sh /config/city-api/
+          chmod +x /config/city-api/countryCities.sh
         volumeMounts:
         - name: shared-files
           mountPath: /shared-files
-        - name: app-code
-          mountPath: /app/city-api
+        - name: config-dir
+          mountPath: /config
       containers:
       - name: city-api
         image: joel030303/city-api:latest
@@ -74,6 +74,11 @@ spec:
         - name: shared-files
           mountPath: /app/shared/weather
           subPath: weather
+        - name: config-dir
+          mountPath: /app/city-api/config
+        - name: config-dir
+          mountPath: /app/city-api/countryCities.sh
+          subPath: city-api/countryCities.sh
       volumes:
       - name: app-code
         configMap:
@@ -85,3 +90,5 @@ spec:
         configMap:
           name: shared-files
           defaultMode: 0755
+      - name: config-dir
+        emptyDir: {}
