@@ -20,15 +20,27 @@ spec:
         command: ['/bin/sh', '-c']
         args:
         - |
-          mkdir -p /config/city-api/config
-          cp /shared-files/country-codes.json /config/city-api/config/
-          cp /shared-files/countryCities.sh /config/city-api/
-          chmod +x /config/city-api/countryCities.sh
+          # Create target directories
+          mkdir -p /target/city-api/config
+          
+          # Copy files from shared-files
+          cp /shared-files/country-codes.json /target/city-api/config/
+          cp /shared-files/countryCities.sh /target/city-api/
+          chmod +x /target/city-api/countryCities.sh
+          
+          # Copy files from app-code
+          cp -r /app-code/* /target/city-api/
+          
+          # List contents for debugging
+          echo "Contents of /target/city-api:"
+          ls -la /target/city-api/
         volumeMounts:
         - name: shared-files
           mountPath: /shared-files
+        - name: app-code
+          mountPath: /app-code
         - name: config-dir
-          mountPath: /config
+          mountPath: /target
       containers:
       - name: city-api
         image: joel030303/city-api:latest
@@ -66,7 +78,7 @@ spec:
               name: api-keys
               key: geodb-cities-api-key
         volumeMounts:
-        - name: app-code
+        - name: config-dir
           mountPath: /app/city-api
         - name: app-config
           mountPath: /app/configuration.yml
@@ -74,8 +86,6 @@ spec:
         - name: shared-files
           mountPath: /app/shared/weather
           subPath: weather
-        - name: config-dir
-          mountPath: /app/city-api
       volumes:
       - name: app-code
         configMap:
