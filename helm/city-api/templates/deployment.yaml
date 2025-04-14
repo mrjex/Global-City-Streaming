@@ -50,13 +50,15 @@ spec:
               key: geodb-cities-api-key
         volumeMounts:
         - name: shared-code
-          mountPath: {{ .Values.volumes.sharedCode.mountPath }}
+          mountPath: /app/shared
         - name: city-api-code
-          mountPath: {{ .Values.volumes.cityApiCode.mountPath }}
+          mountPath: /app/city_api
       volumes:
       - name: shared-code
         configMap:
           name: shared-code
+          defaultMode: 0644
       - name: city-api-code
         configMap:
-          name: city-api-code 
+          name: city-api-code
+          defaultMode: 0644 
