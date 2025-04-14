@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: city-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: city-api
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: city-api
+  template:
+    metadata:
+      labels:
+        app: city-api
+    spec:
+      serviceAccountName: city-api-sa
+      containers:
+      - name: city-api
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        command: ["python", "-m", "uvicorn"]
+        args: ["city_api.main:app", "--host", "0.0.0.0", "--port", "{{ .Values.service.port }}"]
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        env:
+        - name: PYTHONPATH
+          value: /app
+        - name: PORT
+          value: "{{ .Values.service.port }}"
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: {{ .Values.kafka.bootstrapServers }}
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: WEATHER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys
+              key: weather-api-key
+        - name: GEODB_CITIES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys
+              key: geodb-cities-api-key
+        volumeMounts:
+        - name: shared-code
+          mountPath: {{ .Values.volumes.sharedCode.mountPath }}
+        - name: city-api-code
+          mountPath: {{ .Values.volumes.cityApiCode.mountPath }}
+      volumes:
+      - name: shared-code
+        configMap:
+          name: shared-code
+      - name: city-api-code
+        configMap:
+          name: city-api-code 

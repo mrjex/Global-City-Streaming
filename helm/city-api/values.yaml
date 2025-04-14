@@ -1,0 +1,29 @@
+image:
+  repository: joel030303/city-api
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8003
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 200m
+    memory: 512Mi
+
+kafka:
+  bootstrapServers: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
+
+configPath:
+  cityApi: /app/city_api
+  shared: /app/shared
+
+volumes:
+  sharedCode:
+    mountPath: /app/shared
+  cityApiCode:
+    mountPath: /app/city_api 
