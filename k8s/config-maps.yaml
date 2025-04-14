@@ -5,7 +5,7 @@ metadata:
   namespace: global-city-streaming
 data:
   # City API Configuration
-  "city-api/config/configuration.yml": |
+  city-api.config.configuration.yml: |
     services:
       cityApi:
         numberOfCitiesForSelectedCountry: 10
@@ -14,7 +14,7 @@ data:
       zookeeper:
         servers: zookeeper-0.zookeeper.global-city-streaming.svc.cluster.local:2181
 
-  "city-api/config/city-edits.yml": |
+  city-api.config.city-edits.yml: |
     countries:
       "Sweden, Stockholm":
         description: "Capital of Sweden, known for its beautiful archipelago and innovative tech scene"
@@ -23,11 +23,11 @@ data:
       # Add more city descriptions as needed
 
   # Shared Weather Module
-  "shared/weather/__init__.py": |
+  shared.weather.init.py: |
     from .api import WeatherAPI
     __all__ = ['WeatherAPI']
 
-  "shared/weather/api.py": |
+  shared.weather.api.py: |
     import os
     import requests
     import sys
@@ -79,7 +79,7 @@ data:
                 print(f"Error composing city object for {city}: {str(e)}", file=sys.stderr)
                 return None
 
-  "shared/weather/city_coordinates.py": |
+  shared.weather.city_coordinates.py: |
     #!/usr/bin/env python3
     import sys
     import json
@@ -112,10 +112,10 @@ data:
         cities = sys.argv[1:]
         get_city_coordinates(cities)
 
-  "shared/__init__.py": |
+  shared.init.py: |
     # Empty init file to make the directory a Python package
 
-  "shared/utils.py": |
+  shared.utils.py: |
     import json
     import logging
     from typing import Dict, Any
@@ -145,7 +145,7 @@ data:
         return all(field in data for field in required_fields)
 
   # Scripts
-  "city-api/countryCities.sh": |
+  city-api.countryCities.sh: |
     #!/bin/bash
     
     # Debug output redirected to stderr so it doesn't interfere with JSON output
@@ -188,7 +188,7 @@ data:
     # Process response and return JSON
     echo "$RESPONSE"
 
-  "city-api/config/country-codes.json": |
+  city-api.config.country-codes.json: |
     {
       "afghanistan": "AF",
       "albania": "AL",

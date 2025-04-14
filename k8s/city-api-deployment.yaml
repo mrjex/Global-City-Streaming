@@ -14,6 +14,46 @@ spec:
         app: city-api
     spec:
       serviceAccountName: city-api-sa
+      initContainers:
+      - name: init-dirs
+        image: busybox
+        command: ['/bin/sh', '-c']
+        args:
+        - |
+          mkdir -p /target/city-api/config
+          mkdir -p /target/shared/weather
+          
+          # Create directories and copy files
+          cp /config-files/city-api.config.* /target/city-api/config/
+          cp /config-files/city-api.countryCities.sh /target/city-api/
+          
+          cp /config-files/shared.init.py /target/shared/__init__.py
+          cp /config-files/shared.utils.py /target/shared/utils.py
+          cp /config-files/shared.weather.init.py /target/shared/weather/__init__.py
+          cp /config-files/shared.weather.api.py /target/shared/weather/api.py
+          cp /config-files/shared.weather.city_coordinates.py /target/shared/weather/city_coordinates.py
+          
+          # Fix file names
+          cd /target/city-api/config
+          mv city-api.config.configuration.yml configuration.yml
+          mv city-api.config.city-edits.yml city-edits.yml
+          mv city-api.config.country-codes.json country-codes.json
+          
+          # Make scripts executable
+          chmod +x /target/city-api/countryCities.sh
+          chmod +x /target/shared/weather/city_coordinates.py
+          
+          # Set permissions
+          chmod -R 644 /target/shared/weather/*
+          chmod -R 644 /target/city-api/config/*
+          find /target -type d -exec chmod 755 {} \;
+          chmod +x /target/city-api/countryCities.sh
+          chmod +x /target/shared/weather/city_coordinates.py
+        volumeMounts:
+        - name: app-files
+          mountPath: /config-files
+        - name: config-dir
+          mountPath: /target
       containers:
       - name: city-api
         image: joel030303/city-api:latest
@@ -51,36 +91,8 @@ spec:
               name: api-keys
               key: geodb-cities-api-key
         volumeMounts:
-        # Mount city-api files
-        - name: app-files
-          mountPath: /app/city-api/config/configuration.yml
-          subPath: city-api/config/configuration.yml
-        - name: app-files
-          mountPath: /app/city-api/config/city-edits.yml
-          subPath: city-api/config/city-edits.yml
-        - name: app-files
-          mountPath: /app/city-api/config/country-codes.json
-          subPath: city-api/config/country-codes.json
-        - name: app-files
-          mountPath: /app/city-api/countryCities.sh
-          subPath: city-api/countryCities.sh
-        # Mount shared files
-        - name: app-files
-          mountPath: /app/shared/__init__.py
-          subPath: shared/__init__.py
-        - name: app-files
-          mountPath: /app/shared/utils.py
-          subPath: shared/utils.py
-        - name: app-files
-          mountPath: /app/shared/weather/__init__.py
-          subPath: shared/weather/__init__.py
-        - name: app-files
-          mountPath: /app/shared/weather/api.py
-          subPath: shared/weather/api.py
-        - name: app-files
-          mountPath: /app/shared/weather/city_coordinates.py
-          subPath: shared/weather/city_coordinates.py
-        # Mount configuration
+        - name: config-dir
+          mountPath: /app
         - name: app-config
           mountPath: /app/configuration.yml
           subPath: configuration.yml
@@ -89,6 +101,8 @@ spec:
         configMap:
           name: app-files
           defaultMode: 0755
+      - name: config-dir
+        emptyDir: {}
       - name: app-config
         configMap:
           name: app-config-yml
