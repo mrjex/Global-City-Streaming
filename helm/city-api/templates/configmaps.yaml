@@ -7,10 +7,10 @@ data:
   "__init__.py": |
     # Shared package initialization
   "utils.py": {{ (.Files.Get "../../shared/utils.py") | quote }}
-  "weather/__init__.py": |
+  "weather.__init__.py": |
     # Weather package initialization
-  "weather/api.py": {{ (.Files.Get "../../shared/weather/api.py") | quote }}
-  "weather/city_coordinates.py": {{ (.Files.Get "../../shared/weather/city_coordinates.py") | quote }}
+  "weather.api.py": {{ (.Files.Get "../../shared/weather/api.py") | quote }}
+  "weather.city_coordinates.py": {{ (.Files.Get "../../shared/weather/city_coordinates.py") | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -21,6 +21,6 @@ data:
   "__init__.py": |
     # City API package initialization
   "main.py": {{ (.Files.Get "../../city-api/main.py") | quote }}
-  "config/configuration.yml": {{ (.Files.Get "../../city-api/config/configuration.yml") | quote }}
-  "config/city-edits.yml": {{ (.Files.Get "../../city-api/config/city-edits.yml") | quote }}
-  "config/country-codes.json": {{ (.Files.Get "../../city-api/config/country-codes.json") | quote }} 
+  "config.configuration.yml": {{ (.Files.Get "../../city-api/config/configuration.yml") | quote }}
+  "config.city-edits.yml": {{ (.Files.Get "../../city-api/config/city-edits.yml") | quote }}
+  "config.country-codes.json": {{ (.Files.Get "../../city-api/config/country-codes.json") | quote }} 

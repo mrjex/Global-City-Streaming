@@ -17,6 +17,39 @@ spec:
         app: city-api
     spec:
       serviceAccountName: city-api-sa
+      initContainers:
+      - name: init-dirs
+        image: busybox
+        command: ['/bin/sh', '-c']
+        args:
+        - |
+          # Create directories
+          mkdir -p /setup/city_api/config
+          mkdir -p /setup/shared/weather
+          
+          # Set up shared module
+          cp /shared/__init__.py /setup/shared/
+          cp /shared/utils.py /setup/shared/
+          cp /shared/weather.__init__.py /setup/shared/weather/__init__.py
+          cp /shared/weather.api.py /setup/shared/weather/api.py
+          cp /shared/weather.city_coordinates.py /setup/shared/weather/city_coordinates.py
+          
+          # Set up city-api module
+          cp /city-api/__init__.py /setup/city_api/
+          cp /city-api/main.py /setup/city_api/
+          cp /city-api/config.configuration.yml /setup/city_api/config/configuration.yml
+          cp /city-api/config.city-edits.yml /setup/city_api/config/city-edits.yml
+          cp /city-api/config.country-codes.json /setup/city_api/config/country-codes.json
+          
+          # Set permissions
+          chmod -R 755 /setup
+        volumeMounts:
+        - name: shared-code
+          mountPath: /shared
+        - name: city-api-code
+          mountPath: /city-api
+        - name: app-volume
+          mountPath: /setup
       containers:
       - name: city-api
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -49,10 +82,8 @@ spec:
               name: api-keys
               key: geodb-cities-api-key
         volumeMounts:
-        - name: shared-code
-          mountPath: /app/shared
-        - name: city-api-code
-          mountPath: /app/city_api
+        - name: app-volume
+          mountPath: /app
       volumes:
       - name: shared-code
         configMap:
@@ -61,4 +92,6 @@ spec:
       - name: city-api-code
         configMap:
           name: city-api-code
-          defaultMode: 0644 
+          defaultMode: 0644
+      - name: app-volume
+        emptyDir: {} 
