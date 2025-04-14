@@ -38,7 +38,15 @@ spec:
         volumeMounts:
         - name: app-code
           mountPath: /app/city-api
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+        securityContext:
+          privileged: true
       volumes:
       - name: app-code
         configMap:
           name: city-api-code
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket

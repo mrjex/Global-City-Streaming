@@ -68,13 +68,4 @@ spec:
             cpu: "500m"
           requests:
             memory: "128Mi"
-            cpu: "250m"
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: api-keys
-  namespace: global-city-streaming
-type: Opaque
-data:
-  weather-api-key: YOUR_BASE64_ENCODED_API_KEY  # Replace with your actual base64 encoded API key 
+            cpu: "250m" 
