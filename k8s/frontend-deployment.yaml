@@ -39,6 +39,9 @@ spec:
           # Copy shared files
           cp -L /shared-files/* /target/shared/weather/ || true
           
+          # Copy frontend files
+          cp -rL /frontend-files/* /target/ || true
+          
           # Create __init__.py files
           touch /target/shared/__init__.py
           touch /target/shared/weather/__init__.py
@@ -65,11 +68,14 @@ spec:
           
           # Ensure files are readable
           chmod -R 644 /target/shared/weather/*
+          chmod -R 644 /target/*.js || true
           find /target -type d -exec chmod 755 {} \;
           chmod +x /target/start.sh
         volumeMounts:
         - name: shared-files
           mountPath: /shared-files
+        - name: frontend-files
+          mountPath: /frontend-files
         - name: python-modules
           mountPath: /target
       containers:
@@ -127,6 +133,9 @@ spec:
       - name: shared-files
         configMap:
           name: shared-files
+      - name: frontend-files
+        configMap:
+          name: frontend-code
       - name: app-config
         configMap:
           name: app-config-yml
