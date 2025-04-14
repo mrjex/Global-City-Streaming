@@ -27,9 +27,37 @@ spec:
       labels:
         app: frontend
     spec:
+      initContainers:
+      - name: init-python-modules
+        image: busybox
+        command: ['/bin/sh', '-c']
+        args:
+        - |
+          # Create Python package structure
+          mkdir -p /target/shared/weather
+          
+          # Copy shared files
+          cp -L /shared-files/* /target/shared/weather/ || true
+          
+          # Create __init__.py files
+          touch /target/shared/__init__.py
+          touch /target/shared/weather/__init__.py
+          
+          # List contents for debugging
+          echo "Contents of /target/shared/weather:"
+          ls -la /target/shared/weather/
+          
+          # Ensure files are readable
+          chmod -R 644 /target/shared/weather/*
+          find /target -type d -exec chmod 755 {} \;
+        volumeMounts:
+        - name: shared-files
+          mountPath: /shared-files
+        - name: python-modules
+          mountPath: /target
       containers:
       - name: frontend
-        image: joel030303/frontend:latest  # Replace with your image
+        image: joel030303/frontend:latest
         ports:
         - containerPort: 3001
         env:
@@ -62,10 +90,14 @@ spec:
             secretKeyRef:
               name: api-keys
               key: weather-api-key
+        - name: PYTHONPATH
+          value: "/app"
         volumeMounts:
-        - name: shared-files
-          mountPath: /app/shared/weather
-          subPath: weather
+        - name: python-modules
+          mountPath: /app
+        - name: app-config
+          mountPath: /app/configuration.yml
+          subPath: configuration.yml
         resources:
           limits:
             memory: "256Mi"
@@ -76,4 +108,9 @@ spec:
       volumes:
       - name: shared-files
         configMap:
-          name: shared-files 
+          name: shared-files
+      - name: app-config
+        configMap:
+          name: app-config-yml
+      - name: python-modules
+        emptyDir: {} 
