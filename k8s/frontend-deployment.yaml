@@ -39,9 +39,6 @@ spec:
           # Copy shared files
           cp -L /shared-files/* /target/shared/weather/ || true
           
-          # Copy frontend files
-          cp -rL /frontend-files/* /target/ || true
-          
           # Create __init__.py files
           touch /target/shared/__init__.py
           touch /target/shared/weather/__init__.py
@@ -52,30 +49,16 @@ spec:
           mv weather.city_coordinates.py city_coordinates.py || true
           mv weather.__init__.py __init__.py || true
           
-          # Create start script
-          cat > /target/start.sh << 'EOF'
-          #!/bin/sh
-          cd /app
-          exec node server.js
-          EOF
-          chmod +x /target/start.sh
-          
           # List contents for debugging
           echo "Contents of /target/shared/weather:"
           ls -la /target/shared/weather/
-          echo "Contents of /target:"
-          ls -la /target/
           
           # Ensure files are readable
           chmod -R 644 /target/shared/weather/*
-          chmod -R 644 /target/*.js || true
           find /target -type d -exec chmod 755 {} \;
-          chmod +x /target/start.sh
         volumeMounts:
         - name: shared-files
           mountPath: /shared-files
-        - name: frontend-files
-          mountPath: /frontend-files
         - name: python-modules
           mountPath: /target
       containers:
@@ -83,7 +66,6 @@ spec:
         image: joel030303/frontend:latest
         ports:
         - containerPort: 3001
-        command: ["/app/start.sh"]
         env:
         - name: KAFKA_PRODUCER_URL
           value: "http://kafka-producer:8000"
@@ -118,7 +100,7 @@ spec:
           value: "/app"
         volumeMounts:
         - name: python-modules
-          mountPath: /app
+          mountPath: /app/shared
         - name: app-config
           mountPath: /app/configuration.yml
           subPath: configuration.yml
@@ -133,9 +115,6 @@ spec:
       - name: shared-files
         configMap:
           name: shared-files
-      - name: frontend-files
-        configMap:
-          name: frontend-code
       - name: app-config
         configMap:
           name: app-config-yml
