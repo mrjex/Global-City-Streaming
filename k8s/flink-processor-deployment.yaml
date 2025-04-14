@@ -55,3 +55,11 @@ spec:
           value: "8"
         - name: FLINK_PARALLELISM
           value: "4"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configuration.yml
+          subPath: configuration.yml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: flink-config
