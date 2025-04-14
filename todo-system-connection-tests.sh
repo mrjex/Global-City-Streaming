@@ -21,3 +21,11 @@ kubectl exec -it postgres-0 -n global-city-streaming -- psql -U postgres -d post
 
 # Get all distinct cities from PostgreSQL database
 kubectl exec -it postgres-0 -n global-city-streaming -- psql -U postgres -d postgres -c "\pset pager off" -c "SELECT DISTINCT city FROM weather ORDER BY city;" | cat
+
+
+
+
+
+
+# Stop all pods - Works or not??
+# kubectl scale deployment --all --replicas=0 -n global-city-streaming
