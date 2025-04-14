@@ -21,49 +21,47 @@ spec:
         args:
         - |
           # Create base directories
-          mkdir -p /target/city_api
-          mkdir -p /target/shared/weather
+          mkdir -p /app/city_api
+          mkdir -p /app/shared/weather
           
           # Debug: List available files
-          echo "Available files in /config-files:"
-          ls -la /config-files
-          
-          # Copy and rename files for city-api package
-          cp /config-files/city-api.init.py /target/city_api/__init__.py
-          cp /config-files/city-api.main.py /target/city_api/main.py
-          
-          # Copy config files
-          mkdir -p /target/city_api/config
-          cp /config-files/city-api.config.configuration.yml /target/city_api/config/configuration.yml
-          cp /config-files/city-api.config.city-edits.yml /target/city_api/config/city-edits.yml
-          cp /config-files/city-api.config.country-codes.json /target/city_api/config/country-codes.json
-          cp /config-files/city-api.countryCities.sh /target/city_api/countryCities.sh
+          echo "Starting initialization..."
+          echo "Created directories. Listing source files:"
+          echo "Contents of /shared:"
+          ls -la /shared
+          echo "Contents of /city-api:"
+          ls -la /city-api
           
           # Copy shared module files
-          cp /config-files/shared.init.py /target/shared/__init__.py
-          cp /config-files/shared.utils.py /target/shared/utils.py
-          cp /config-files/shared.weather.init.py /target/shared/weather/__init__.py
-          cp /config-files/shared.weather.api.py /target/shared/weather/api.py
-          cp /config-files/shared.weather.city_coordinates.py /target/shared/weather/city_coordinates.py
+          echo "Setting up shared module..."
+          cp /shared/__init__.py /app/shared/
+          cp /shared/utils.py /app/shared/
+          cp /shared/weather.__init__.py /app/shared/weather/__init__.py
+          cp /shared/weather.api.py /app/shared/weather/api.py
+          cp /shared/weather.city_coordinates.py /app/shared/weather/city_coordinates.py
           
-          # Debug: List target directories
-          echo "Contents of /target/city_api:"
-          ls -la /target/city_api
-          echo "Contents of /target/city_api/config:"
-          ls -la /target/city_api/config
-          echo "Contents of /target/shared/weather:"
-          ls -la /target/shared/weather
+          # Copy city-api files
+          echo "Setting up city-api module..."
+          cp /city-api/__init__.py /app/city_api/
+          cp /city-api/main.py /app/city_api/
+          mkdir -p /app/city_api/config
+          cp /city-api/config.* /app/city_api/config/
           
           # Set permissions
-          find /target -type d -exec chmod 755 {} \;
-          find /target -type f -exec chmod 644 {} \;
-          chmod +x /target/city_api/countryCities.sh || echo "Warning: Could not chmod countryCities.sh"
-          chmod +x /target/shared/weather/city_coordinates.py || echo "Warning: Could not chmod city_coordinates.py"
+          echo "Setting permissions..."
+          find /app -type d -exec chmod 755 {} \;
+          find /app -type f -exec chmod 644 {} \;
+          
+          # Debug: Show final structure
+          echo "Final directory structure:"
+          find /app -type d -exec sh -c 'echo; echo "{}:"; ls -la "{}"' \;
         volumeMounts:
-        - name: app-files
-          mountPath: /config-files
+        - name: shared-files
+          mountPath: /shared
+        - name: city-api-files
+          mountPath: /city-api
         - name: config-dir
-          mountPath: /target
+          mountPath: /app
       containers:
       - name: city-api
         image: joel030303/city-api:latest
@@ -107,10 +105,12 @@ spec:
           mountPath: /app/configuration.yml
           subPath: configuration.yml
       volumes:
-      - name: app-files
+      - name: shared-files
         configMap:
-          name: app-files
-          defaultMode: 0755
+          name: shared-files
+      - name: city-api-files
+        configMap:
+          name: city-api-files
       - name: config-dir
         emptyDir: {}
       - name: app-config
