@@ -75,10 +75,7 @@ spec:
           mountPath: /app/shared/weather
           subPath: weather
         - name: config-dir
-          mountPath: /app/city-api/config
-        - name: config-dir
-          mountPath: /app/city-api/countryCities.sh
-          subPath: city-api/countryCities.sh
+          mountPath: /app/city-api
       volumes:
       - name: app-code
         configMap:
