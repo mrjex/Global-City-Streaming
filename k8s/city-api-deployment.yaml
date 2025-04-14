@@ -23,17 +23,19 @@ spec:
           # Create target directories
           mkdir -p /target/city-api/config
           
+          # Copy files from ConfigMap
+          cp -L /app-code/* /target/city-api/ || true
+          
           # Copy files from shared-files
           cp /shared-files/country-codes.json /target/city-api/config/
           cp /shared-files/countryCities.sh /target/city-api/
           chmod +x /target/city-api/countryCities.sh
           
-          # Copy files from app-code
-          cp -r /app-code/* /target/city-api/
-          
           # List contents for debugging
           echo "Contents of /target/city-api:"
           ls -la /target/city-api/
+          echo "Contents of main.py:"
+          cat /target/city-api/main.py || echo "main.py not found"
         volumeMounts:
         - name: shared-files
           mountPath: /shared-files
