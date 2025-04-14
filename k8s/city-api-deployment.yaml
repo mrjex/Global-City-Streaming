@@ -13,6 +13,7 @@ spec:
       labels:
         app: city-api
     spec:
+      serviceAccountName: city-api-sa
       containers:
       - name: city-api
         image: joel030303/city-api:latest
@@ -35,6 +36,14 @@ spec:
           value: "8003"
         - name: KAFKA_BOOTSTRAP_SERVERS
           value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
+        - name: KUBERNETES_NAMESPACE
+          value: "global-city-streaming"
+        - name: KUBERNETES_SERVICE_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: KUBERNETES_SERVICE_PORT
+          value: "443"
         volumeMounts:
         - name: app-code
           mountPath: /app/city-api
