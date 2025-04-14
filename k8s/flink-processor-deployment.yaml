@@ -33,11 +33,11 @@ spec:
         - containerPort: 8001
         resources:
           requests:
-            cpu: 1000m
-            memory: 4Gi
+            cpu: 500m
+            memory: 1Gi
           limits:
-            cpu: 2000m
-            memory: 5Gi
+            cpu: 1000m
+            memory: 2Gi
         env:
         - name: KAFKA_SERVER
           value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
@@ -48,9 +48,9 @@ spec:
         - name: FLINK_ENV_JAVA_OPTS
           value: "-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication -XX:+AggressiveOpts"
         - name: FLINK_ENV_JAVA_OPTS_JM
-          value: "-Xmx4g -Xms4g"
+          value: "-Xmx1g -Xms1g"
         - name: FLINK_ENV_JAVA_OPTS_TM
-          value: "-Xmx4g -Xms4g"
+          value: "-Xmx1g -Xms1g"
         - name: FLINK_MAX_PARALLELISM
           value: "8"
         - name: FLINK_PARALLELISM
