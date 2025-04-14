@@ -17,6 +17,7 @@ spec:
       containers:
       - name: city-api
         image: joel030303/city-api:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8003
         command: ["uvicorn"]
@@ -42,7 +43,13 @@ spec:
         volumeMounts:
         - name: app-code
           mountPath: /app/city-api
+        - name: app-config
+          mountPath: /app/configuration.yml
+          subPath: configuration.yml
       volumes:
       - name: app-code
         configMap:
           name: city-api-code
+      - name: app-config
+        configMap:
+          name: app-config-yml
