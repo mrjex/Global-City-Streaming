@@ -16,42 +16,27 @@ spec:
       containers:
       - name: db-manager
         image: joel030303/db-manager:latest
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 2560Mi
         env:
         - name: POSTGRES_HOST
           value: "postgres"
         - name: POSTGRES_PORT
           value: "5432"
         - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: username
+          value: "postgres"
         - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: password
+          value: "postgres"
         - name: POSTGRES_DB
           value: "postgres"
         - name: MAX_RECORDS
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: MAX_RECORDS
+          value: "2000"
         - name: CHECK_INTERVAL
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: CHECK_INTERVAL
+          value: "60"
         - name: BATCH_DELETE_SIZE
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: BATCH_DELETE_SIZE
-        resources:
-          limits:
-            memory: "2560Mi"
-            cpu: "1000m"
-          requests:
-            memory: "1Gi"
-            cpu: "500m"
+          value: "10000"

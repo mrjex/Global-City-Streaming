@@ -31,27 +31,27 @@ spec:
         image: joel030303/flink-processor:latest
         ports:
         - containerPort: 8001
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 4Gi
+          limits:
+            cpu: 2000m
+            memory: 5Gi
         env:
         - name: KAFKA_SERVER
-          value: "kafka:9092"
+          value: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
         - name: ZOOKEEPER_SERVER
-          value: "zookeeper:2181"
+          value: "zookeeper-0.zookeeper.global-city-streaming.svc.cluster.local:2181"
+        - name: PRODUCER_INTERVAL
+          value: "100"
         - name: FLINK_ENV_JAVA_OPTS
           value: "-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication -XX:+AggressiveOpts"
+        - name: FLINK_ENV_JAVA_OPTS_JM
+          value: "-Xmx4g -Xms4g"
+        - name: FLINK_ENV_JAVA_OPTS_TM
+          value: "-Xmx4g -Xms4g"
         - name: FLINK_MAX_PARALLELISM
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: FLINK_MAX_PARALLELISM
+          value: "8"
         - name: FLINK_PARALLELISM
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: FLINK_PARALLELISM
-        resources:
-          limits:
-            memory: "5Gi"
-            cpu: "2000m"
-          requests:
-            memory: "2Gi"
-            cpu: "1000m"
+          value: "4"
