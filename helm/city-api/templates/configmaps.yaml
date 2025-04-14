@@ -4,99 +4,11 @@ metadata:
   name: shared-code
   namespace: {{ .Release.Namespace }}
 data:
-  "__init__.py": |
-    # Shared package initialization
-  "utils.py": |
-    import logging
-    import json
-    from typing import Any, Dict, Optional
-
-    def setup_logging(service_name: str) -> logging.Logger:
-        """Set up logging configuration for the given service."""
-        logger = logging.getLogger(service_name)
-        logger.setLevel(logging.INFO)
-        
-        # Create console handler with formatting
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        
-        # Add handler to logger
-        logger.addHandler(handler)
-        return logger
-
-    def parse_json_message(message: str) -> Optional[Dict[str, Any]]:
-        """Safely parse a JSON message."""
-        try:
-            return json.loads(message)
-        except json.JSONDecodeError as e:
-            logging.error(f"Failed to parse JSON message: {e}")
-            return None
-
-    def format_temperature(temp: float, unit: str = 'C') -> str:
-        """Format temperature with unit."""
-        return f"{temp:.1f}°{unit}"
-
-  "weather.__init__.py": |
-    # Weather package initialization
-  "weather.api.py": |
-    import os
-    import requests
-    from typing import Dict, Any, Optional
-    from ..utils import setup_logging
-
-    logger = setup_logging("weather-api")
-
-    def get_weather_data(city: str, country: str) -> Optional[Dict[str, Any]]:
-        """Get weather data for a given city."""
-        api_key = os.getenv('WEATHER_API_KEY')
-        if not api_key:
-            logger.error("Weather API key not found")
-            return None
-            
-        try:
-            url = f"http://api.openweathermap.org/data/2.5/weather?q={city},{country}&appid={api_key}&units=metric"
-            response = requests.get(url)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            logger.error(f"Error fetching weather data: {e}")
-            return None
-
-  "weather.city_coordinates.py": |
-    from typing import Dict, Any, Optional
-    import requests
-    import os
-    from ..utils import setup_logging
-
-    logger = setup_logging("city-coordinates")
-
-    def get_city_coordinates(city: str, country: str) -> Optional[Dict[str, float]]:
-        """Get coordinates for a given city."""
-        api_key = os.getenv('GEODB_CITIES_API_KEY')
-        if not api_key:
-            logger.error("GeoDB Cities API key not found")
-            return None
-            
-        try:
-            url = f"http://geodb-free-service.wirefreethought.com/v1/geo/cities"
-            headers = {'x-rapidapi-key': api_key}
-            params = {'namePrefix': city, 'countryCode': country, 'limit': 1}
-            
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()
-            
-            data = response.json()
-            if data['data']:
-                city_data = data['data'][0]
-                return {
-                    'latitude': city_data['latitude'],
-                    'longitude': city_data['longitude']
-                }
-            return None
-        except Exception as e:
-            logger.error(f"Error fetching city coordinates: {e}")
-            return None
+  "__init__.py": {{ (.Files.Get "files/shared/__init__.py") | quote }}
+  "utils.py": {{ (.Files.Get "files/shared/utils.py") | quote }}
+  "weather.__init__.py": {{ (.Files.Get "files/shared/weather/__init__.py") | quote }}
+  "weather.api.py": {{ (.Files.Get "files/shared/weather/api.py") | quote }}
+  "weather.city_coordinates.py": {{ (.Files.Get "files/shared/weather/city_coordinates.py") | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -104,64 +16,8 @@ metadata:
   name: city-api-code
   namespace: {{ .Release.Namespace }}
 data:
-  "__init__.py": |
-    # City API package initialization
-  "main.py": |
-    from fastapi import FastAPI, HTTPException
-    from pydantic import BaseModel
-    from datetime import datetime
-    import json
-    import os
-    from shared.utils import setup_logging
-    from shared.weather.api import get_weather_data
-    
-    # Set up logging
-    logger = setup_logging("city-api")
-    
-    # Initialize FastAPI app
-    app = FastAPI(title="City Temperature API")
-    
-    class CityTemperature(BaseModel):
-        city: str
-        country: str
-        temperature: float
-        timestamp: datetime
-    
-    @app.get("/health")
-    async def health_check():
-        return {"status": "healthy"}
-    
-    @app.post("/temperature")
-    async def post_temperature(data: CityTemperature):
-        try:
-            logger.info(f"Received temperature data for {data.city}, {data.country}")
-            return {"status": "success", "message": "Temperature data received"}
-        except Exception as e:
-            logger.error(f"Error processing temperature data: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))
-  "config.configuration.yml": |
-    # City API Configuration
-    api:
-      port: 8003
-      host: "0.0.0.0"
-    
-    logging:
-      level: "INFO"
-      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    
-    kafka:
-      bootstrap_servers: "kafka-0.kafka.global-city-streaming.svc.cluster.local:9092"
-      topic: "weather-data"
-  "config.city-edits.yml": |
-    city_edits:
-      "New York City": "New York"
-      "LA": "Los Angeles"
-      "SF": "San Francisco"
-  "config.country-codes.json": |
-    {
-      "USA": "US",
-      "United States": "US",
-      "United Kingdom": "GB",
-      "UK": "GB",
-      "Sweden": "SE"
-    } 
+  "__init__.py": {{ (.Files.Get "files/city-api/__init__.py") | quote }}
+  "main.py": {{ (.Files.Get "files/city-api/main.py") | quote }}
+  "config.configuration.yml": {{ (.Files.Get "files/city-api/config/configuration.yml") | quote }}
+  "config.city-edits.yml": {{ (.Files.Get "files/city-api/config/city-edits.yml") | quote }}
+  "config.country-codes.json": {{ (.Files.Get "files/city-api/config/country-codes.json") | quote }} 

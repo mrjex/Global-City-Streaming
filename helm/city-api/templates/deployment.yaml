@@ -76,6 +76,9 @@ spec:
         command: ['/bin/sh', '-c']
         args:
         - |
+          echo "Installing required packages..."
+          pip install kubernetes requests fastapi uvicorn
+          
           echo "Container starting..."
           echo "Python path: $PYTHONPATH"
           echo "Directory contents of /app:"
