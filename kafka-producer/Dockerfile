@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1.4
 FROM python:3.8-slim
 
 # Install curl for healthcheck
@@ -10,14 +9,11 @@ RUN set -ex; \
     pip install --no-cache-dir -r requirements.txt
 
 # Set up working directory first
-WORKDIR /app
+WORKDIR /app/kafka-producer
 
 # Copy files to specific locations
 COPY wait-for-it.sh /usr/local/bin/
-COPY python-producer.py .
-
-# Copy shared directory from the shared context
-COPY --from=shared . /app/shared/
+COPY python-producer.py /app/
 
 # Fix line endings and make script executable
 RUN sed -i 's/\r$//' /usr/local/bin/wait-for-it.sh && \

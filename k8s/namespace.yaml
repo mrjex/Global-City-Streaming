@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: global-city-streaming
-  labels:
-    name: global-city-streaming 
