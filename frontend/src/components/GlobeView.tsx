@@ -147,9 +147,9 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.rotateSpeed = 0.5;
-    controls.enableZoom = true;
-    controls.minDistance = 3;
-    controls.maxDistance = 10;
+    controls.enableZoom = false;
+    controls.minDistance = 5;
+    controls.maxDistance = 5;
     
     // Earth setup
     const earthRadius = 3;
