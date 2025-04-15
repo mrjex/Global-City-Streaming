@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
