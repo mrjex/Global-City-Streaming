@@ -1,0 +1,17 @@
+{
+  "Cameroon": {
+    "country_code": "CM",
+    "cities": [
+      "Douala",
+      "Yaoundé",
+      "Garoua",
+      "Bafoussam",
+      "Bamenda",
+      "Maroua",
+      "Ngaoundéré",
+      "Kumba",
+      "Nkongsamba",
+      "Buea"
+    ]
+  }
+}

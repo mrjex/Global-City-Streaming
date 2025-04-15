@@ -17,3 +17,10 @@ RESPONSE=$(curl -G "https://api.giphy.com/v1/gifs/search" \
 MP4_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.mp4')
 
 echo "MP4 URL: $MP4_URL"
+
+
+
+
+# docker logs city-api 2>&1 | grep -v "MY KAFKA LOGS"
+
+# docker logs city-api 2>&1 | grep -Ev "MY KAFKA LOGS|INFO"
