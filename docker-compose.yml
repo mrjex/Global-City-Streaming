@@ -140,10 +140,18 @@ services:
         condition: service_started
       zookeeper:
         condition: service_started
+      postgres:
+        condition: service_healthy
     environment:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:2181"
       PRODUCER_INTERVAL: 100
+      # PostgreSQL configuration
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
       # Flink specific configurations
       FLINK_ENV_JAVA_OPTS: "-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication -XX:+AggressiveOpts"
       FLINK_ENV_JAVA_OPTS_JM: "-Xmx4g -Xms4g"
@@ -184,9 +192,17 @@ services:
       - app_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
     mem_limit: 5g
-    # Add some swap to handle spikes
     memswap_limit: 6g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   db-manager:
     build:
@@ -196,7 +212,8 @@ services:
     networks:
       - app_network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
