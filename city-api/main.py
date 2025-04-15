@@ -14,6 +14,9 @@ from pathlib import Path
 import subprocess
 from kafka import KafkaProducer, KafkaConsumer
 import re
+from cache.redis_manager import RedisCache
+import asyncio
+from typing import List
 
 app = FastAPI()
 
@@ -25,6 +28,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Initialize Redis cache
+redis_cache = RedisCache()
 
 # Kafka configuration
 KAFKA_NODES = "kafka:9092"
@@ -513,127 +519,103 @@ async def update_config(request: Request):
 @app.post("/api/selected-country")
 async def receive_selected_country(request: Request):
     try:
-        global is_ready
         data = await request.json()
         country = data.get('country')
-        print(f"[DEBUG] Processing country: {country}", flush=True)
+        print(f"Processing request for country: {country}")
 
-        script_path = Path('/app/city-api/countryCities.sh')
-        if not script_path.exists():
-            print(f"[ERROR] Script not found at {script_path}", flush=True)
-            return JSONResponse(content={"error": "Script not found"}, status_code=500)
+        # Try to get cached data
+        cached_city_data = await redis_cache.get_city_data(country)
+        cached_video_data = await redis_cache.get_video_data(country)
+
+        if cached_city_data and cached_video_data:
+            print(f"Using cached data for {country}")
+            return JSONResponse(content={
+                "success": True,
+                "country": country,
+                "country_code": cached_city_data.get('country_code'),
+                "cities": cached_city_data.get('cities', []),
+                "capital_city_video_link": cached_video_data.get('video_url'),
+                "capital_city_description": cached_video_data.get('description')
+            })
+
+        # If not cached, get fresh data
+        print(f"Getting fresh data for {country}")
+        script_result = await execute_country_cities_script(country)
         
-        try:
-            # Make script executable
-            print("[DEBUG] Setting script permissions...", flush=True)
-            os.chmod(script_path, 0o755)
+        if script_result.get('success'):
+            # Cache the new data
+            capital_city = script_result.get('cities', [{}])[0].get('city')
             
-            # Execute script with environment variables
-            script_env = os.environ.copy()
-            script_env.update({
-                "GEODB_CITIES_API_KEY": os.environ.get("GEODB_CITIES_API_KEY", ""),
-                "WEATHER_API_KEY": os.environ.get("WEATHER_API_KEY", "")
+            await redis_cache.set_city_data(country, {
+                'country': country,
+                'country_code': script_result.get('country_code'),
+                'cities': script_result.get('cities', [])
             })
             
-            print("[DEBUG] Executing script...", flush=True)
-            result = subprocess.run(
-                ['/bin/bash', str(script_path), country],
-                capture_output=True,
-                text=True,
-                env=script_env
-            )
+            await redis_cache.set_video_data(country, {
+                'country': country,
+                'capital_city': capital_city,
+                'video_url': script_result.get('capital_city_video_link'),
+                'description': script_result.get('capital_city_description')
+            })
             
-            print("[DEBUG] Script stdout:", flush=True)
-            print(result.stdout, flush=True)
-            print("[DEBUG] Script stderr:", flush=True)
-            print(result.stderr, flush=True)
-            
-            if result.returncode != 0:
-                print(f"[ERROR] Script failed with return code {result.returncode}", flush=True)
-                return JSONResponse(
-                    content={"error": "Failed to process country"},
-                    status_code=500
-                )
-
-            # Parse the script output
-            try:
-                response_data = json.loads(result.stdout)
-                print(f"[DEBUG] Parsed response data: {json.dumps(response_data, indent=2)}", flush=True)
-                
-                # Extract cities from response
-                if response_data.get('success') and 'cities' in response_data:
-                    # Debug log the cities structure
-                    print("[DEBUG] Cities data structure:", flush=True)
-                    for city in response_data['cities']:
-                        print(f"City object: {json.dumps(city)}", flush=True)
-                    
-                    try:
-                        # Extract city names, with better error handling
-                        cities = []
-                        for city in response_data['cities']:
-                            if isinstance(city, dict) and 'city' in city:  # Check if it's a dict and has 'city' key
-                                cities.append(city['city'])
-                            else:
-                                print(f"[WARNING] Unexpected city format: {city}", flush=True)
-                        
-                        if not cities:
-                            print("[WARNING] No valid cities found in response", flush=True)
-                            return JSONResponse(content=response_data)
-                        
-                        print(f"[DEBUG] Extracted city names: {cities}", flush=True)
-                        
-                        # Check if this is the first batch
-                        config_path = Path('configuration.yml')
-                        is_first_batch = True
-                        if config_path.exists():
-                            with open(config_path) as f:
-                                config = yaml.safe_load(f)
-                                is_first_batch = not config.get('dynamicCities', {}).get('enabled', False)
-                        
-                        # Update configuration file
-                        if update_dynamic_cities(cities, is_first_batch):
-                            # Send update to control topic
-                            try:
-                                producer = get_kafka_producer()
-                                control_message = {
-                                    'action': 'UPDATE_CITIES',
-                                    'data': {
-                                        'cities': cities,
-                                        'isFirstBatch': is_first_batch
-                                    }
-                                }
-                                producer.send(CONTROL_TOPIC, control_message)
-                                producer.flush()
-                                producer.close()
-                                print(f"[DEBUG] Sent control message: {control_message}", flush=True)
-                                is_ready = True  # Mark as ready after successful configuration
-                            except Exception as e:
-                                print(f"[ERROR] Failed to send control message: {str(e)}", flush=True)
-                    except Exception as e:
-                        print(f"[ERROR] Error processing city data: {str(e)}", flush=True)
-                        print(f"[DEBUG] Cities data: {response_data['cities']}", flush=True)
-                        return JSONResponse(
-                            content={"error": f"Error processing city data: {str(e)}"},
-                            status_code=500
-                        )
-                
-                return JSONResponse(content=response_data)
-            except json.JSONDecodeError as e:
-                print(f"[ERROR] Failed to parse JSON output: {str(e)}", flush=True)
-                print(f"[DEBUG] Raw output: {result.stdout}", flush=True)
-                return JSONResponse(
-                    content={"error": "Failed to parse script output"},
-                    status_code=500
-                )
-        except Exception as e:
-            print(f"Error executing script: {str(e)}", flush=True)
+            return JSONResponse(content=script_result)
+        else:
             return JSONResponse(
-                content={"error": str(e)},
+                content={"error": "Failed to fetch country data"},
                 status_code=500
             )
+            
     except Exception as e:
-        print(f"Error processing request: {str(e)}", flush=True)
+        print(f"Error processing request: {str(e)}")
         return JSONResponse(
             content={"error": str(e)},
             status_code=500
         )
+
+@app.post("/api/cache/clear")
+async def clear_cache(request: Request):
+    try:
+        data = await request.json()
+        country = data.get('country')
+        redis_cache.clear_cache(country)
+        return JSONResponse(content={"success": True})
+    except Exception as e:
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        )
+
+# Add the new function here
+async def execute_country_cities_script(country: str) -> dict:
+    """Execute the countryCities.sh script to fetch city data for a given country."""
+    try:
+        # Make the script executable
+        script_path = '/app/city-api/countryCities.sh'
+        os.chmod(script_path, 0o755)
+        
+        # Execute the script with the country as argument
+        process = await asyncio.create_subprocess_exec(
+            script_path,
+            country,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        stdout, stderr = await process.communicate()
+        
+        if process.returncode != 0:
+            print(f"Script execution failed with error: {stderr.decode()}")
+            return {"success": False, "error": "Failed to fetch country data"}
+            
+        # Parse the JSON output
+        try:
+            result = json.loads(stdout.decode())
+            return result
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse script output: {e}")
+            return {"success": False, "error": "Failed to parse country data"}
+            
+    except Exception as e:
+        print(f"Error executing country cities script: {str(e)}")
+        return {"success": False, "error": str(e)}

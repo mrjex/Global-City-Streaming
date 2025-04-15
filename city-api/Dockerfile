@@ -15,25 +15,13 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy requirements first for better caching
-COPY city-api/apis/requirements.txt ./requirements.txt
+# Copy requirements first and install all Python dependencies at once
+COPY city-api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install additional dependencies needed for charts
-RUN pip install --no-cache-dir \
-    pandas \
-    plotly \
-    psycopg2-binary \
-    pyyaml \
-    matplotlib \
-    requests \
-    docker \
-    fastapi \
-    uvicorn \
-    statsmodels \
-    scipy \
-    numpy \
-    aiohttp
+# Copy application files
+COPY city-api/ .
+COPY configuration.yml .
 
 # Create necessary directories
 RUN mkdir -p \
@@ -51,4 +39,4 @@ ENV PORT=8003
 EXPOSE 8003
 
 # Start the FastAPI server
-CMD ["uvicorn", "city-api.main:app", "--host", "0.0.0.0", "--port", "8003"] 
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003"] 
