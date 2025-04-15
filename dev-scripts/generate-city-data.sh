@@ -22,7 +22,7 @@ cities_count=0
 videos_count=0
 
 # Process each line from the CSV
-tail -n +2 most_populated_cities_with_codes.csv | while IFS=, read -r country city code; do
+tail -n +2 most_populated_cities_with_codes_TEMP.csv | while IFS=, read -r country city code; do
     # Remove any quotes and trailing whitespace
     country=$(echo "$country" | tr -d '"' | xargs)
     city=$(echo "$city" | tr -d '"' | xargs)

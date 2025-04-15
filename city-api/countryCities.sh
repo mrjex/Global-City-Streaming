@@ -29,24 +29,41 @@ debug "Getting number of cities from configuration..."
 CITIES_LIMIT=$(yq '.services.cityApi.numberOfCitiesForSelectedCountry' /app/configuration.yml)
 debug "Number of cities to fetch: $CITIES_LIMIT"
 
-# Store the curl response in a variable
-debug "Making API request for country code: $COUNTRY_CODE..."
-RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY_CODE&limit=$CITIES_LIMIT&sort=-population&types=CITY" \
-  -H "X-RapidAPI-Host: wft-geo-db.p.rapidapi.com" \
-  -H "X-RapidAPI-Key: $GEODB_CITIES_API_KEY")
+# First check if country exists in cities-data.json
+debug "Checking if country exists in cities-data.json..."
+CITIES_DATA=$(jq -r --arg country "$COUNTRY" '.[$country]' /app/city-api/config/cities-data.json)
 
-debug "Raw API Response:"
-debug "$RESPONSE"
+if [ "$CITIES_DATA" != "null" ]; then
+    debug "Found country in cities-data.json, extracting cities..."
+    # Extract cities into an array
+    CITIES=$(jq -r --arg limit "$CITIES_LIMIT" '.cities[0:($limit | tonumber)] | join("|")' <<< "$CITIES_DATA")
+    CITY_COUNT=$(echo "$CITIES" | tr '|' '\n' | grep -v '^$' | wc -l)
+    debug "Found $CITY_COUNT cities from JSON"
+    
+    # Get the capital city (first city in the list)
+    CAPITAL_CITY=$(echo "$CITIES" | cut -d'|' -f1)
+    debug "Capital city from JSON: $CAPITAL_CITY"
+else
+    debug "Country not found in cities-data.json, falling back to API..."
+    # Store the curl response in a variable
+    debug "Making API request for country code: $COUNTRY_CODE..."
+    RESPONSE=$(curl -X GET "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=$COUNTRY_CODE&limit=$CITIES_LIMIT&sort=-population&types=CITY" \
+      -H "X-RapidAPI-Host: wft-geo-db.p.rapidapi.com" \
+      -H "X-RapidAPI-Key: $GEODB_CITIES_API_KEY")
 
-# Extract cities into an array and get count
-debug "Extracting cities..."
-CITIES=$(echo "$RESPONSE" | jq -r '.data[].city' | tr '\n' '|')
-CITY_COUNT=$(echo "$CITIES" | tr '|' '\n' | grep -v '^$' | wc -l)
-debug "Found $CITY_COUNT cities to process"
+    debug "Raw API Response:"
+    debug "$RESPONSE"
 
-# Get the capital city (first city in response)
-CAPITAL_CITY=$(echo "$RESPONSE" | jq -r '.data[0].city')
-debug "Capital city: $CAPITAL_CITY"
+    # Extract cities into an array and get count
+    debug "Extracting cities..."
+    CITIES=$(echo "$RESPONSE" | jq -r '.data[].city' | tr '\n' '|')
+    CITY_COUNT=$(echo "$CITIES" | tr '|' '\n' | grep -v '^$' | wc -l)
+    debug "Found $CITY_COUNT cities to process"
+
+    # Get the capital city (first city in response)
+    CAPITAL_CITY=$(echo "$RESPONSE" | jq -r '.data[0].city')
+    debug "Capital city from API: $CAPITAL_CITY"
+fi
 
 # Get the description for this capital city from the JSON file
 DESCRIPTION_KEY="$COUNTRY, $CAPITAL_CITY"
@@ -66,16 +83,16 @@ debug "Capital description: $CAPITAL_DESCRIPTION"
 # Escape any special quotes in the description
 CAPITAL_DESCRIPTION=$(echo "$CAPITAL_DESCRIPTION" | sed 's/"/\\"/g')
 
-# Check if video mapping exists for this city in city-edits.yml
-debug "Checking for existing video mapping in yml..."
-EXISTING_VIDEO=$(yq ".countries[\"$DESCRIPTION_KEY\"].video" /app/city-api/config/city-edits.yml)
-debug "Existing video mapping: $EXISTING_VIDEO"
+# First check if video exists in city-videos.json
+debug "Checking if video exists in city-videos.json..."
+VIDEO_DATA=$(jq -r --arg key "$DESCRIPTION_KEY" '.[$key]' /app/city-api/config/city-videos.json)
 
-if [ "$EXISTING_VIDEO" != "null" ]; then
-    debug "Found existing video mapping, using it instead of Giphy API"
-    MP4_URL="$EXISTING_VIDEO"
+if [ "$VIDEO_DATA" != "null" ]; then
+    debug "Found video in city-videos.json"
+    MP4_URL=$(jq -r '.video_url' <<< "$VIDEO_DATA")
+    debug "Video URL from JSON: $MP4_URL"
 else
-    debug "Getting Giphy video for $CAPITAL_CITY..."
+    debug "Video not found in city-videos.json, falling back to Giphy API..."
     # Get Giphy video for capital city
     GIPHY_RESPONSE=$(curl -G "https://api.giphy.com/v1/gifs/search" \
     --data-urlencode "api_key=$GIPHY_API_KEY" \
