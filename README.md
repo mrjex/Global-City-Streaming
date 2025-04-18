@@ -14,7 +14,7 @@
 
 
 - FastAPI, React, Nextjs, Typescript, Confluentinc, Bitnami, OpenAI API
-- Kubernetes, Terraform, DigitalOcean cloud hosting
+- Kubernetes, Terraform, DigitalOcean cloud hosting, Redis
 
 
 ## 📑 Table of Contents

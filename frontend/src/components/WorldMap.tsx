@@ -32,12 +32,32 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
   // Initial load for Sweden
   useEffect(() => {
     const defaultCountry = "Sweden";
-    fetch('/api/selected-country', {
+    
+    // First update configuration for Sweden
+    fetch('/api/config', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ country: defaultCountry }),
+      body: JSON.stringify({
+        path: 'dynamicCities',
+        config: {
+          enabled: true,
+          current: [],  // Will be populated with Swedish cities
+          previousBatch: []
+        }
+      })
+    })
+    .then(response => response.json())
+    .then(() => {
+      // Then fetch country data
+      return fetch('/api/selected-country', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ country: defaultCountry }),
+      });
     })
     .then(response => response.json())
     .then(data => {
@@ -47,12 +67,29 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
         setCityData(data.cities);
         setCountryCode(data.country_code);
         
-        // Dispatch event for initial country load
-        const event = new CustomEvent('initialCountryLoaded', {
-          detail: { country: defaultCountry, data }
+        // Update configuration with the cities
+        return fetch('/api/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            path: 'dynamicCities',
+            config: {
+              enabled: true,
+              current: data.cities.map((city: any) => city.city),
+              previousBatch: []
+            }
+          })
         });
-        window.dispatchEvent(event);
       }
+    })
+    .then(() => {
+      // Dispatch event for initial country load
+      const event = new CustomEvent('initialCountryLoaded', {
+        detail: { country: defaultCountry }
+      });
+      window.dispatchEvent(event);
     })
     .catch(error => console.error('Error loading initial country data:', error));
   }, []); // Empty dependency array means this runs once on mount
@@ -179,7 +216,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
           
           setSelectedCountry(newSelectedCountry);
           
-          // Call our API endpoint
+          // First get the country data
           fetch('/api/selected-country', {
             method: 'POST',
             headers: {
@@ -194,12 +231,29 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
               setCityData(data.cities);
               setCountryCode(data.country_code);
               
-              // Dispatch custom event for successful country selection
-              const event = new CustomEvent('countrySelected', {
-                detail: { country: newSelectedCountry, data }
+              // Then update configuration with the new cities
+              return fetch('/api/config', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  path: 'dynamicCities',
+                  config: {
+                    enabled: true,
+                    current: data.cities.map((city: any) => city.city),
+                    previousBatch: data.cities.map((city: any) => city.city)
+                  }
+                })
               });
-              window.dispatchEvent(event);
             }
+          })
+          .then(() => {
+            // Dispatch custom event for successful country selection
+            const event = new CustomEvent('countrySelected', {
+              detail: { country: newSelectedCountry }
+            });
+            window.dispatchEvent(event);
           })
           .catch(error => console.error('Error sending country selection:', error));
           

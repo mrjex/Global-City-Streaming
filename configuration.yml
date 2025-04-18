@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Greater Rio de Janeiro
-  - "S\xE3o Paulo"
-  - Rio de Janeiro
-  - "Bras\xEDlia"
-  - Fortaleza
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
   enabled: true
   previousBatch:
-  - Greater Rio de Janeiro
-  - "S\xE3o Paulo"
-  - Rio de Janeiro
-  - "Bras\xEDlia"
-  - Fortaleza
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
