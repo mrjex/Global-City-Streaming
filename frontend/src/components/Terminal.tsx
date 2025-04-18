@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
 interface TerminalProps {
@@ -13,6 +13,38 @@ const Terminal: React.FC<TerminalProps> = ({
   const [logs, setLogs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [seenLogs] = useState<Set<string>>(new Set());
+  const [logWindow, setLogWindow] = useState<string[]>([]);
+
+  // Function to select a varied subset of logs
+  const selectLogsForDisplay = useCallback((allLogs: string[]) => {
+    const dynamicLogs = allLogs.filter(log => log.includes('DYNAMIC CITY:'));
+    const staticLogs = allLogs.filter(log => !log.includes('DYNAMIC CITY:'));
+    
+    // Calculate how many logs to show (about 1/3 of maxLines)
+    const displayCount = Math.min(Math.floor(maxLines / 3), allLogs.length);
+    
+    // Try to maintain a 40/60 ratio between dynamic and static logs
+    const dynamicCount = Math.floor(displayCount * 0.4);
+    const staticCount = displayCount - dynamicCount;
+    
+    // Randomly select logs from each category
+    const selectedDynamic = dynamicLogs
+      .sort(() => Math.random() - 0.5)
+      .slice(0, dynamicCount);
+    
+    const selectedStatic = staticLogs
+      .sort(() => Math.random() - 0.5)
+      .slice(0, staticCount);
+    
+    // Combine and sort by timestamp
+    return [...selectedDynamic, ...selectedStatic]
+      .sort((a, b) => {
+        const timeA = a.match(/\[(.*?)\]/)?.[1] || '';
+        const timeB = b.match(/\[(.*?)\]/)?.[1] || '';
+        return timeA.localeCompare(timeB);
+      });
+  }, [maxLines]);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -26,14 +58,22 @@ const Terminal: React.FC<TerminalProps> = ({
         
         if (data && data.logs) {
           // Split logs into lines and filter out empty lines
-          const allLogs = data.logs.split('\n')
+          const newLogs = data.logs.split('\n')
             .filter(line => line.trim())
-            .slice(-maxLines); // Only keep the last maxLines
-          setLogs(allLogs);
+            .filter(line => !seenLogs.has(line));
+
+          if (newLogs.length > 0) {
+            // Add new logs to seen set
+            newLogs.forEach(log => seenLogs.add(log));
+            
+            // Update logs state with new unique logs
+            setLogs(prevLogs => {
+              const combinedLogs = [...prevLogs, ...newLogs];
+              // Keep more logs in memory than we display
+              return combinedLogs.slice(-maxLines * 2);
+            });
+          }
           setError(null);
-        } else {
-          setLogs([]);
-          setError('No logs available');
         }
       } catch (error) {
         console.error('Error fetching logs:', error);
@@ -46,11 +86,19 @@ const Terminal: React.FC<TerminalProps> = ({
     // Initial fetch
     fetchLogs();
 
-    // Poll for updates every second
-    const interval = setInterval(fetchLogs, 1000);
+    // Poll for updates every 2 seconds
+    const interval = setInterval(fetchLogs, 2000);
 
     return () => clearInterval(interval);
-  }, [maxLines]);
+  }, [maxLines, seenLogs]);
+
+  // Update displayed logs whenever the log collection changes
+  useEffect(() => {
+    if (logs.length > 0) {
+      const selectedLogs = selectLogsForDisplay(logs);
+      setLogWindow(selectedLogs);
+    }
+  }, [logs, selectLogsForDisplay]);
 
   // Auto-scroll to bottom when new logs arrive
   useEffect(() => {
@@ -58,7 +106,7 @@ const Terminal: React.FC<TerminalProps> = ({
     if (terminalContent) {
       terminalContent.scrollTop = terminalContent.scrollHeight;
     }
-  }, [logs]);
+  }, [logWindow]);
 
   return (
     <motion.div
@@ -100,20 +148,20 @@ const Terminal: React.FC<TerminalProps> = ({
               }
             `}
           </style>
-          {isLoading ? (
+          {isLoading && logWindow.length === 0 ? (
             <div className="text-gray-500 italic">Loading logs...</div>
           ) : error ? (
             <div className="text-red-400 italic">{error}</div>
-          ) : logs.length > 0 ? (
-            logs.map((log, index) => (
+          ) : logWindow.length > 0 ? (
+            logWindow.map((log, index) => (
               <motion.div
-                key={`${index}-${log.slice(0, 20)}`}
+                key={`${index}-${log.slice(0, 20)}-${Date.now()}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-green-400 mb-1"
+                className={`mb-1 ${log.includes('DYNAMIC CITY:') ? 'text-blue-400' : 'text-green-400'}`}
               >
-                <span className="text-blue-400">$</span> {log}
+                <span className="text-purple-400">$</span> {log}
               </motion.div>
             ))
           ) : (
