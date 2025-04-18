@@ -463,6 +463,23 @@ async def update_config(request: Request):
         with open(config_path) as f:
             print(f.read())
 
+        # If we're updating dynamic cities, send a control message
+        if path[0] == 'dynamicCities':
+            try:
+                producer = get_kafka_producer()
+                new_cities = body.get('config', {}).get('current', [])
+                control_message = {
+                    'action': 'UPDATE_CITIES',
+                    'data': {
+                        'cities': new_cities
+                    }
+                }
+                producer.send(CONTROL_TOPIC, value=control_message)
+                producer.flush()
+                print(f"Sent UPDATE_CITIES control message with cities: {new_cities}")
+            except Exception as e:
+                print(f"Error sending control message: {str(e)}")
+
         # Execute the equator chart script and capture its output
         script_path = Path('/app/city-api/equatorChart.sh')
         figure_json = None

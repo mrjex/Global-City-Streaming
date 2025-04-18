@@ -17,3 +17,6 @@ target/
 .mvn/
 .idea/
 *.iml
+
+# Node.js
+node_modules/

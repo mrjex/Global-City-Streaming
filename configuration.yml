@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
+  - Delhi
+  - Mumbai
+  - Bengaluru
+  - Hyderabad
+  - Ahmedabad
   enabled: true
   previousBatch:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
+  - Delhi
+  - Mumbai
+  - Bengaluru
+  - Hyderabad
+  - Ahmedabad
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
