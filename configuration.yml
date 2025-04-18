@@ -85,18 +85,13 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Metropolitan City of Rome
-  - Metropolitan City of Milan
-  - Metropolitan City of Naples
-  - Rome
-  - Metropolitan City of Turin
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
   enabled: true
-  previousBatch:
-  - Metropolitan City of Rome
-  - Metropolitan City of Milan
-  - Metropolitan City of Naples
-  - Rome
-  - Metropolitan City of Turin
+  previousBatch: []
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

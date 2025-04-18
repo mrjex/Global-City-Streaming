@@ -143,11 +143,12 @@ const CityTemperatureChart: React.FC = () => {
 
   // Chart rendering logic
   const getColorForCity = (city: string): string => {
-    if (cityColors[city]) return cityColors[city];
-    const colorIndex = Object.keys(cityColors).length % CHART_COLORS.length;
-    const newColor = CHART_COLORS[colorIndex];
-    setCityColors(prev => ({ ...prev, [city]: newColor }));
-    return newColor;
+    if (!cityColors[city]) {
+      const colorIndex = Object.keys(cityColors).length % CHART_COLORS.length;
+      setCityColors(prev => ({ ...prev, [city]: CHART_COLORS[colorIndex] }));
+      return CHART_COLORS[colorIndex];
+    }
+    return cityColors[city];
   };
 
   const createGradient = (ctx: CanvasRenderingContext2D, color: string): CanvasGradient => {
