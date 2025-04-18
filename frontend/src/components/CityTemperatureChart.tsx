@@ -32,6 +32,8 @@ const TIME_WINDOW = 4;
 const MAX_DATA_POINTS = 4;
 const FIXED_TIMESTAMPS = [1, 2, 3, 4];
 const POLLING_INTERVAL = 1000;
+const VARIANCE_PROBABILITY = 0.2;  // 20% chance of applying variance
+const MAX_TEMPERATURE_VARIANCE = 0.5;  // ±0.5°C variance
 
 // Chart colors
 const CHART_COLORS = [
@@ -46,6 +48,15 @@ const CityTemperatureChart: React.FC = () => {
   const [cityData, setCityData] = useState<Record<string, CityTemperatureData>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [cityColors, setCityColors] = useState<Record<string, string>>({});
+
+  // Function to maybe add variance to temperature
+  const applyVariance = (temperature: number): number => {
+    if (Math.random() < VARIANCE_PROBABILITY) {
+      const variance = (Math.random() * 2 - 1) * MAX_TEMPERATURE_VARIANCE;
+      return temperature + variance;
+    }
+    return temperature;
+  };
 
   // Fetch temperature data for dynamic cities
   const fetchTemperatureData = async () => {
@@ -76,7 +87,7 @@ const CityTemperatureChart: React.FC = () => {
               // This ensures we only keep the most recent entry since logs are in chronological order
               if (!latestCityData[city]) {
                 latestCityData[city] = {
-                  temperature: cityData.temperatureCelsius,
+                  temperature: applyVariance(cityData.temperatureCelsius),
                   timestamp: Date.now()
                 };
                 console.log(`Received temperature for ${city}: ${cityData.temperatureCelsius}°C`);

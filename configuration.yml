@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Delhi
-  - Mumbai
-  - Bengaluru
-  - Hyderabad
-  - Ahmedabad
+  - Metropolitan City of Rome
+  - Metropolitan City of Milan
+  - Metropolitan City of Naples
+  - Rome
+  - Metropolitan City of Turin
   enabled: true
   previousBatch:
-  - Delhi
-  - Mumbai
-  - Bengaluru
-  - Hyderabad
-  - Ahmedabad
+  - Metropolitan City of Rome
+  - Metropolitan City of Milan
+  - Metropolitan City of Naples
+  - Rome
+  - Metropolitan City of Turin
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
