@@ -181,7 +181,7 @@ const DatabaseTerminal: React.FC<{ maxLines: number }> = ({ maxLines }) => {
     <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl w-1/2">
       <div className="bg-gray-800 px-4 py-2 flex items-center">
         <div className="text-gray-400 text-sm mx-auto">
-          Database Operations
+          Database Insertion
         </div>
       </div>
 

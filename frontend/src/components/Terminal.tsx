@@ -1,6 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
+// Constants
+const REFRESH_RATE_MS = 1500; // 1.5 seconds
+const PROMPT_SYMBOLS = ['$', '>', '#'];
+const DISPLAY_COUNT = 4; // Total logs to display
+const DYNAMIC_COUNT = 2; // Number of dynamic logs to show
+const STATIC_COUNT = 2; // Number of static logs to show
+
 interface TerminalProps {
   maxLines?: number;
   title?: string;
@@ -21,30 +28,26 @@ const Terminal: React.FC<TerminalProps> = ({
     const dynamicLogs = allLogs.filter(log => log.includes('DYNAMIC CITY:'));
     const staticLogs = allLogs.filter(log => !log.includes('DYNAMIC CITY:'));
     
-    // Calculate how many logs to show (about 1/3 of maxLines)
-    const displayCount = Math.min(Math.floor(maxLines / 3), allLogs.length);
-    
-    // Try to maintain a 40/60 ratio between dynamic and static logs
-    const dynamicCount = Math.floor(displayCount * 0.4);
-    const staticCount = displayCount - dynamicCount;
-    
-    // Randomly select logs from each category
+    // Select exactly 2 logs from each category
     const selectedDynamic = dynamicLogs
       .sort(() => Math.random() - 0.5)
-      .slice(0, dynamicCount);
+      .slice(-DYNAMIC_COUNT); // Take from end to get most recent
     
     const selectedStatic = staticLogs
       .sort(() => Math.random() - 0.5)
-      .slice(0, staticCount);
+      .slice(-STATIC_COUNT); // Take from end to get most recent
+
+    // Combine logs and randomize their order
+    const combinedLogs = [...selectedDynamic, ...selectedStatic]
+      .sort(() => Math.random() - 0.5); // Randomize the order of all logs
     
-    // Combine and sort by timestamp
-    return [...selectedDynamic, ...selectedStatic]
-      .sort((a, b) => {
-        const timeA = a.match(/\[(.*?)\]/)?.[1] || '';
-        const timeB = b.match(/\[(.*?)\]/)?.[1] || '';
-        return timeA.localeCompare(timeB);
-      });
-  }, [maxLines]);
+    // Sort by timestamp within their new random positions
+    return combinedLogs.sort((a, b) => {
+      const timeA = a.match(/\[(.*?)\]/)?.[1] || '';
+      const timeB = b.match(/\[(.*?)\]/)?.[1] || '';
+      return timeA.localeCompare(timeB);
+    });
+  }, []);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -86,8 +89,8 @@ const Terminal: React.FC<TerminalProps> = ({
     // Initial fetch
     fetchLogs();
 
-    // Poll for updates every 2 seconds
-    const interval = setInterval(fetchLogs, 2000);
+    // Poll for updates at the specified refresh rate
+    const interval = setInterval(fetchLogs, REFRESH_RATE_MS);
 
     return () => clearInterval(interval);
   }, [maxLines, seenLogs]);
@@ -153,17 +156,21 @@ const Terminal: React.FC<TerminalProps> = ({
           ) : error ? (
             <div className="text-red-400 italic">{error}</div>
           ) : logWindow.length > 0 ? (
-            logWindow.map((log, index) => (
-              <motion.div
-                key={`${index}-${log.slice(0, 20)}-${Date.now()}`}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`mb-1 ${log.includes('DYNAMIC CITY:') ? 'text-blue-400' : 'text-green-400'}`}
-              >
-                <span className="text-purple-400">$</span> {log}
-              </motion.div>
-            ))
+            logWindow.map((log, index) => {
+              const isDynamic = log.includes('DYNAMIC CITY:');
+              const promptIndex = index % PROMPT_SYMBOLS.length;
+              return (
+                <motion.div
+                  key={`${index}-${log.slice(0, 20)}-${Date.now()}`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`mb-1 ${isDynamic ? 'text-blue-400' : 'text-green-400'}`}
+                >
+                  <span className="text-purple-400">{PROMPT_SYMBOLS[promptIndex]}</span> {log}
+                </motion.div>
+              );
+            })
           ) : (
             <div className="text-gray-500 italic">Waiting for logs...</div>
           )}
