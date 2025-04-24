@@ -151,4 +151,80 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+// Add POST handler for batch endpoint
+export async function POST(request: Request) {
+  try {
+    console.log('POST /api/city-coordinates called');
+    
+    // Parse request body
+    const data = await request.json();
+    const cities = data.cities || [];
+    
+    if (!cities.length) {
+      return NextResponse.json(
+        { error: 'No cities provided' }, 
+        { status: 400 }
+      );
+    }
+    
+    console.log(`Processing batch request for ${cities.length} cities`);
+    
+    // Call backend batch API
+    const CITY_API_URL = process.env.CITY_API_URL || 'http://city-api:8003';
+    
+    try {
+      const response = await fetch(`${CITY_API_URL}/api/city-coordinates/batch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cities }),
+      });
+      
+      if (!response.ok) {
+        console.error(`Backend API error: ${response.status} ${response.statusText}`);
+        throw new Error('Failed to fetch coordinates from backend');
+      }
+      
+      const result = await response.json();
+      console.log(`Received coordinates for ${Object.keys(result.coordinates || {}).length} cities from backend`);
+      
+      // Update local cache
+      if (result.coordinates) {
+        for (const [city, coords] of Object.entries(result.coordinates)) {
+          cityCoordinatesCache[city] = coords as { lat: number; lng: number };
+        }
+      }
+      
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Error fetching from backend:', error);
+      
+      // Fallback to local script if backend call fails
+      const cityData = await getCityCoordinates(cities);
+      
+      // Format response
+      const coordinates: Record<string, { lat: number; lng: number }> = {};
+      
+      for (const [city, data] of Object.entries(cityData)) {
+        if (data && data.latitude !== undefined && data.longitude !== undefined) {
+          coordinates[city] = {
+            lat: data.latitude,
+            lng: data.longitude
+          };
+          cityCoordinatesCache[city] = coordinates[city];
+        }
+      }
+      
+      return NextResponse.json({ coordinates });
+    }
+  } catch (error) {
+    console.error('Error processing batch city coordinates request:', error);
+    return NextResponse.json(
+      { error: 'Failed to process city coordinates request' },
+      { status: 500 }
+    );
+  }
 } 

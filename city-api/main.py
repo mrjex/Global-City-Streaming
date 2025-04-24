@@ -17,6 +17,7 @@ import re
 from cache.redis_manager import RedisCache
 import asyncio
 from typing import List
+import aiohttp
 
 app = FastAPI()
 
@@ -39,6 +40,7 @@ CONTROL_TOPIC = "city-control"
 # Global variables
 dynamic_cities = []
 is_ready = False  # Track if initial configuration is complete
+city_coordinates_cache = {}
 
 # Initialize Docker client with improved error handling
 def get_docker_client():
@@ -603,6 +605,22 @@ async def clear_cache(request: Request):
             status_code=500
         )
 
+# Get configuration helper function
+def get_configuration():
+    """Read and return the configuration from configuration.yml file"""
+    try:
+        config_path = Path('configuration.yml')
+        if not config_path.exists():
+            print("Configuration file not found")
+            return {}
+
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+        return config
+    except Exception as e:
+        print(f"Error reading configuration: {str(e)}")
+        return {}
+
 # Add the new function here
 async def execute_country_cities_script(country: str) -> dict:
     """Execute the countryCities.sh script to fetch city data for a given country."""
@@ -636,3 +654,119 @@ async def execute_country_cities_script(country: str) -> dict:
     except Exception as e:
         print(f"Error executing country cities script: {str(e)}")
         return {"success": False, "error": str(e)}
+
+@app.post("/api/city-coordinates/batch")
+async def get_city_coordinates_batch(request: Request):
+    try:
+        # Parse request body
+        data = await request.json()
+        requested_cities = data.get("cities", [])
+        
+        if not requested_cities:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "No cities provided in request"}
+            )
+        
+        print(f"Processing batch request for {len(requested_cities)} cities")
+        
+        # Get city coordinates
+        coordinates = {}
+        for city in requested_cities:
+            # Check if we have coordinates in memory cache
+            if city in city_coordinates_cache:
+                coordinates[city] = city_coordinates_cache[city]
+                continue
+                
+            # Try to get coordinates from the database or external service
+            city_coord = await get_city_coordinate(city)
+            if city_coord:
+                coordinates[city] = {
+                    "lat": city_coord["latitude"],
+                    "lng": city_coord["longitude"]
+                }
+                # Update cache
+                city_coordinates_cache[city] = coordinates[city]
+        
+        print(f"Returning coordinates for {len(coordinates)} cities")
+        
+        return JSONResponse(
+            content={"coordinates": coordinates}
+        )
+    except Exception as e:
+        print(f"Error processing batch city coordinates request: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Failed to process city coordinates request"}
+        )
+
+@app.get("/api/static-city-coordinates")
+async def get_static_city_coordinates():
+    try:
+        # Get list of static cities from configuration
+        config = get_configuration()
+        static_cities = config.get("cities", [])
+        
+        if not static_cities:
+            return JSONResponse(
+                content={"coordinates": {}}
+            )
+        
+        print(f"Processing static city coordinates for {len(static_cities)} cities")
+        
+        # Get coordinates for all static cities
+        coordinates = {}
+        for city in static_cities:
+            # Check if we have coordinates in memory cache
+            if city in city_coordinates_cache:
+                coordinates[city] = city_coordinates_cache[city]
+                continue
+                
+            # Try to get coordinates from the database or external service
+            city_coord = await get_city_coordinate(city)
+            if city_coord:
+                coordinates[city] = {
+                    "lat": city_coord["latitude"],
+                    "lng": city_coord["longitude"]
+                }
+                # Update cache
+                city_coordinates_cache[city] = coordinates[city]
+        
+        print(f"Returning static coordinates for {len(coordinates)} cities")
+        
+        return JSONResponse(
+            content={"coordinates": coordinates}
+        )
+    except Exception as e:
+        print(f"Error processing static city coordinates request: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Failed to process static city coordinates request"}
+        )
+
+async def get_city_coordinate(city_name):
+    """Get coordinates for a city from a database or external service"""
+    try:
+        # Call to geocoding service (replace with your preferred service)
+        # This is just an example implementation - you may want to use a real geocoding API
+        
+        # First try to get from Nominatim
+        city_name_encoded = city_name.replace(" ", "+")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"https://nominatim.openstreetmap.org/search?q={city_name_encoded}&format=json&limit=1",
+                headers={"User-Agent": "GlobalCityStreaming/1.0"}
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data and len(data) > 0:
+                        return {
+                            "latitude": float(data[0]["lat"]),
+                            "longitude": float(data[0]["lon"])
+                        }
+        
+        print(f"Could not find coordinates for city: {city_name}")
+        return None
+    except Exception as e:
+        print(f"Error getting coordinates for {city_name}: {str(e)}")
+        return None

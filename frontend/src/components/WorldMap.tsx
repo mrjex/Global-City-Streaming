@@ -256,16 +256,31 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
                 })
               })
               .then(() => {
-                // Dispatch custom event for successful country selection with the data
-                const event = new CustomEvent('countrySelected', {
-                  detail: { 
-                    country: newSelectedCountry,
-                    data: data,
-                    coordinates: data.coordinates
-                  }
+                // Fetch coordinates for the cities
+                return fetch('/api/city-coordinates', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    cities: data.cities.map((city: any) => city.city)
+                  })
+                })
+                .then(response => response.json())
+                .then(coordsData => {
+                  console.log("RECEIVED COORDINATES [WorldMap.tsx]:", coordsData);
+                  
+                  // Dispatch custom event for successful country selection with the data and coordinates
+                  const event = new CustomEvent('countrySelected', {
+                    detail: { 
+                      country: newSelectedCountry,
+                      data: data,
+                      coordinates: coordsData.coordinates || {}
+                    }
+                  });
+                  window.dispatchEvent(event);
+                  return data; // Return data for chaining
                 });
-                window.dispatchEvent(event);
-                return data; // Return data for chaining
               });
             }
           })

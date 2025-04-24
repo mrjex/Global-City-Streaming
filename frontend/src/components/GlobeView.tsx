@@ -44,6 +44,8 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
         setForceUpdate(prev => prev + 1);
       } else {
         console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
+        // If no coordinates in the event, fetch them using the batch endpoint
+        fetchCityCoordinatesBatch();
       }
     };
 
@@ -70,15 +72,60 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
         setForceUpdate(prev => prev + 1);
       } else {
         console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
+        // If no coordinates in the event, fetch them using the batch endpoint
+        fetchCityCoordinatesBatch();
       }
     };
 
     window.addEventListener('countrySelected', handleCountrySelect);
     window.addEventListener('initialCountryLoaded', handleInitialCountryLoad);
 
-    // This will be called when coordinates are updated from events
+    // Function to fetch city coordinates in batch
+    const fetchCityCoordinatesBatch = async () => {
+      console.log('[GlobeView.tsx] Fetching city coordinates using batch endpoint');
+      
+      // Get all cities that need coordinates
+      const allCities = [...cities, ...dynamicCities];
+      if (allCities.length === 0) {
+        console.log('[GlobeView.tsx] No cities to fetch coordinates for');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/city-coordinates', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ cities: allCities }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch coordinates: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('[GlobeView.tsx] Received coordinates from batch endpoint:', data);
+        
+        if (data.coordinates) {
+          setCityCoordinates(data.coordinates);
+          setForceUpdate(prev => prev + 1);
+        } else {
+          console.error('[GlobeView.tsx] No coordinates in response:', data);
+        }
+      } catch (error) {
+        console.error('[GlobeView.tsx] Error fetching city coordinates:', error);
+      }
+    };
+
+    // This will be called when component loads to ensure we have coordinates
     const fetchCityCoordinates = () => {
-      console.log('[GlobeView.tsx] Now getting coordinates from events instead of API calls');
+      if (Object.keys(cityCoordinates).length === 0) {
+        console.log('[GlobeView.tsx] No coordinates available, fetching using batch endpoint');
+        fetchCityCoordinatesBatch();
+      } else {
+        console.log('[GlobeView.tsx] Using existing coordinates:', cityCoordinates);
+      }
     };
 
     fetchCityCoordinates();
@@ -87,7 +134,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       window.removeEventListener('countrySelected', handleCountrySelect);
       window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad);
     };
-  }, []);
+  }, [cities, dynamicCities]);
 
   // Update markers when cityCoordinates change
   useEffect(() => {
