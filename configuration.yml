@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
   enabled: true
   previousBatch:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

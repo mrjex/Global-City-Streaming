@@ -1,162 +1,164 @@
 import * as React from 'react';
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 interface CityVideoProps {
   selectedCountry: string | null;
 }
 
 const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry: initialCountry }) => {
+  // Core state
   const [videoUrl, setVideoUrl] = useState<string>('');
-  const [key, setKey] = useState<number>(0);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [description, setDescription] = useState<string>('');
   const [selectedCountry, setSelectedCountry] = useState<string | null>(initialCountry);
-  const [videoUrls, setVideoUrls] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-
+  
+  // UI state
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Direct event listening for maximum speed
   useEffect(() => {
-    // Function to handle the country selection event
-    const handleCountrySelected = (event: any) => {
-      console.log('[CityVideo.tsx] Received countrySelected event with data:', event.detail);
-      if (event.detail && event.detail.videoUrls) {
+    // Simplified unified event handler
+    const handleCountryEvent = (event: any) => {
+      console.log("[CityVideo.tsx] Country event received", event.type);
+      
+      // Always update country name immediately
+      if (event.detail && event.detail.country) {
         setSelectedCountry(event.detail.country);
-        setVideoUrls(event.detail.videoUrls);
-        setLoading(false);
       }
-    };
-
-    // Function to handle the initial country load event
-    const handleInitialCountryLoad = (event: any) => {
-      console.log('[CityVideo.tsx] Received initialCountryLoaded event with data:', event.detail);
-      if (event.detail && event.detail.videoUrls) {
-        setSelectedCountry(event.detail.country);
-        setVideoUrls(event.detail.videoUrls);
-        setLoading(false);
-      }
-    };
-
-    // Add event listeners for country selection and initial load
-    window.addEventListener('countrySelected', handleCountrySelected);
-    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad);
-
-    console.log('[CityVideo.tsx] Event listeners added for countrySelected and initialCountryLoaded');
-
-    // Clean up the event listeners when the component is unmounted
-    return () => {
-      window.removeEventListener('countrySelected', handleCountrySelected);
-      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Listen for country selection events
-    const handleCountrySelected = (event: CustomEvent) => {
-      console.log("EVENT RECEIVED [CityVideo.tsx] - Country selected", event.detail);
-      if (event.detail && event.detail.data) {
+      
+      // Check for data structure - directly from API response
+      if (event.detail && event.detail.data && event.detail.data.success) {
         const data = event.detail.data;
-        if (data.success) {
-          setVideoUrl(data.capital_city_video_link);
-          // Extract city name from the description
-          const cityMatch = data.capital_city_description?.match(/^([^,]+),/);
+        
+        // IMPORTANT: Update description IMMEDIATELY
+        if (data.capital_city_description) {
+          console.log("[CityVideo.tsx] Updating description");
+          const cityMatch = data.capital_city_description.match(/^([^,]+),/);
           const cityName = cityMatch ? cityMatch[1] : '';
-          // Add bold to city name if found
           const enhancedDescription = cityName 
             ? data.capital_city_description.replace(cityName, `**${cityName}**`) 
             : data.capital_city_description;
+          
+          // Set description with no delay
           setDescription(enhancedDescription || '');
-          setKey(prev => prev + 1);
         }
-      }
-    };
-
-    // Listen for initial country load events
-    const handleInitialCountryLoad = (event: CustomEvent) => {
-      console.log("EVENT RECEIVED [CityVideo.tsx] - Initial country loaded", event.detail);
-      if (event.detail && event.detail.data) {
-        const data = event.detail.data;
-        if (data.success) {
+        
+        // Set video URL with no delay
+        if (data.capital_city_video_link) {
+          console.log("[CityVideo.tsx] Setting new video:", data.capital_city_video_link);
+          setIsLoading(true);
           setVideoUrl(data.capital_city_video_link);
-          // Extract city name from the description
-          const cityMatch = data.capital_city_description?.match(/^([^,]+),/);
-          const cityName = cityMatch ? cityMatch[1] : '';
-          // Add bold to city name if found
-          const enhancedDescription = cityName 
-            ? data.capital_city_description.replace(cityName, `**${cityName}**`) 
-            : data.capital_city_description;
-          setDescription(enhancedDescription || '');
-          setKey(prev => prev + 1);
-          setIsInitialLoad(false);
         }
       }
     };
-
-    // Add event listeners
-    window.addEventListener('countrySelected', handleCountrySelected as EventListener);
-    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
-
-    // Only fetch directly on initial component mount if there's no data
-    if (isInitialLoad && !videoUrl && !selectedCountry) {
-      console.log("[CityVideo.tsx] - Waiting for initial country data from WorldMap...");
-    }
-
-    // Cleanup event listeners
+    
+    // Add event listeners - using ANY type for maximum compatibility
+    window.addEventListener('countrySelected', handleCountryEvent);
+    window.addEventListener('initialCountryLoaded', handleCountryEvent);
+    
+    // Debug
+    console.log("[CityVideo.tsx] Event listeners registered");
+    
     return () => {
-      window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
-      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+      window.removeEventListener('countrySelected', handleCountryEvent);
+      window.removeEventListener('initialCountryLoaded', handleCountryEvent);
     };
-  }, [isInitialLoad, videoUrl, selectedCountry]);
-
-  // Function to convert markdown-style bold to HTML
+  }, []); // Empty dependency array - only run once
+  
+  // Handle video loading state
+  useEffect(() => {
+    if (!videoRef.current || !videoUrl) return;
+    
+    const handleVideoLoaded = () => {
+      console.log("[CityVideo.tsx] Video loaded:", videoUrl);
+      setIsLoading(false);
+    };
+    
+    const handleVideoError = () => {
+      console.error("[CityVideo.tsx] Video error:", videoUrl);
+      setIsLoading(false);
+    };
+    
+    videoRef.current.addEventListener('loadeddata', handleVideoLoaded);
+    videoRef.current.addEventListener('error', handleVideoError);
+    
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.removeEventListener('loadeddata', handleVideoLoaded);
+        videoRef.current.removeEventListener('error', handleVideoError);
+      }
+    };
+  }, [videoUrl]);
+  
+  // Format description text
   const formatDescription = (text: string) => {
     return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   };
-
+  
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <div className="bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
         {/* Video Header */}
-        <div className="bg-gray-800 px-4 py-2 flex items-center">
-          <div className="text-gray-400 text-sm mx-auto">
-            {selectedCountry ? `${selectedCountry === 'England' ? 'United Kingdom' : selectedCountry}'s Most Populated City` : 'Sweden\'s Most Populated City'}
+        <div className="bg-gray-800 px-4 py-2 flex justify-between items-center">
+          <div className="text-gray-400 text-sm">
+            {selectedCountry 
+              ? `${selectedCountry === 'England' ? 'United Kingdom' : selectedCountry}'s Most Populated City` 
+              : 'Loading country...'}
           </div>
-        </div>
-
-        {/* Video Content */}
-        <div
-          className="p-4 h-96 font-mono text-sm"
-          style={{
-            backgroundColor: '#1a1b1e',
-            overflowY: 'hidden'
-          }}
-        >
-          {videoUrl ? (
-            <video
-              key={key}
-              className="w-full h-full object-cover rounded-lg"
-              autoPlay
-              loop
-              muted
-              playsInline
-            >
-              <source
-                src={videoUrl}
-                type="video/mp4"
-              />
-              Your browser does not support the video tag.
-            </video>
-          ) : (
-            <div className="text-gray-500 italic text-center h-full flex items-center justify-center">
+          
+          {isLoading && (
+            <div className="text-xs text-blue-400 animate-pulse flex items-center">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
               Loading video...
             </div>
           )}
         </div>
+
+        {/* Video Content */}
+        <div className="p-4 h-96 font-mono text-sm relative bg-[#1a1b1e] overflow-hidden">
+          {/* Video */}
+          <div className={`w-full h-full transition-opacity duration-300 ${isLoading ? 'opacity-30' : 'opacity-100'}`}>
+            {videoUrl ? (
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover rounded-lg"
+                autoPlay
+                loop
+                muted
+                playsInline
+                key={videoUrl} // Force reload on URL change
+              >
+                <source src={videoUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <div className="text-gray-500 italic text-center h-full flex items-center justify-center">
+                No video available
+              </div>
+            )}
+          </div>
+          
+          {/* Loading Overlay */}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-lg">
+              <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
+            </div>
+          )}
+        </div>
+        
+        {/* Description */}
         <div className="px-4 pb-4 text-gray-300 text-center border-t border-gray-700 mt-4 pt-4">
-          <em 
-            dangerouslySetInnerHTML={{ 
-              __html: formatDescription(description) || 'Loading description...' 
-            }} 
-            className="leading-relaxed tracking-wide"
-          />
+          {description ? (
+            <em 
+              dangerouslySetInnerHTML={{ __html: formatDescription(description) }} 
+              className="leading-relaxed tracking-wide"
+            />
+          ) : (
+            <div className="animate-pulse h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
+          )}
         </div>
       </div>
     </div>
