@@ -1,30 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+const { useState, useEffect } = React;
 
 interface CityVideoProps {
   selectedCountry: string | null;
 }
 
-const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
+const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry: initialCountry }) => {
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [key, setKey] = useState<number>(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [description, setDescription] = useState<string>('');
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(initialCountry);
+  const [videoUrls, setVideoUrls] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchVideoUrl = async () => {
-      // For initial load, use "Sweden" if no country is selected
-      const countryToFetch = isInitialLoad ? "Sweden" : selectedCountry;
-      if (!countryToFetch) return;
-      
-      try {
-        const response = await fetch('/api/selected-country', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ country: countryToFetch }),
-        });
-        const data = await response.json();
+    // Function to handle the country selection event
+    const handleCountrySelected = (event: any) => {
+      console.log('[CityVideo.tsx] Received countrySelected event with data:', event.detail);
+      if (event.detail && event.detail.videoUrls) {
+        setSelectedCountry(event.detail.country);
+        setVideoUrls(event.detail.videoUrls);
+        setLoading(false);
+      }
+    };
+
+    // Function to handle the initial country load event
+    const handleInitialCountryLoad = (event: any) => {
+      console.log('[CityVideo.tsx] Received initialCountryLoaded event with data:', event.detail);
+      if (event.detail && event.detail.videoUrls) {
+        setSelectedCountry(event.detail.country);
+        setVideoUrls(event.detail.videoUrls);
+        setLoading(false);
+      }
+    };
+
+    // Add event listeners for country selection and initial load
+    window.addEventListener('countrySelected', handleCountrySelected);
+    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad);
+
+    console.log('[CityVideo.tsx] Event listeners added for countrySelected and initialCountryLoaded');
+
+    // Clean up the event listeners when the component is unmounted
+    return () => {
+      window.removeEventListener('countrySelected', handleCountrySelected);
+      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Listen for country selection events
+    const handleCountrySelected = (event: CustomEvent) => {
+      console.log("EVENT RECEIVED [CityVideo.tsx] - Country selected", event.detail);
+      if (event.detail && event.detail.data) {
+        const data = event.detail.data;
         if (data.success) {
           setVideoUrl(data.capital_city_video_link);
           // Extract city name from the description
@@ -37,15 +66,45 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry }) => {
           setDescription(enhancedDescription || '');
           setKey(prev => prev + 1);
         }
-      } catch (error) {
-        console.error('Error fetching video URL:', error);
-      } finally {
-        setIsInitialLoad(false);
       }
     };
 
-    fetchVideoUrl();
-  }, [selectedCountry, isInitialLoad]);
+    // Listen for initial country load events
+    const handleInitialCountryLoad = (event: CustomEvent) => {
+      console.log("EVENT RECEIVED [CityVideo.tsx] - Initial country loaded", event.detail);
+      if (event.detail && event.detail.data) {
+        const data = event.detail.data;
+        if (data.success) {
+          setVideoUrl(data.capital_city_video_link);
+          // Extract city name from the description
+          const cityMatch = data.capital_city_description?.match(/^([^,]+),/);
+          const cityName = cityMatch ? cityMatch[1] : '';
+          // Add bold to city name if found
+          const enhancedDescription = cityName 
+            ? data.capital_city_description.replace(cityName, `**${cityName}**`) 
+            : data.capital_city_description;
+          setDescription(enhancedDescription || '');
+          setKey(prev => prev + 1);
+          setIsInitialLoad(false);
+        }
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('countrySelected', handleCountrySelected as EventListener);
+    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+
+    // Only fetch directly on initial component mount if there's no data
+    if (isInitialLoad && !videoUrl && !selectedCountry) {
+      console.log("[CityVideo.tsx] - Waiting for initial country data from WorldMap...");
+    }
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
+      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+    };
+  }, [isInitialLoad, videoUrl, selectedCountry]);
 
   // Function to convert markdown-style bold to HTML
   const formatDescription = (text: string) => {

@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Dublin
-  - Cork
-  - Galway
-  - Tallaght
-  - Limerick
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
   enabled: true
   previousBatch:
-  - Dublin
-  - Cork
-  - Galway
-  - Tallaght
-  - Limerick
+  - Melbourne
+  - Sydney
+  - Brisbane
+  - Perth
+  - Adelaide
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

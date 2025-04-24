@@ -51,6 +51,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
     .then(response => response.json())
     .then(() => {
       // Then fetch country data
+      console.log("SENT REQUEST [WorldMap.tsx] - Initial load");
       return fetch('/api/selected-country', {
         method: 'POST',
         headers: {
@@ -61,6 +62,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
     })
     .then(response => response.json())
     .then(data => {
+      console.log("RECEIVED REQUEST [WorldMap.tsx] - Initial load", data);
       console.log('Initial country data loaded:', data);
       if (data.success && data.cities) {
         setSelectedCountry(defaultCountry);
@@ -81,15 +83,20 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
               previousBatch: []
             }
           })
+        })
+        .then(() => {
+          // Dispatch event for initial country load with the data
+          const event = new CustomEvent('initialCountryLoaded', {
+            detail: { 
+              country: defaultCountry,
+              data: data,
+              coordinates: data.coordinates
+            }
+          });
+          window.dispatchEvent(event);
+          return data; // Return data for chaining
         });
       }
-    })
-    .then(() => {
-      // Dispatch event for initial country load
-      const event = new CustomEvent('initialCountryLoaded', {
-        detail: { country: defaultCountry }
-      });
-      window.dispatchEvent(event);
     })
     .catch(error => console.error('Error loading initial country data:', error));
   }, []); // Empty dependency array means this runs once on mount
@@ -217,6 +224,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
           setSelectedCountry(newSelectedCountry);
           
           // First get the country data
+          console.log("SENT REQUEST [WorldMap.tsx] - Country selection", newSelectedCountry);
           fetch('/api/selected-country', {
             method: 'POST',
             headers: {
@@ -226,6 +234,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
           })
           .then(response => response.json())
           .then(data => {
+            console.log("RECEIVED REQUEST [WorldMap.tsx] - Country selection", data);
             console.log('Country selection response:', data);
             if (data.success && data.cities) {
               setCityData(data.cities);
@@ -245,19 +254,25 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
                     previousBatch: data.cities.map((city: any) => city.city)
                   }
                 })
+              })
+              .then(() => {
+                // Dispatch custom event for successful country selection with the data
+                const event = new CustomEvent('countrySelected', {
+                  detail: { 
+                    country: newSelectedCountry,
+                    data: data,
+                    coordinates: data.coordinates
+                  }
+                });
+                window.dispatchEvent(event);
+                return data; // Return data for chaining
               });
             }
           })
           .then(() => {
-            // Dispatch custom event for successful country selection
-            const event = new CustomEvent('countrySelected', {
-              detail: { country: newSelectedCountry }
-            });
-            window.dispatchEvent(event);
+            onCountrySelect(newSelectedCountry);
           })
           .catch(error => console.error('Error sending country selection:', error));
-          
-          onCountrySelect(newSelectedCountry);
         });
 
       // Add subtle animation on load

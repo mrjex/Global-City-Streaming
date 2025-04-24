@@ -18,78 +18,52 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
   const [cityCoordinates, setCityCoordinates] = useState<Record<string, { lat: number; lng: number }>>({});
   const [renderKey, setRenderKey] = useState<number>(0);
-  
-  // Fetch city coordinates
-  const fetchCityCoordinates = async () => {
-    try {
-      console.log('Fetching city coordinates...');
-      const response = await fetch('/api/city-coordinates');
-      if (!response.ok) {
-        throw new Error('Failed to fetch city coordinates');
-      }
-      const data = await response.json();
-      console.log('Fetched city coordinates:', data);
-      
-      // Check if coordinates are valid
-      const validCoordinates: Record<string, { lat: number; lng: number }> = {};
-      
-      // Log the raw coordinates for debugging
-      console.log('Raw coordinates:', data.coordinates);
-      
-      for (const [city, coords] of Object.entries(data.coordinates)) {
-        // Type assertion to handle the coordinates
-        const typedCoords = coords as { lat: number; lng: number };
-        
-        console.log(`Processing ${city}:`, typedCoords);
-        
-        // Less strict validation - just check if the coordinates exist
-        if (typedCoords && typeof typedCoords.lat === 'number' && typeof typedCoords.lng === 'number') {
-          validCoordinates[city] = typedCoords;
-          console.log(`Added ${city} with coordinates:`, typedCoords);
-        } else {
-          console.warn(`Invalid coordinates for ${city}:`, typedCoords);
-        }
-      }
-      
-      console.log('Valid coordinates:', validCoordinates);
-      setCityCoordinates(validCoordinates);
-      
-      // Force a re-render when coordinates are updated
-      setRenderKey(prev => prev + 1);
-    } catch (error) {
-      console.error('Error fetching city coordinates:', error);
-    }
-  };
-  
-  useEffect(() => {
-    fetchCityCoordinates();
-  }, [cities, dynamicCities]);
+  const [forceUpdate, setForceUpdate] = useState<number>(0);
   
   // Listen for country selection events
   useEffect(() => {
-    const handleCountrySelected = (event: CustomEvent) => {
-      console.log('Country selected event received in GlobeView:', event.detail);
-      // Fetch new city coordinates when country changes
-      fetchCityCoordinates();
+    const handleCountrySelect = (event: any) => {
+      console.log('[GlobeView.tsx] Received countrySelected event with data:', event.detail);
+      if (event.detail.coordinates) {
+        setCityCoordinates(event.detail.coordinates);
+        // Force a re-render
+        setForceUpdate(prev => prev + 1);
+      }
     };
-    
-    // Add event listener for country selection
-    window.addEventListener('countrySelected', handleCountrySelected as EventListener);
-    
-    // Also listen for the initial country load event
-    const handleInitialCountryLoad = () => {
-      console.log('Initial country load event received in GlobeView');
-      // Fetch new city coordinates when initial country is loaded
-      fetchCityCoordinates();
+
+    // Listen for initial country load events
+    const handleInitialCountryLoad = (event: any) => {
+      console.log('[GlobeView.tsx] Received initialCountryLoaded event with data:', event.detail);
+      if (event.detail.coordinates) {
+        setCityCoordinates(event.detail.coordinates);
+        // Force a re-render
+        setForceUpdate(prev => prev + 1);
+      }
     };
-    
-    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
-    
+
+    window.addEventListener('countrySelected', handleCountrySelect);
+    window.addEventListener('initialCountryLoaded', handleInitialCountryLoad);
+
+    // This will be called when coordinates are updated from events
+    const fetchCityCoordinates = () => {
+      console.log('[GlobeView.tsx] Now getting coordinates from events instead of API calls');
+    };
+
+    fetchCityCoordinates();
+
     return () => {
-      window.removeEventListener('countrySelected', handleCountrySelected as EventListener);
-      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad as EventListener);
+      window.removeEventListener('countrySelected', handleCountrySelect);
+      window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad);
     };
   }, []);
+
+  // Update markers when cityCoordinates change
+  useEffect(() => {
+    if (cityCoordinates.length > 0) {
+      console.log('[GlobeView.tsx] City coordinates updated from events:', cityCoordinates);
+      updateMarkers();
+    }
+  }, [cityCoordinates, forceUpdate]);
   
   // Convert lat/lng to 3D coordinates
   const latLngToVector3 = (lat: number, lng: number, radius: number) => {
