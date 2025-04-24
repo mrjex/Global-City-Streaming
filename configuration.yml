@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
+  - Dublin
+  - Cork
+  - Galway
+  - Tallaght
+  - Limerick
   enabled: true
   previousBatch:
-  - Madrid
-  - Madrid city
-  - Barcelona
-  - Barcelona City
-  - Valencia
+  - Dublin
+  - Cork
+  - Galway
+  - Tallaght
+  - Limerick
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

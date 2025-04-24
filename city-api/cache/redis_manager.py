@@ -48,6 +48,10 @@ class CityOverrides:
         return override
 
 class RedisCache:
+    # TTL constants
+    CITY_DATA_TTL = 604800  # 1 week
+    VIDEO_DATA_TTL = 604800  # 1 week
+    
     def __init__(self):
         self.redis_client = Redis(
             host=os.getenv('REDIS_HOST', 'redis'),
@@ -87,7 +91,7 @@ class RedisCache:
             cache_key = f"city_data:{country}"
             self.redis_client.setex(
                 cache_key,
-                86400,  # 24 hours
+                self.CITY_DATA_TTL,  # 1 week
                 json.dumps(data)
             )
             print(f"Set cache for {cache_key}")
@@ -126,7 +130,7 @@ class RedisCache:
             cache_key = f"capital_video:{country}"
             self.redis_client.setex(
                 cache_key,
-                43200,  # 12 hours
+                self.VIDEO_DATA_TTL,  # 1 week
                 json.dumps(data)
             )
             print(f"Set cache for {cache_key}")
