@@ -90,7 +90,6 @@ const CityTemperatureChart: React.FC = () => {
                   temperature: applyVariance(cityData.temperatureCelsius),
                   timestamp: Date.now()
                 };
-                console.log(`Received temperature for ${city}: ${cityData.temperatureCelsius}°C`);
               }
             }
           } catch (error) {

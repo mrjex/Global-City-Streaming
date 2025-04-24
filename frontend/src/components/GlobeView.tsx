@@ -24,20 +24,52 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   useEffect(() => {
     const handleCountrySelect = (event: any) => {
       console.log('[GlobeView.tsx] Received countrySelected event with data:', event.detail);
+      
+      // Debug event structure
+      console.log('[GlobeView.tsx] Event coordinates structure:', {
+        hasCoordinates: !!event.detail.coordinates,
+        type: event.detail.coordinates ? typeof event.detail.coordinates : 'not present',
+        keys: event.detail.coordinates ? Object.keys(event.detail.coordinates) : []
+      });
+      
       if (event.detail.coordinates) {
+        console.log('[GlobeView.tsx] Setting coordinates from event:', event.detail.coordinates);
         setCityCoordinates(event.detail.coordinates);
         // Force a re-render
         setForceUpdate(prev => prev + 1);
+      } else if (event.detail.data && event.detail.data.coordinates) {
+        // Try alternative location for coordinates
+        console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
+        setCityCoordinates(event.detail.data.coordinates);
+        setForceUpdate(prev => prev + 1);
+      } else {
+        console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
       }
     };
 
     // Listen for initial country load events
     const handleInitialCountryLoad = (event: any) => {
       console.log('[GlobeView.tsx] Received initialCountryLoaded event with data:', event.detail);
+      
+      // Debug event structure 
+      console.log('[GlobeView.tsx] Event coordinates structure:', {
+        hasCoordinates: !!event.detail.coordinates,
+        type: event.detail.coordinates ? typeof event.detail.coordinates : 'not present',
+        keys: event.detail.coordinates ? Object.keys(event.detail.coordinates) : []
+      });
+      
       if (event.detail.coordinates) {
+        console.log('[GlobeView.tsx] Setting coordinates from event:', event.detail.coordinates);
         setCityCoordinates(event.detail.coordinates);
         // Force a re-render
         setForceUpdate(prev => prev + 1);
+      } else if (event.detail.data && event.detail.data.coordinates) {
+        // Try alternative location for coordinates
+        console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
+        setCityCoordinates(event.detail.data.coordinates);
+        setForceUpdate(prev => prev + 1);
+      } else {
+        console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
       }
     };
 
@@ -59,9 +91,10 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
 
   // Update markers when cityCoordinates change
   useEffect(() => {
-    if (cityCoordinates.length > 0) {
+    if (Object.keys(cityCoordinates).length > 0) {
       console.log('[GlobeView.tsx] City coordinates updated from events:', cityCoordinates);
-      updateMarkers();
+      // No need to call updateMarkers() as the main useEffect will handle marker creation
+      setRenderKey(prev => prev + 1); // Force re-render to update markers
     }
   }, [cityCoordinates, forceUpdate]);
   
