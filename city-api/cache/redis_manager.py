@@ -1,7 +1,7 @@
 from redis import Redis, RedisError
 import yaml
 import json
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, List
 import os
 from pathlib import Path
 
@@ -52,6 +52,13 @@ class RedisCache:
     CITY_DATA_TTL = 604800  # 1 week
     VIDEO_DATA_TTL = 604800  # 1 week
     
+    # Key prefixes for the new structure
+    DYNAMIC_COUNTRIES_ALL_KEY = "dynamic:countries:all"
+    DYNAMIC_COUNTRY_PREFIX = "dynamic:country:"
+    DYNAMIC_CITY_PREFIX = "dynamic:city:"
+    STATIC_CITY_PREFIX = "static:city:"
+    STATIC_CITIES_ALL_KEY = "static:cities:all"
+    
     def __init__(self):
         self.redis_client = Redis(
             host=os.getenv('REDIS_HOST', 'redis'),
@@ -63,12 +70,47 @@ class RedisCache:
     async def get_city_data(self, country: str) -> Optional[Dict[str, Any]]:
         """Get cached city data with TTL check"""
         try:
-            cache_key = f"city_data:{country}"
-            data = self.redis_client.get(cache_key)
-            if data:
-                print(f"Cache hit for {cache_key}")
-                return json.loads(data)
-            print(f"Cache miss for {cache_key}")
+            # Only use the new structure
+            if self.redis_client.hexists("dynamic:country_codes", country):
+                print(f"Found country {country} in new structure")
+                
+                # Get country data
+                country_key = f"{self.DYNAMIC_COUNTRY_PREFIX}{country}"
+                if self.redis_client.exists(country_key):
+                    country_data = self.redis_client.hgetall(country_key)
+                    
+                    # Get city list
+                    city_list_str = country_data.get("cities", "[]")
+                    try:
+                        city_list = json.loads(city_list_str)
+                    except:
+                        city_list = []
+                    
+                    # Build response
+                    cities = []
+                    for city_name in city_list:
+                        city_key = f"{self.DYNAMIC_CITY_PREFIX}{country}:{city_name}"
+                        if self.redis_client.exists(city_key):
+                            city_data = self.redis_client.hgetall(city_key)
+                            cities.append({
+                                "city": city_name,
+                                **{k: v for k, v in city_data.items() if k != "city"}
+                            })
+                    
+                    return {
+                        "country": country,
+                        "country_code": country_data.get("country_code", ""),
+                        "cities": cities
+                    }
+            
+            # Fall back to old structure if new structure doesn't have this country
+            # COMMENTED OUT - no longer using old structure
+            # cache_key = f"city_data:{country}"
+            # data = self.redis_client.get(cache_key)
+            # if data:
+            #     print(f"Cache hit for {cache_key} (old structure)")
+            #     return json.loads(data)
+            print(f"Cache miss for country: {country}")
             return None
         except Exception as e:
             print(f"Error getting city data from cache: {str(e)}")
@@ -79,6 +121,8 @@ class RedisCache:
         try:
             # Apply overrides for each city
             cities = data.get('cities', [])
+            country_code = data.get('country_code', '')
+            
             for city in cities:
                 city_name = city.get('city')
                 if city_name:
@@ -88,13 +132,55 @@ class RedisCache:
                         if 'description' in override:
                             city['description'] = override['description']
             
-            cache_key = f"city_data:{country}"
-            self.redis_client.setex(
-                cache_key,
-                self.CITY_DATA_TTL,  # 1 week
-                json.dumps(data)
-            )
-            print(f"Set cache for {cache_key}")
+            # Store using only the new structure 
+            # COMMENTED OUT - no longer using old structure
+            # # 1. Old structure
+            # cache_key = f"city_data:{country}"
+            # self.redis_client.setex(
+            #     cache_key,
+            #     self.CITY_DATA_TTL,  # 1 week
+            #     json.dumps(data)
+            # )
+            
+            # 2. New structure
+            # Add to dynamic countries set
+            self.redis_client.sadd(self.DYNAMIC_COUNTRIES_ALL_KEY, country)
+            
+            # Store country code
+            self.redis_client.hset("dynamic:country_codes", country, country_code)
+            
+            # Create/update country entry
+            country_key = f"{self.DYNAMIC_COUNTRY_PREFIX}{country}"
+            city_names = [city.get('city') for city in cities if city.get('city')]
+            
+            pipe = self.redis_client.pipeline()
+            pipe.hset(country_key, "country_code", country_code)
+            pipe.hset(country_key, "cities", json.dumps(city_names))
+            
+            # Set expiration on country key
+            pipe.expire(country_key, self.CITY_DATA_TTL)
+            
+            # Store each city
+            for city in cities:
+                city_name = city.get('city')
+                if city_name:
+                    city_key = f"{self.DYNAMIC_CITY_PREFIX}{country}:{city_name}"
+                    
+                    # Delete old data if it exists
+                    pipe.delete(city_key)
+                    
+                    # Add all city fields
+                    for field, value in city.items():
+                        if field != 'city':  # Skip city name as it's in the key
+                            pipe.hset(city_key, field, str(value))
+                    
+                    # Set expiration
+                    pipe.expire(city_key, self.CITY_DATA_TTL)
+            
+            # Execute all commands
+            pipe.execute()
+            
+            print(f"Set cache for {country} using new structure")
             return True
         except Exception as e:
             print(f"Error setting city data in cache: {str(e)}")
@@ -103,12 +189,44 @@ class RedisCache:
     async def get_video_data(self, country: str) -> Optional[Dict[str, Any]]:
         """Get cached video data"""
         try:
-            cache_key = f"capital_video:{country}"
-            data = self.redis_client.get(cache_key)
-            if data:
-                print(f"Cache hit for {cache_key}")
-                return json.loads(data)
-            print(f"Cache miss for {cache_key}")
+            # Only use new structure
+            capital_key = None
+            
+            # Get country data to find capital city
+            country_key = f"{self.DYNAMIC_COUNTRY_PREFIX}{country}"
+            if self.redis_client.exists(country_key):
+                country_data = self.redis_client.hgetall(country_key)
+                
+                # Try to find capital city
+                city_list_str = country_data.get("cities", "[]")
+                try:
+                    city_list = json.loads(city_list_str)
+                    if city_list:
+                        # Assume first city is capital (or we could store this explicitly)
+                        capital_city = city_list[0]
+                        capital_key = f"{self.DYNAMIC_CITY_PREFIX}{country}:{capital_city}"
+                except:
+                    pass
+            
+            # If we found a capital city, get its data
+            if capital_key and self.redis_client.exists(capital_key):
+                city_data = self.redis_client.hgetall(capital_key)
+                if "video_url" in city_data or "description" in city_data:
+                    print(f"Found video data for {country} in new structure")
+                    return {
+                        "country": country,
+                        "capital_city": city_data.get("city", ""),
+                        "video_url": city_data.get("video_url", ""),
+                        "description": city_data.get("description", "")
+                    }
+            
+            # Fall back to old structure - COMMENTED OUT
+            # cache_key = f"capital_video:{country}"
+            # data = self.redis_client.get(cache_key)
+            # if data:
+            #     print(f"Cache hit for {cache_key} (old structure)")
+            #     return json.loads(data)
+            print(f"Cache miss for video data: {country}")
             return None
         except Exception as e:
             print(f"Error getting video data from cache: {str(e)}")
@@ -127,13 +245,34 @@ class RedisCache:
                     if override.get('description'):
                         data['description'] = override['description']
             
-            cache_key = f"capital_video:{country}"
-            self.redis_client.setex(
-                cache_key,
-                self.VIDEO_DATA_TTL,  # 1 week
-                json.dumps(data)
-            )
-            print(f"Set cache for {cache_key}")
+            # Store using only new structure
+            
+            # COMMENTED OUT - no longer using old structure
+            # # 1. Old structure
+            # cache_key = f"capital_video:{country}"
+            # self.redis_client.setex(
+            #     cache_key,
+            #     self.VIDEO_DATA_TTL,  # 1 week
+            #     json.dumps(data)
+            # )
+            
+            # 2. New structure - update city data with video info
+            if capital_city:
+                city_key = f"{self.DYNAMIC_CITY_PREFIX}{country}:{capital_city}"
+                
+                pipe = self.redis_client.pipeline()
+                
+                if data.get('video_url'):
+                    pipe.hset(city_key, "video_url", data['video_url'])
+                
+                if data.get('description'):
+                    pipe.hset(city_key, "description", data['description'])
+                
+                # Refresh TTL
+                pipe.expire(city_key, self.VIDEO_DATA_TTL)
+                pipe.execute()
+            
+            print(f"Set video data for {country} using new structure")
             return True
         except Exception as e:
             print(f"Error setting video data in cache: {str(e)}")
@@ -143,15 +282,149 @@ class RedisCache:
         """Clear cache for a country or all cache if country is None"""
         try:
             if country:
-                keys = [
-                    f"city_data:{country}",
-                    f"capital_video:{country}"
-                ]
-                for key in keys:
-                    self.redis_client.delete(key)
-                print(f"Cleared cache for {country}")
+                # Clear old structure - COMMENTED OUT
+                # keys = [
+                #     f"city_data:{country}",
+                #     f"capital_video:{country}"
+                # ]
+                # for key in keys:
+                #     self.redis_client.delete(key)
+                
+                # Clear new structure
+                country_key = f"{self.DYNAMIC_COUNTRY_PREFIX}{country}"
+                
+                # Get city list to delete all city keys
+                if self.redis_client.exists(country_key):
+                    country_data = self.redis_client.hgetall(country_key)
+                    city_list_str = country_data.get("cities", "[]")
+                    try:
+                        city_list = json.loads(city_list_str)
+                        for city_name in city_list:
+                            city_key = f"{self.DYNAMIC_CITY_PREFIX}{country}:{city_name}"
+                            self.redis_client.delete(city_key)
+                    except:
+                        pass
+                
+                # Delete country key and remove from set
+                self.redis_client.delete(country_key)
+                self.redis_client.srem(self.DYNAMIC_COUNTRIES_ALL_KEY, country)
+                self.redis_client.hdel("dynamic:country_codes", country)
+                
+                print(f"Cleared cache for {country} using new structure")
             else:
+                # Clear everything
                 self.redis_client.flushall()
                 print("Cleared all cache")
         except Exception as e:
-            print(f"Error clearing cache: {str(e)}") 
+            print(f"Error clearing cache: {str(e)}")
+    
+    async def get_city_coordinates(self, city_name: str) -> Optional[Dict[str, float]]:
+        """Get city coordinates from Redis"""
+        try:
+            # First check static cities
+            static_city_key = f"{self.STATIC_CITY_PREFIX}{city_name}"
+            if self.redis_client.exists(static_city_key):
+                city_data = self.redis_client.hgetall(static_city_key)
+                if "latitude" in city_data and "longitude" in city_data:
+                    print(f"DEBUG: Found coordinates for '{city_name}' in STATIC city data in Redis")
+                    return {
+                        "lat": float(city_data["latitude"]),
+                        "lng": float(city_data["longitude"])
+                    }
+            
+            # Then check all dynamic countries for this city
+            dynamic_countries = self.redis_client.smembers(self.DYNAMIC_COUNTRIES_ALL_KEY)
+            for country in dynamic_countries:
+                country_key = f"{self.DYNAMIC_COUNTRY_PREFIX}{country}"
+                if self.redis_client.exists(country_key):
+                    country_data = self.redis_client.hgetall(country_key)
+                    city_list_str = country_data.get("cities", "[]")
+                    try:
+                        city_list = json.loads(city_list_str)
+                        if city_name in city_list:
+                            city_key = f"{self.DYNAMIC_CITY_PREFIX}{country}:{city_name}"
+                            city_data = self.redis_client.hgetall(city_key)
+                            if "latitude" in city_data and "longitude" in city_data:
+                                print(f"DEBUG: Found coordinates for '{city_name}' in DYNAMIC city data in Redis (country: {country})")
+                                return {
+                                    "lat": float(city_data["latitude"]),
+                                    "lng": float(city_data["longitude"])
+                                }
+                    except:
+                        continue
+            
+            # Not found in Redis
+            print(f"DEBUG: Could not find coordinates for '{city_name}' in Redis")
+            return None
+        except Exception as e:
+            print(f"Error getting city coordinates from Redis: {str(e)}")
+            return None
+            
+    def print_redis_structure(self):
+        """Print the current Redis structure for debugging"""
+        try:
+            structure = {
+                "static": {},
+                "dynamic": {}
+            }
+            
+            # Get static cities
+            static_cities = self.redis_client.smembers("static:cities:all")
+            if static_cities:
+                structure["static"]["cities"] = list(static_cities)
+                # Get a sample city
+                if len(static_cities) > 0:
+                    sample_city = next(iter(static_cities))
+                    structure["static"]["sample_city"] = {
+                        "key": f"static:city:{sample_city}",
+                        "data": self.redis_client.hgetall(f"static:city:{sample_city}")
+                    }
+            
+            # Get dynamic countries
+            dynamic_countries = self.redis_client.smembers("dynamic:countries:all")
+            if dynamic_countries:
+                structure["dynamic"]["countries"] = list(dynamic_countries)
+                # Get a sample country
+                if len(dynamic_countries) > 0:
+                    sample_country = next(iter(dynamic_countries))
+                    country_key = f"dynamic:country:{sample_country}"
+                    country_data = self.redis_client.hgetall(country_key)
+                    structure["dynamic"]["sample_country"] = {
+                        "key": country_key,
+                        "data": country_data
+                    }
+                    
+                    # Get cities for this country
+                    city_list_str = country_data.get("cities", "[]")
+                    try:
+                        city_list = json.loads(city_list_str)
+                        if city_list and len(city_list) > 0:
+                            sample_city = city_list[0]
+                            city_key = f"dynamic:city:{sample_country}:{sample_city}"
+                            structure["dynamic"]["sample_city"] = {
+                                "key": city_key,
+                                "data": self.redis_client.hgetall(city_key)
+                            }
+                    except:
+                        pass
+            
+            # Also include the legacy structure (COMMENTED OUT)
+            # structure["legacy"] = {
+            #     "city_data": {},
+            #     "capital_video": {}
+            # }
+            
+            # Get sample legacy keys
+            # for key in self.redis_client.keys("city_data:*")[:1]:
+            #     structure["legacy"]["city_data"][key] = "JSON string (truncated)"
+            
+            # for key in self.redis_client.keys("capital_video:*")[:1]:
+            #     structure["legacy"]["capital_video"][key] = "JSON string (truncated)"
+            
+            print("Current Redis Structure:")
+            print(json.dumps(structure, indent=2))
+            
+            return structure
+        except Exception as e:
+            print(f"Error printing Redis structure: {str(e)}")
+            return {} 

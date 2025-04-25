@@ -5,17 +5,16 @@ RUN apk add --no-cache python3 py3-pip
 
 WORKDIR /app
 
-# Copy requirements file and install dependencies
-COPY requirements.txt .
+# Copy all necessary files
+COPY requirements.txt /app/
+COPY load_to_redis.py /app/
+COPY entrypoint.sh /app/
 
-# Install packages with the --break-system-packages flag
-RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+# Make entrypoint executable
+RUN chmod +x /app/entrypoint.sh
 
-# Copy the loader script
-COPY load_to_redis.py .
+# Install Python dependencies
+RUN pip3 install --no-cache-dir --break-system-packages -r /app/requirements.txt
 
-# Add an entry point script that starts Redis and conditionally runs the loader
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["entrypoint.sh"] 
+# Use shell form for entrypoint to ensure path resolution works properly
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"] 

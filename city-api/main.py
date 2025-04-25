@@ -18,6 +18,7 @@ from cache.redis_manager import RedisCache
 import asyncio
 from typing import List
 import aiohttp
+import redis
 
 app = FastAPI()
 
@@ -40,7 +41,6 @@ CONTROL_TOPIC = "city-control"
 # Global variables
 dynamic_cities = []
 is_ready = False  # Track if initial configuration is complete
-city_coordinates_cache = {}
 
 # Initialize Docker client with improved error handling
 def get_docker_client():
@@ -657,6 +657,11 @@ async def execute_country_cities_script(country: str) -> dict:
 
 @app.post("/api/city-coordinates/batch")
 async def get_city_coordinates_batch(request: Request):
+    """
+    Batch endpoint to get coordinates for multiple cities at once.
+    This endpoint accepts a list of city names and returns their coordinates.
+    All data is retrieved from Redis, using both static and dynamic city collections.
+    """
     try:
         # Parse request body
         data = await request.json()
@@ -670,24 +675,28 @@ async def get_city_coordinates_batch(request: Request):
         
         print(f"Processing batch request for {len(requested_cities)} cities")
         
-        # Get city coordinates
+        # Get city coordinates from Redis directly
         coordinates = {}
+        redis_found = 0
+        api_found = 0
         for city in requested_cities:
-            # Check if we have coordinates in memory cache
-            if city in city_coordinates_cache:
-                coordinates[city] = city_coordinates_cache[city]
-                continue
-                
-            # Try to get coordinates from the database or external service
-            city_coord = await get_city_coordinate(city)
-            if city_coord:
-                coordinates[city] = {
-                    "lat": city_coord["latitude"],
-                    "lng": city_coord["longitude"]
-                }
-                # Update cache
-                city_coordinates_cache[city] = coordinates[city]
+            # Get coordinates from Redis
+            city_coords = await redis_cache.get_city_coordinates(city)
+            if city_coords:
+                coordinates[city] = city_coords
+                redis_found += 1
+            else:
+                # If not found in Redis, attempt to get from external service as fallback
+                city_coord = await get_city_coordinate(city)
+                if city_coord:
+                    print(f"DEBUG: Retrieved coordinates for '{city}' from external API - consider adding to Redis")
+                    coordinates[city] = {
+                        "lat": city_coord["latitude"],
+                        "lng": city_coord["longitude"]
+                    }
+                    api_found += 1
         
+        print(f"Batch coordinates summary: {redis_found} cities from Redis, {api_found} cities from external API")
         print(f"Returning coordinates for {len(coordinates)} cities")
         
         return JSONResponse(
@@ -702,6 +711,11 @@ async def get_city_coordinates_batch(request: Request):
 
 @app.get("/api/static-city-coordinates")
 async def get_static_city_coordinates():
+    """
+    Endpoint to get coordinates for all static cities configured in the system.
+    This endpoint reads the city list from configuration.yml and returns
+    coordinates for each city from Redis.
+    """
     try:
         # Get list of static cities from configuration
         config = get_configuration()
@@ -714,24 +728,29 @@ async def get_static_city_coordinates():
         
         print(f"Processing static city coordinates for {len(static_cities)} cities")
         
-        # Get coordinates for all static cities
+        # Get coordinates for all static cities from Redis
         coordinates = {}
-        for city in static_cities:
-            # Check if we have coordinates in memory cache
-            if city in city_coordinates_cache:
-                coordinates[city] = city_coordinates_cache[city]
-                continue
-                
-            # Try to get coordinates from the database or external service
-            city_coord = await get_city_coordinate(city)
-            if city_coord:
-                coordinates[city] = {
-                    "lat": city_coord["latitude"],
-                    "lng": city_coord["longitude"]
-                }
-                # Update cache
-                city_coordinates_cache[city] = coordinates[city]
+        redis_found = 0
+        api_found = 0
         
+        for city in static_cities:
+            # Get coordinates directly from Redis
+            city_coords = await redis_cache.get_city_coordinates(city)
+            if city_coords:
+                coordinates[city] = city_coords
+                redis_found += 1
+            else:
+                # If not found in Redis, try to get from external API as fallback
+                city_coord = await get_city_coordinate(city)
+                if city_coord:
+                    print(f"DEBUG: Retrieved coordinates for static city '{city}' from external API - consider adding to Redis")
+                    coordinates[city] = {
+                        "lat": city_coord["latitude"],
+                        "lng": city_coord["longitude"]
+                    }
+                    api_found += 1
+        
+        print(f"Static coordinates summary: {redis_found} cities from Redis, {api_found} cities from external API")
         print(f"Returning static coordinates for {len(coordinates)} cities")
         
         return JSONResponse(
@@ -745,7 +764,7 @@ async def get_static_city_coordinates():
         )
 
 async def get_city_coordinate(city_name):
-    """Get coordinates for a city from a database or external service"""
+    """Get coordinates for a city from an external service (fallback method)"""
     try:
         # Call to geocoding service (replace with your preferred service)
         # This is just an example implementation - you may want to use a real geocoding API
@@ -760,12 +779,13 @@ async def get_city_coordinate(city_name):
                 if response.status == 200:
                     data = await response.json()
                     if data and len(data) > 0:
+                        print(f"DEBUG: External API found coordinates for '{city_name}'")
                         return {
                             "latitude": float(data[0]["lat"]),
                             "longitude": float(data[0]["lon"])
                         }
         
-        print(f"Could not find coordinates for city: {city_name}")
+        print(f"DEBUG: External API could not find coordinates for city: {city_name}")
         return None
     except Exception as e:
         print(f"Error getting coordinates for {city_name}: {str(e)}")
