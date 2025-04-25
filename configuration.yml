@@ -85,13 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
   enabled: true
-  previousBatch: []
+  previousBatch:
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

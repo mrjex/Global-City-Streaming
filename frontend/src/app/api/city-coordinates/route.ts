@@ -161,6 +161,7 @@ export async function POST(request: Request) {
     // Parse request body
     const data = await request.json();
     const cities = data.cities || [];
+    const country = data.country; // Get the country if provided
     
     if (!cities.length) {
       return NextResponse.json(
@@ -169,18 +170,24 @@ export async function POST(request: Request) {
       );
     }
     
-    console.log(`Processing batch request for ${cities.length} cities`);
+    console.log(`Processing batch request for ${cities.length} cities${country ? ` from ${country}` : ''}`);
     
     // Call backend batch API
     const CITY_API_URL = process.env.CITY_API_URL || 'http://city-api:8003';
     
     try {
+      // Create request body with cities and optional country
+      const requestBody: any = { cities };
+      if (country) {
+        requestBody.country = country;
+      }
+      
       const response = await fetch(`${CITY_API_URL}/api/city-coordinates/batch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cities }),
+        body: JSON.stringify(requestBody),
       });
       
       if (!response.ok) {

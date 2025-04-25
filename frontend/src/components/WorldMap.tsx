@@ -85,16 +85,30 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
           })
         })
         .then(() => {
-          // Dispatch event for initial country load with the data
-          const event = new CustomEvent('initialCountryLoaded', {
-            detail: { 
-              country: defaultCountry,
-              data: data,
-              coordinates: data.coordinates
-            }
+          // Fetch coordinates for the cities if needed
+          return fetch('/api/city-coordinates', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cities: data.cities.map((city: any) => city.city),
+              country: defaultCountry
+            })
+          })
+          .then(response => response.json())
+          .then(coordsData => {
+            // Dispatch event for initial country load with the data
+            const event = new CustomEvent('initialCountryLoaded', {
+              detail: { 
+                country: defaultCountry,
+                data: data,
+                coordinates: coordsData.coordinates || {}
+              }
+            });
+            window.dispatchEvent(event);
+            return data; // Return data for chaining
           });
-          window.dispatchEvent(event);
-          return data; // Return data for chaining
         });
       }
     })
@@ -263,7 +277,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect }: WorldMapProps) =
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    cities: data.cities.map((city: any) => city.city)
+                    cities: data.cities.map((city: any) => city.city),
+                    country: newSelectedCountry
                   })
                 })
                 .then(response => response.json())

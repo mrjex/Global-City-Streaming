@@ -19,11 +19,17 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   const [cityCoordinates, setCityCoordinates] = useState<Record<string, { lat: number; lng: number }>>({});
   const [renderKey, setRenderKey] = useState<number>(0);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   
   // Listen for country selection events
   useEffect(() => {
     const handleCountrySelect = (event: any) => {
       console.log('[GlobeView.tsx] Received countrySelected event with data:', event.detail);
+      
+      // Update selected country
+      if (event.detail.country) {
+        setSelectedCountry(event.detail.country);
+      }
       
       // Debug event structure
       console.log('[GlobeView.tsx] Event coordinates structure:', {
@@ -52,6 +58,11 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     // Listen for initial country load events
     const handleInitialCountryLoad = (event: any) => {
       console.log('[GlobeView.tsx] Received initialCountryLoaded event with data:', event.detail);
+      
+      // Update selected country
+      if (event.detail.country) {
+        setSelectedCountry(event.detail.country);
+      }
       
       // Debug event structure 
       console.log('[GlobeView.tsx] Event coordinates structure:', {
@@ -92,12 +103,19 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       }
       
       try {
+        // Create request body with cities and optional country
+        const requestBody: any = { cities: allCities };
+        if (selectedCountry) {
+          requestBody.country = selectedCountry;
+          console.log(`[GlobeView.tsx] Including country (${selectedCountry}) in coordinates request`);
+        }
+        
         const response = await fetch('/api/city-coordinates', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ cities: allCities }),
+          body: JSON.stringify(requestBody),
         });
         
         if (!response.ok) {
@@ -134,7 +152,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       window.removeEventListener('countrySelected', handleCountrySelect);
       window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad);
     };
-  }, [cities, dynamicCities]);
+  }, [cities, dynamicCities, selectedCountry]);
 
   // Update markers when cityCoordinates change
   useEffect(() => {

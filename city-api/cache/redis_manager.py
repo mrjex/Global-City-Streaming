@@ -360,6 +360,74 @@ class RedisCache:
             print(f"REDIS_LOGS: Error getting city coordinates from Redis: {str(e)}")
             return None
             
+    async def update_city_coordinates(self, city_name: str, country: str, coordinates: Dict[str, float]) -> bool:
+        """Update coordinates for a dynamic city in Redis"""
+        try:
+            if not city_name or not country:
+                print(f"REDIS_LOGS: Cannot update coordinates - missing city name or country")
+                return False
+                
+            print(f"REDIS_LOGS: Attempting to update coordinates for '{city_name}' in country '{country}'")
+            
+            # First check if this is a dynamic city that exists
+            city_key = f"{self.DYNAMIC_CITY_PREFIX}{country}:{city_name}"
+            
+            # Check if the city belongs to this country
+            country_key = f"{self.DYNAMIC_COUNTRY_PREFIX}{country}"
+            
+            # Use a pipeline for atomic operations
+            pipe = self.redis_client.pipeline()
+            
+            if not self.redis_client.exists(country_key):
+                # Country doesn't exist in Redis yet, add it
+                print(f"REDIS_LOGS: Adding new country {country} to Redis")
+                pipe.sadd(self.DYNAMIC_COUNTRIES_ALL_KEY, country)
+                pipe.hset(country_key, "cities", json.dumps([city_name]))
+                pipe.expire(country_key, self.CITY_DATA_TTL)
+            else:
+                # Country exists, check if city is in the list
+                country_data = self.redis_client.hgetall(country_key)
+                city_list_str = country_data.get("cities", "[]")
+                try:
+                    city_list = json.loads(city_list_str)
+                    if city_name not in city_list:
+                        # Add the city to the country's city list
+                        city_list.append(city_name)
+                        pipe.hset(country_key, "cities", json.dumps(city_list))
+                except json.JSONDecodeError:
+                    # Invalid JSON, create a new list
+                    pipe.hset(country_key, "cities", json.dumps([city_name]))
+            
+            # Update the city coordinates
+            pipe.hset(city_key, "latitude", str(coordinates["lat"]))
+            pipe.hset(city_key, "longitude", str(coordinates["lng"]))
+            
+            # Make sure we keep any existing data like temperature
+            existing_data = self.redis_client.hgetall(city_key)
+            if "temperature" in existing_data:
+                # Keep the existing temperature
+                pipe.hset(city_key, "temperature", existing_data["temperature"])
+            
+            # Extend TTL for the city key
+            pipe.expire(city_key, self.CITY_DATA_TTL)
+            
+            # Execute all commands as a transaction
+            result = pipe.execute()
+            
+            print(f"REDIS_LOGS: Successfully stored coordinates for '{city_name}' in Redis (lat={coordinates['lat']}, lng={coordinates['lng']})")
+            print(f"REDIS_LOGS: Redis key: {city_key}")
+            
+            # Debugging - print what's now in Redis for this city
+            updated_data = self.redis_client.hgetall(city_key)
+            print(f"REDIS_LOGS: Updated city data in Redis: {updated_data}")
+            
+            return True
+        except Exception as e:
+            print(f"REDIS_LOGS: Error updating city coordinates in Redis: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
     def print_redis_structure(self):
         """Print the current Redis structure for debugging"""
         try:

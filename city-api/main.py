@@ -579,20 +579,35 @@ async def receive_selected_country(request: Request):
         
         if script_result.get('success'):
             # Cache the new data
-            capital_city = script_result.get('cities', [{}])[0].get('city')
+            cities = script_result.get('cities', [])
+            capital_city = cities[0].get('city') if cities else None
+            country_code = script_result.get('country_code', '')
             
+            # Store main city data
             await redis_cache.set_city_data(country, {
                 'country': country,
-                'country_code': script_result.get('country_code'),
-                'cities': script_result.get('cities', [])
+                'country_code': country_code,
+                'cities': cities
             })
             
-            await redis_cache.set_video_data(country, {
-                'country': country,
-                'capital_city': capital_city,
-                'video_url': script_result.get('capital_city_video_link'),
-                'description': script_result.get('capital_city_description')
-            })
+            # Store video data for capital city
+            if capital_city:
+                await redis_cache.set_video_data(country, {
+                    'country': country,
+                    'capital_city': capital_city,
+                    'video_url': script_result.get('capital_city_video_link'),
+                    'description': script_result.get('capital_city_description')
+                })
+            
+            # Cache coordinates for each city
+            for city_data in cities:
+                city_name = city_data.get('city')
+                if city_name and 'latitude' in city_data and 'longitude' in city_data:
+                    print(f"REDIS_LOGS: Storing coordinates for dynamic city {city_name} in country {country}")
+                    await redis_cache.update_city_coordinates(city_name, country, {
+                        "lat": float(city_data.get('latitude')),
+                        "lng": float(city_data.get('longitude'))
+                    })
             
             return JSONResponse(content=script_result)
         else:
@@ -680,11 +695,14 @@ async def get_city_coordinates_batch(request: Request):
     Batch endpoint to get coordinates for multiple cities at once.
     This endpoint accepts a list of city names and returns their coordinates.
     All data is retrieved from Redis, using both static and dynamic city collections.
+    
+    Optional: Pass a 'country' parameter to store coordinates in Redis for that country.
     """
     try:
         # Parse request body
         data = await request.json()
         requested_cities = data.get("cities", [])
+        country = data.get("country")  # Optional parameter
         
         if not requested_cities:
             return JSONResponse(
@@ -692,12 +710,11 @@ async def get_city_coordinates_batch(request: Request):
                 content={"error": "No cities provided in request"}
             )
         
-        # print(f"Processing batch request for {len(requested_cities)} cities")
-        
         # Get city coordinates from Redis directly
         coordinates = {}
         redis_found = 0
         api_found = 0
+        
         for city in requested_cities:
             # Get coordinates from Redis
             city_coords = await redis_cache.get_city_coordinates(city)
@@ -714,6 +731,13 @@ async def get_city_coordinates_batch(request: Request):
                         "lng": city_coord["longitude"]
                     }
                     api_found += 1
+                    
+                    # Store the coordinates in Redis if we know the country
+                    if country:
+                        await redis_cache.update_city_coordinates(city, country, {
+                            "lat": city_coord["latitude"],
+                            "lng": city_coord["longitude"]
+                        })
         
         print(f"REDIS_LOGS: Batch coordinates summary: {redis_found} cities from Redis, {api_found} cities from external API")
         print(f"REDIS_LOGS: Returning coordinates for {len(coordinates)} cities")
@@ -768,6 +792,14 @@ async def get_static_city_coordinates():
                         "lng": city_coord["longitude"]
                     }
                     api_found += 1
+                    
+                    # For static cities, we can determine a default country if not specified
+                    # We use a default country of "Unknown" as a fallback
+                    country = config.get("defaultCountry", "Unknown")
+                    await redis_cache.update_city_coordinates(city, country, {
+                        "lat": city_coord["latitude"],
+                        "lng": city_coord["longitude"]
+                    })
         
         print(f"REDIS_LOGS: Static coordinates summary: {redis_found} cities from Redis, {api_found} cities from external API")
         print(f"REDIS_LOGS: Returning static coordinates for {len(coordinates)} cities")
@@ -891,6 +923,15 @@ async def get_city_coordinates(city_name: str):
         coordinates = await get_city_coordinate(city_name)
         
         if coordinates:
+            # Get country from query parameters if available
+            country = "Unknown"
+            
+            # Store coordinates in Redis for future use
+            await redis_cache.update_city_coordinates(city_name, country, {
+                "lat": coordinates["latitude"],
+                "lng": coordinates["longitude"]
+            })
+            
             return coordinates
         else:
             return JSONResponse(
