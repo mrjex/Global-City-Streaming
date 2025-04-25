@@ -3,7 +3,7 @@
     "city": "London",
     "country": "United Kingdom",
     "continent": "Europe",
-    "temperatureCelsius": 15.2,
+    "temperatureCelsius": 16.2,
     "latitude": 51.5171,
     "longitude": -0.1062
   },
@@ -11,7 +11,7 @@
     "city": "Stockholm",
     "country": "Sweden",
     "continent": "Europe",
-    "temperatureCelsius": 8.2,
+    "temperatureCelsius": 8.1,
     "latitude": 59.3333,
     "longitude": 18.05
   },
@@ -19,7 +19,7 @@
     "city": "Toronto",
     "country": "Canada",
     "continent": "America",
-    "temperatureCelsius": 12.3,
+    "temperatureCelsius": 11.1,
     "latitude": 43.6667,
     "longitude": -79.4167
   },
@@ -27,7 +27,7 @@
     "city": "Moscow",
     "country": "Russia",
     "continent": "Europe",
-    "temperatureCelsius": 15.0,
+    "temperatureCelsius": 14.2,
     "latitude": 55.7522,
     "longitude": 37.6156
   },
@@ -35,7 +35,7 @@
     "city": "Madrid",
     "country": "Spain",
     "continent": "Europe",
-    "temperatureCelsius": 24.1,
+    "temperatureCelsius": 24.2,
     "latitude": 40.4,
     "longitude": -3.6833
   },
@@ -43,7 +43,7 @@
     "city": "Reykjavik",
     "country": "Iceland",
     "continent": "Atlantic",
-    "temperatureCelsius": 11.0,
+    "temperatureCelsius": 11.3,
     "latitude": 64.15,
     "longitude": -21.95
   },
@@ -51,7 +51,7 @@
     "city": "Helsinki",
     "country": "Finland",
     "continent": "Europe",
-    "temperatureCelsius": 7.1,
+    "temperatureCelsius": 5.2,
     "latitude": 60.176,
     "longitude": 24.934
   },
@@ -59,7 +59,7 @@
     "city": "Rome",
     "country": "Italy",
     "continent": "Europe",
-    "temperatureCelsius": 20.1,
+    "temperatureCelsius": 20.2,
     "latitude": 41.9,
     "longitude": 12.4833
   },
@@ -67,7 +67,7 @@
     "city": "Venice",
     "country": "Italy",
     "continent": "Europe",
-    "temperatureCelsius": 14.1,
+    "temperatureCelsius": 15.3,
     "latitude": 45.4386,
     "longitude": 12.3267
   },
@@ -75,7 +75,7 @@
     "city": "Lisbon",
     "country": "Portugal",
     "continent": "Europe",
-    "temperatureCelsius": 17.1,
+    "temperatureCelsius": 18.0,
     "latitude": 38.7167,
     "longitude": -9.1333
   },
@@ -83,7 +83,7 @@
     "city": "Paris",
     "country": "France",
     "continent": "Europe",
-    "temperatureCelsius": 15.3,
+    "temperatureCelsius": 15.2,
     "latitude": 48.8667,
     "longitude": 2.3333
   },
@@ -115,7 +115,7 @@
     "city": "Dubai",
     "country": "United Arab Emirates",
     "continent": "Asia",
-    "temperatureCelsius": 32.3,
+    "temperatureCelsius": 32.2,
     "latitude": 25.2522,
     "longitude": 55.28
   },
@@ -131,7 +131,7 @@
     "city": "Tokyo",
     "country": "Japan",
     "continent": "Asia",
-    "temperatureCelsius": 18.2,
+    "temperatureCelsius": 18.0,
     "latitude": 35.6895,
     "longitude": 139.6917
   },
@@ -139,7 +139,7 @@
     "city": "Bangkok",
     "country": "Thailand",
     "continent": "Asia",
-    "temperatureCelsius": 33.1,
+    "temperatureCelsius": 32.1,
     "latitude": 13.75,
     "longitude": 100.5167
   },
@@ -147,7 +147,7 @@
     "city": "Seoul",
     "country": "South Korea",
     "continent": "Asia",
-    "temperatureCelsius": 12.3,
+    "temperatureCelsius": 11.2,
     "latitude": 37.5664,
     "longitude": 126.9997
   },
@@ -155,7 +155,7 @@
     "city": "Buenos Aires",
     "country": "Argentina",
     "continent": "America",
-    "temperatureCelsius": 20.4,
+    "temperatureCelsius": 22.3,
     "latitude": -34.5875,
     "longitude": -58.6725
   },
@@ -163,7 +163,7 @@
     "city": "Mexico City",
     "country": "Mexico",
     "continent": "America",
-    "temperatureCelsius": 15.8,
+    "temperatureCelsius": 15.3,
     "latitude": 19.4285,
     "longitude": -99.1277
   },
@@ -171,7 +171,7 @@
     "city": "Honolulu",
     "country": "United States of America",
     "continent": "Pacific",
-    "temperatureCelsius": 23.2,
+    "temperatureCelsius": 23.0,
     "latitude": 21.3069,
     "longitude": -157.8583
   },
@@ -179,7 +179,7 @@
     "city": "Papeete",
     "country": "French Polynesia Islands",
     "continent": "Pacific",
-    "temperatureCelsius": 26.4,
+    "temperatureCelsius": 26.0,
     "latitude": -17.5333,
     "longitude": -149.5667
   },
@@ -187,7 +187,7 @@
     "city": "Juneau",
     "country": "United States of America",
     "continent": "America",
-    "temperatureCelsius": 5.4,
+    "temperatureCelsius": 5.1,
     "latitude": 58.3019,
     "longitude": -134.4197
   },
@@ -195,7 +195,7 @@
     "city": "Sacramento",
     "country": "United States of America",
     "continent": "America",
-    "temperatureCelsius": 10.1,
+    "temperatureCelsius": 8.9,
     "latitude": 38.5817,
     "longitude": -121.4933
   },
@@ -211,7 +211,7 @@
     "city": "Palermo",
     "country": "Italy",
     "continent": "Europe",
-    "temperatureCelsius": 18.2,
+    "temperatureCelsius": 19.0,
     "latitude": 38.1167,
     "longitude": 13.3667
   },
@@ -219,7 +219,7 @@
     "city": "Naples",
     "country": "Italy",
     "continent": "Europe",
-    "temperatureCelsius": 18.1,
+    "temperatureCelsius": 19.4,
     "latitude": 40.8333,
     "longitude": 14.25
   },
@@ -227,7 +227,7 @@
     "city": "Milan",
     "country": "Italy",
     "continent": "Europe",
-    "temperatureCelsius": 21.4,
+    "temperatureCelsius": 22.4,
     "latitude": 45.4667,
     "longitude": 9.2
   },
@@ -235,7 +235,7 @@
     "city": "Budapest",
     "country": "Hungary",
     "continent": "Europe",
-    "temperatureCelsius": 18.3,
+    "temperatureCelsius": 18.1,
     "latitude": 47.5,
     "longitude": 19.0833
   },
@@ -243,7 +243,7 @@
     "city": "Bucharest",
     "country": "Romania",
     "continent": "Europe",
-    "temperatureCelsius": 27.3,
+    "temperatureCelsius": 27.4,
     "latitude": 44.4333,
     "longitude": 26.1
   },
@@ -251,7 +251,7 @@
     "city": "Sofia",
     "country": "Bulgaria",
     "continent": "Europe",
-    "temperatureCelsius": 22.0,
+    "temperatureCelsius": 22.1,
     "latitude": 42.6833,
     "longitude": 23.3167
   },
@@ -259,7 +259,7 @@
     "city": "Athens",
     "country": "Greece",
     "continent": "Europe",
-    "temperatureCelsius": 22.2,
+    "temperatureCelsius": 22.4,
     "latitude": 37.9795,
     "longitude": 23.7162
   },
@@ -267,7 +267,7 @@
     "city": "Warsaw",
     "country": "Poland",
     "continent": "Europe",
-    "temperatureCelsius": 15.2,
+    "temperatureCelsius": 17.2,
     "latitude": 52.25,
     "longitude": 21.0
   },
@@ -275,7 +275,7 @@
     "city": "Prague",
     "country": "Czech Republic",
     "continent": "Europe",
-    "temperatureCelsius": 11.1,
+    "temperatureCelsius": 11.2,
     "latitude": 50.083,
     "longitude": 14.467
   },
@@ -283,7 +283,7 @@
     "city": "Zurich",
     "country": "Switzerland",
     "continent": "Europe",
-    "temperatureCelsius": 12.4,
+    "temperatureCelsius": 12.3,
     "latitude": 47.3667,
     "longitude": 8.55
   },
@@ -291,7 +291,7 @@
     "city": "Geneva",
     "country": "Switzerland",
     "continent": "Europe",
-    "temperatureCelsius": 15.1,
+    "temperatureCelsius": 16.3,
     "latitude": 46.2,
     "longitude": 6.1667
   },
@@ -299,7 +299,7 @@
     "city": "Rotterdam",
     "country": "Netherlands",
     "continent": "Europe",
-    "temperatureCelsius": 15.1,
+    "temperatureCelsius": 15.4,
     "latitude": 51.9225,
     "longitude": 4.4792
   },
@@ -307,7 +307,7 @@
     "city": "Antwerp",
     "country": "Belgium",
     "continent": "Europe",
-    "temperatureCelsius": 15.1,
+    "temperatureCelsius": 15.3,
     "latitude": 51.2167,
     "longitude": 4.4167
   },
@@ -315,7 +315,7 @@
     "city": "Brussels",
     "country": "Belgium",
     "continent": "Europe",
-    "temperatureCelsius": 15.1,
+    "temperatureCelsius": 15.3,
     "latitude": 50.8333,
     "longitude": 4.3333
   },
@@ -347,7 +347,7 @@
     "city": "Abuja",
     "country": "Nigeria",
     "continent": "Africa",
-    "temperatureCelsius": 35.1,
+    "temperatureCelsius": 33.0,
     "latitude": 9.1758,
     "longitude": 7.1808
   },
@@ -371,7 +371,7 @@
     "city": "Gaborone",
     "country": "Botswana",
     "continent": "Africa",
-    "temperatureCelsius": 22.0,
+    "temperatureCelsius": 23.1,
     "latitude": -24.6464,
     "longitude": 25.9119
   },
@@ -387,7 +387,7 @@
     "city": "Antananarivo",
     "country": "Madagascar",
     "continent": "Indian",
-    "temperatureCelsius": 27.0,
+    "temperatureCelsius": 26.4,
     "latitude": -18.9167,
     "longitude": 47.5167
   },
@@ -411,7 +411,7 @@
     "city": "Boston",
     "country": "United States of America",
     "continent": "America",
-    "temperatureCelsius": 14.4,
+    "temperatureCelsius": 16.1,
     "latitude": 42.3583,
     "longitude": -71.0603
   },
@@ -419,7 +419,7 @@
     "city": "Miami",
     "country": "United States of America",
     "continent": "America",
-    "temperatureCelsius": 24.4,
+    "temperatureCelsius": 25.2,
     "latitude": 25.7739,
     "longitude": -80.1939
   },
@@ -427,7 +427,7 @@
     "city": "Seattle",
     "country": "United States of America",
     "continent": "America",
-    "temperatureCelsius": 10.6,
+    "temperatureCelsius": 9.4,
     "latitude": 47.6064,
     "longitude": -122.3308
   },
@@ -435,7 +435,7 @@
     "city": "Denver",
     "country": "United States of America",
     "continent": "America",
-    "temperatureCelsius": 4.6,
+    "temperatureCelsius": 4.4,
     "latitude": 39.7392,
     "longitude": -104.9842
   },
@@ -443,7 +443,7 @@
     "city": "Bogota",
     "country": "Colombia",
     "continent": "America",
-    "temperatureCelsius": 13.1,
+    "temperatureCelsius": 15.2,
     "latitude": 4.6,
     "longitude": -74.0833
   },
@@ -459,7 +459,7 @@
     "city": "Santiago",
     "country": "Chile",
     "continent": "America",
-    "temperatureCelsius": 13.1,
+    "temperatureCelsius": 12.3,
     "latitude": -33.45,
     "longitude": -70.6667
   },
@@ -467,7 +467,7 @@
     "city": "Novosibirsk",
     "country": "Russia",
     "continent": "Asia",
-    "temperatureCelsius": 14.0,
+    "temperatureCelsius": 13.2,
     "latitude": 55.0411,
     "longitude": 82.9344
   },
@@ -475,7 +475,7 @@
     "city": "Omsk",
     "country": "Russia",
     "continent": "Asia",
-    "temperatureCelsius": 21.4,
+    "temperatureCelsius": 21.0,
     "latitude": 55.0,
     "longitude": 73.4
   },
@@ -483,7 +483,7 @@
     "city": "Tehran",
     "country": "Iran",
     "continent": "Asia",
-    "temperatureCelsius": 32.3,
+    "temperatureCelsius": 30.1,
     "latitude": 35.7261,
     "longitude": 51.3304
   },
@@ -499,7 +499,7 @@
     "city": "Ankara",
     "country": "Turkey",
     "continent": "Europe",
-    "temperatureCelsius": 13.1,
+    "temperatureCelsius": 13.0,
     "latitude": 39.9272,
     "longitude": 32.8644
   },
@@ -507,7 +507,7 @@
     "city": "Damascus",
     "country": "Syria",
     "continent": "Asia",
-    "temperatureCelsius": 26.4,
+    "temperatureCelsius": 26.0,
     "latitude": 33.5,
     "longitude": 36.3
   },
@@ -523,7 +523,7 @@
     "city": "Caracas",
     "country": "Venezuela",
     "continent": "America",
-    "temperatureCelsius": 24.3,
+    "temperatureCelsius": 25.2,
     "latitude": 10.5,
     "longitude": -66.9167
   },
@@ -539,7 +539,7 @@
     "city": "Rio de Janeiro",
     "country": "Brazil",
     "continent": "America",
-    "temperatureCelsius": 24.1,
+    "temperatureCelsius": 25.1,
     "latitude": -22.9,
     "longitude": -43.2333
   },
@@ -547,7 +547,7 @@
     "city": "Salvador",
     "country": "Brazil",
     "continent": "America",
-    "temperatureCelsius": 28.1,
+    "temperatureCelsius": 29.1,
     "latitude": -12.9833,
     "longitude": -38.5167
   },
@@ -555,7 +555,7 @@
     "city": "Brasilia",
     "country": "Brazil",
     "continent": "America",
-    "temperatureCelsius": 24.3,
+    "temperatureCelsius": 25.2,
     "latitude": -15.7833,
     "longitude": -47.9167
   },
@@ -563,7 +563,7 @@
     "city": "Recife",
     "country": "Brazil",
     "continent": "America",
-    "temperatureCelsius": 29.1,
+    "temperatureCelsius": 30.2,
     "latitude": -8.05,
     "longitude": -34.9
   },
@@ -579,7 +579,7 @@
     "city": "Chennai",
     "country": "India",
     "continent": "Asia",
-    "temperatureCelsius": 32.3,
+    "temperatureCelsius": 31.2,
     "latitude": 13.0833,
     "longitude": 80.2833
   },
@@ -587,7 +587,7 @@
     "city": "Bangalore",
     "country": "India",
     "continent": "Asia",
-    "temperatureCelsius": 33.1,
+    "temperatureCelsius": 32.1,
     "latitude": 12.9833,
     "longitude": 77.5833
   },
@@ -603,7 +603,7 @@
     "city": "Ulaanbaatar",
     "country": "Mongolia",
     "continent": "Asia",
-    "temperatureCelsius": 0.3,
+    "temperatureCelsius": -1.0,
     "latitude": 47.9167,
     "longitude": 106.9167
   },
@@ -611,7 +611,7 @@
     "city": "Almaty",
     "country": "Kazakhstan",
     "continent": "Asia",
-    "temperatureCelsius": 21.2,
+    "temperatureCelsius": 19.3,
     "latitude": 43.25,
     "longitude": 76.95
   },
@@ -619,7 +619,7 @@
     "city": "Ganja",
     "country": "Azerbaijan",
     "continent": "Asia",
-    "temperatureCelsius": 20.2,
+    "temperatureCelsius": 18.3,
     "latitude": 40.6828,
     "longitude": 46.3606
   },
@@ -627,7 +627,7 @@
     "city": "Astana",
     "country": "Kazakhstan",
     "continent": "Asia",
-    "temperatureCelsius": 20.2,
+    "temperatureCelsius": 20.1,
     "latitude": 51.1811,
     "longitude": 71.4278
   },
@@ -635,7 +635,7 @@
     "city": "Beijing",
     "country": "China",
     "continent": "Asia",
-    "temperatureCelsius": 14.1,
+    "temperatureCelsius": 14.2,
     "latitude": 39.9289,
     "longitude": 116.3883
   },
@@ -643,7 +643,7 @@
     "city": "Shanghai",
     "country": "China",
     "continent": "Asia",
-    "temperatureCelsius": 16.3,
+    "temperatureCelsius": 16.1,
     "latitude": 31.005,
     "longitude": 121.4086
   },
@@ -651,7 +651,7 @@
     "city": "Hong Kong",
     "country": "Hong Kong",
     "continent": "Asia",
-    "temperatureCelsius": 26.1,
+    "temperatureCelsius": 26.0,
     "latitude": 22.283,
     "longitude": 114.15
   },
@@ -659,7 +659,7 @@
     "city": "Osaka",
     "country": "Japan",
     "continent": "Asia",
-    "temperatureCelsius": 14.3,
+    "temperatureCelsius": 13.1,
     "latitude": 34.6937,
     "longitude": 135.5022
   },
@@ -667,7 +667,7 @@
     "city": "Chengdu",
     "country": "China",
     "continent": "Asia",
-    "temperatureCelsius": 17.1,
+    "temperatureCelsius": 16.0,
     "latitude": 30.6667,
     "longitude": 104.0667
   }
