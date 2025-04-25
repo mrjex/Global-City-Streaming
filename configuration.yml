@@ -85,18 +85,13 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Paris
-  - Marseille
-  - Lyon
-  - Toulouse
-  - Nice
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
   enabled: true
-  previousBatch:
-  - Paris
-  - Marseille
-  - Lyon
-  - Toulouse
-  - Nice
+  previousBatch: []
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
