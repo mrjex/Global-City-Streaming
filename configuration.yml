@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - New York City
-  - Los Angeles
-  - Chicago
-  - Brooklyn
-  - Queens
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
   enabled: true
   previousBatch:
-  - New York City
-  - Los Angeles
-  - Chicago
-  - Brooklyn
-  - Queens
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

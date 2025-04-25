@@ -1,0 +1,674 @@
+{
+  "London": {
+    "city": "London",
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "temperatureCelsius": 15.2,
+    "latitude": 51.5171,
+    "longitude": -0.1062
+  },
+  "Stockholm": {
+    "city": "Stockholm",
+    "country": "Sweden",
+    "continent": "Europe",
+    "temperatureCelsius": 8.2,
+    "latitude": 59.3333,
+    "longitude": 18.05
+  },
+  "Toronto": {
+    "city": "Toronto",
+    "country": "Canada",
+    "continent": "America",
+    "temperatureCelsius": 12.3,
+    "latitude": 43.6667,
+    "longitude": -79.4167
+  },
+  "Moscow": {
+    "city": "Moscow",
+    "country": "Russia",
+    "continent": "Europe",
+    "temperatureCelsius": 15.0,
+    "latitude": 55.7522,
+    "longitude": 37.6156
+  },
+  "Madrid": {
+    "city": "Madrid",
+    "country": "Spain",
+    "continent": "Europe",
+    "temperatureCelsius": 24.1,
+    "latitude": 40.4,
+    "longitude": -3.6833
+  },
+  "Reykjavik": {
+    "city": "Reykjavik",
+    "country": "Iceland",
+    "continent": "Atlantic",
+    "temperatureCelsius": 11.0,
+    "latitude": 64.15,
+    "longitude": -21.95
+  },
+  "Helsinki": {
+    "city": "Helsinki",
+    "country": "Finland",
+    "continent": "Europe",
+    "temperatureCelsius": 7.1,
+    "latitude": 60.176,
+    "longitude": 24.934
+  },
+  "Rome": {
+    "city": "Rome",
+    "country": "Italy",
+    "continent": "Europe",
+    "temperatureCelsius": 20.1,
+    "latitude": 41.9,
+    "longitude": 12.4833
+  },
+  "Venice": {
+    "city": "Venice",
+    "country": "Italy",
+    "continent": "Europe",
+    "temperatureCelsius": 14.1,
+    "latitude": 45.4386,
+    "longitude": 12.3267
+  },
+  "Lisbon": {
+    "city": "Lisbon",
+    "country": "Portugal",
+    "continent": "Europe",
+    "temperatureCelsius": 17.1,
+    "latitude": 38.7167,
+    "longitude": -9.1333
+  },
+  "Paris": {
+    "city": "Paris",
+    "country": "France",
+    "continent": "Europe",
+    "temperatureCelsius": 15.3,
+    "latitude": 48.8667,
+    "longitude": 2.3333
+  },
+  "Amsterdam": {
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "continent": "Europe",
+    "temperatureCelsius": 13.3,
+    "latitude": 52.374,
+    "longitude": 4.8897
+  },
+  "Chernobyl": {
+    "city": "Chernobyl",
+    "country": "Ukraine",
+    "continent": "Europe",
+    "temperatureCelsius": 18.3,
+    "latitude": 51.2667,
+    "longitude": 30.2333
+  },
+  "Nairobi": {
+    "city": "Nairobi",
+    "country": "Kenya",
+    "continent": "Africa",
+    "temperatureCelsius": 24.3,
+    "latitude": -1.2833,
+    "longitude": 36.8167
+  },
+  "Dubai": {
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "temperatureCelsius": 32.3,
+    "latitude": 25.2522,
+    "longitude": 55.28
+  },
+  "Bali": {
+    "city": "Bali",
+    "country": "Indonesia",
+    "continent": "Asia",
+    "temperatureCelsius": 28.8,
+    "latitude": -0.14,
+    "longitude": 98.186
+  },
+  "Tokyo": {
+    "city": "Tokyo",
+    "country": "Japan",
+    "continent": "Asia",
+    "temperatureCelsius": 18.2,
+    "latitude": 35.6895,
+    "longitude": 139.6917
+  },
+  "Bangkok": {
+    "city": "Bangkok",
+    "country": "Thailand",
+    "continent": "Asia",
+    "temperatureCelsius": 33.1,
+    "latitude": 13.75,
+    "longitude": 100.5167
+  },
+  "Seoul": {
+    "city": "Seoul",
+    "country": "South Korea",
+    "continent": "Asia",
+    "temperatureCelsius": 12.3,
+    "latitude": 37.5664,
+    "longitude": 126.9997
+  },
+  "Buenos Aires": {
+    "city": "Buenos Aires",
+    "country": "Argentina",
+    "continent": "America",
+    "temperatureCelsius": 20.4,
+    "latitude": -34.5875,
+    "longitude": -58.6725
+  },
+  "Mexico City": {
+    "city": "Mexico City",
+    "country": "Mexico",
+    "continent": "America",
+    "temperatureCelsius": 15.8,
+    "latitude": 19.4285,
+    "longitude": -99.1277
+  },
+  "Honolulu": {
+    "city": "Honolulu",
+    "country": "United States of America",
+    "continent": "Pacific",
+    "temperatureCelsius": 23.2,
+    "latitude": 21.3069,
+    "longitude": -157.8583
+  },
+  "Papeete": {
+    "city": "Papeete",
+    "country": "French Polynesia Islands",
+    "continent": "Pacific",
+    "temperatureCelsius": 26.4,
+    "latitude": -17.5333,
+    "longitude": -149.5667
+  },
+  "Juneau": {
+    "city": "Juneau",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 5.4,
+    "latitude": 58.3019,
+    "longitude": -134.4197
+  },
+  "Sacramento": {
+    "city": "Sacramento",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 10.1,
+    "latitude": 38.5817,
+    "longitude": -121.4933
+  },
+  "Tijuana": {
+    "city": "Tijuana",
+    "country": "Mexico",
+    "continent": "America",
+    "temperatureCelsius": 13.2,
+    "latitude": 32.5027,
+    "longitude": -117.0037
+  },
+  "Palermo": {
+    "city": "Palermo",
+    "country": "Italy",
+    "continent": "Europe",
+    "temperatureCelsius": 18.2,
+    "latitude": 38.1167,
+    "longitude": 13.3667
+  },
+  "Naples": {
+    "city": "Naples",
+    "country": "Italy",
+    "continent": "Europe",
+    "temperatureCelsius": 18.1,
+    "latitude": 40.8333,
+    "longitude": 14.25
+  },
+  "Milan": {
+    "city": "Milan",
+    "country": "Italy",
+    "continent": "Europe",
+    "temperatureCelsius": 21.4,
+    "latitude": 45.4667,
+    "longitude": 9.2
+  },
+  "Budapest": {
+    "city": "Budapest",
+    "country": "Hungary",
+    "continent": "Europe",
+    "temperatureCelsius": 18.3,
+    "latitude": 47.5,
+    "longitude": 19.0833
+  },
+  "Bucharest": {
+    "city": "Bucharest",
+    "country": "Romania",
+    "continent": "Europe",
+    "temperatureCelsius": 27.3,
+    "latitude": 44.4333,
+    "longitude": 26.1
+  },
+  "Sofia": {
+    "city": "Sofia",
+    "country": "Bulgaria",
+    "continent": "Europe",
+    "temperatureCelsius": 22.0,
+    "latitude": 42.6833,
+    "longitude": 23.3167
+  },
+  "Athens": {
+    "city": "Athens",
+    "country": "Greece",
+    "continent": "Europe",
+    "temperatureCelsius": 22.2,
+    "latitude": 37.9795,
+    "longitude": 23.7162
+  },
+  "Warsaw": {
+    "city": "Warsaw",
+    "country": "Poland",
+    "continent": "Europe",
+    "temperatureCelsius": 15.2,
+    "latitude": 52.25,
+    "longitude": 21.0
+  },
+  "Prague": {
+    "city": "Prague",
+    "country": "Czech Republic",
+    "continent": "Europe",
+    "temperatureCelsius": 11.1,
+    "latitude": 50.083,
+    "longitude": 14.467
+  },
+  "Zurich": {
+    "city": "Zurich",
+    "country": "Switzerland",
+    "continent": "Europe",
+    "temperatureCelsius": 12.4,
+    "latitude": 47.3667,
+    "longitude": 8.55
+  },
+  "Geneva": {
+    "city": "Geneva",
+    "country": "Switzerland",
+    "continent": "Europe",
+    "temperatureCelsius": 15.1,
+    "latitude": 46.2,
+    "longitude": 6.1667
+  },
+  "Rotterdam": {
+    "city": "Rotterdam",
+    "country": "Netherlands",
+    "continent": "Europe",
+    "temperatureCelsius": 15.1,
+    "latitude": 51.9225,
+    "longitude": 4.4792
+  },
+  "Antwerp": {
+    "city": "Antwerp",
+    "country": "Belgium",
+    "continent": "Europe",
+    "temperatureCelsius": 15.1,
+    "latitude": 51.2167,
+    "longitude": 4.4167
+  },
+  "Brussels": {
+    "city": "Brussels",
+    "country": "Belgium",
+    "continent": "Europe",
+    "temperatureCelsius": 15.1,
+    "latitude": 50.8333,
+    "longitude": 4.3333
+  },
+  "Cairo": {
+    "city": "Cairo",
+    "country": "Egypt",
+    "continent": "Africa",
+    "temperatureCelsius": 26.3,
+    "latitude": 30.05,
+    "longitude": 31.25
+  },
+  "Addis Ababa": {
+    "city": "Addis Ababa",
+    "country": "Ethiopia",
+    "continent": "Africa",
+    "temperatureCelsius": 26.3,
+    "latitude": 9.0333,
+    "longitude": 38.7
+  },
+  "Dakar": {
+    "city": "Dakar",
+    "country": "Senegal",
+    "continent": "Africa",
+    "temperatureCelsius": 26.3,
+    "latitude": 14.6708,
+    "longitude": -17.4381
+  },
+  "Abuja": {
+    "city": "Abuja",
+    "country": "Nigeria",
+    "continent": "Africa",
+    "temperatureCelsius": 35.1,
+    "latitude": 9.1758,
+    "longitude": 7.1808
+  },
+  "Luanda": {
+    "city": "Luanda",
+    "country": "Angola",
+    "continent": "Africa",
+    "temperatureCelsius": 28.8,
+    "latitude": -8.8383,
+    "longitude": 13.2344
+  },
+  "Kinshasa": {
+    "city": "Kinshasa",
+    "country": "Democratic Republic of Congo",
+    "continent": "Africa",
+    "temperatureCelsius": 32.1,
+    "latitude": -4.3,
+    "longitude": 15.3
+  },
+  "Gaborone": {
+    "city": "Gaborone",
+    "country": "Botswana",
+    "continent": "Africa",
+    "temperatureCelsius": 22.0,
+    "latitude": -24.6464,
+    "longitude": 25.9119
+  },
+  "Pretoria": {
+    "city": "Pretoria",
+    "country": "South Africa",
+    "continent": "Africa",
+    "temperatureCelsius": 20.1,
+    "latitude": -25.7469,
+    "longitude": 28.188
+  },
+  "Antananarivo": {
+    "city": "Antananarivo",
+    "country": "Madagascar",
+    "continent": "Indian",
+    "temperatureCelsius": 27.0,
+    "latitude": -18.9167,
+    "longitude": 47.5167
+  },
+  "Abu Dabhi": {
+    "city": "Abu Dabhi",
+    "country": "Pakistan",
+    "continent": "Asia",
+    "temperatureCelsius": 34.7,
+    "latitude": 24.7917,
+    "longitude": 69.9333
+  },
+  "Austin": {
+    "city": "Austin",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 20.6,
+    "latitude": 30.2669,
+    "longitude": -97.7428
+  },
+  "Boston": {
+    "city": "Boston",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 14.4,
+    "latitude": 42.3583,
+    "longitude": -71.0603
+  },
+  "Miami": {
+    "city": "Miami",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 24.4,
+    "latitude": 25.7739,
+    "longitude": -80.1939
+  },
+  "Seattle": {
+    "city": "Seattle",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 10.6,
+    "latitude": 47.6064,
+    "longitude": -122.3308
+  },
+  "Denver": {
+    "city": "Denver",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 4.6,
+    "latitude": 39.7392,
+    "longitude": -104.9842
+  },
+  "Bogota": {
+    "city": "Bogota",
+    "country": "Colombia",
+    "continent": "America",
+    "temperatureCelsius": 13.1,
+    "latitude": 4.6,
+    "longitude": -74.0833
+  },
+  "Lima": {
+    "city": "Lima",
+    "country": "Peru",
+    "continent": "America",
+    "temperatureCelsius": 19.6,
+    "latitude": -12.05,
+    "longitude": -77.05
+  },
+  "Santiago": {
+    "city": "Santiago",
+    "country": "Chile",
+    "continent": "America",
+    "temperatureCelsius": 13.1,
+    "latitude": -33.45,
+    "longitude": -70.6667
+  },
+  "Novosibirsk": {
+    "city": "Novosibirsk",
+    "country": "Russia",
+    "continent": "Asia",
+    "temperatureCelsius": 14.0,
+    "latitude": 55.0411,
+    "longitude": 82.9344
+  },
+  "Omsk": {
+    "city": "Omsk",
+    "country": "Russia",
+    "continent": "Asia",
+    "temperatureCelsius": 21.4,
+    "latitude": 55.0,
+    "longitude": 73.4
+  },
+  "Tehran": {
+    "city": "Tehran",
+    "country": "Iran",
+    "continent": "Asia",
+    "temperatureCelsius": 32.3,
+    "latitude": 35.7261,
+    "longitude": 51.3304
+  },
+  "Baghdad": {
+    "city": "Baghdad",
+    "country": "Iraq",
+    "continent": "Asia",
+    "temperatureCelsius": 36.1,
+    "latitude": 33.3386,
+    "longitude": 44.3939
+  },
+  "Ankara": {
+    "city": "Ankara",
+    "country": "Turkey",
+    "continent": "Europe",
+    "temperatureCelsius": 13.1,
+    "latitude": 39.9272,
+    "longitude": 32.8644
+  },
+  "Damascus": {
+    "city": "Damascus",
+    "country": "Syria",
+    "continent": "Asia",
+    "temperatureCelsius": 26.4,
+    "latitude": 33.5,
+    "longitude": 36.3
+  },
+  "Sao Paulo": {
+    "city": "Sao Paulo",
+    "country": "Brazil",
+    "continent": "America",
+    "temperatureCelsius": 19.3,
+    "latitude": -23.5333,
+    "longitude": -46.6167
+  },
+  "Caracas": {
+    "city": "Caracas",
+    "country": "Venezuela",
+    "continent": "America",
+    "temperatureCelsius": 24.3,
+    "latitude": 10.5,
+    "longitude": -66.9167
+  },
+  "San Jose": {
+    "city": "San Jose",
+    "country": "United States of America",
+    "continent": "America",
+    "temperatureCelsius": 11.1,
+    "latitude": 37.3394,
+    "longitude": -121.8939
+  },
+  "Rio de Janeiro": {
+    "city": "Rio de Janeiro",
+    "country": "Brazil",
+    "continent": "America",
+    "temperatureCelsius": 24.1,
+    "latitude": -22.9,
+    "longitude": -43.2333
+  },
+  "Salvador": {
+    "city": "Salvador",
+    "country": "Brazil",
+    "continent": "America",
+    "temperatureCelsius": 28.1,
+    "latitude": -12.9833,
+    "longitude": -38.5167
+  },
+  "Brasilia": {
+    "city": "Brasilia",
+    "country": "Brazil",
+    "continent": "America",
+    "temperatureCelsius": 24.3,
+    "latitude": -15.7833,
+    "longitude": -47.9167
+  },
+  "Recife": {
+    "city": "Recife",
+    "country": "Brazil",
+    "continent": "America",
+    "temperatureCelsius": 29.1,
+    "latitude": -8.05,
+    "longitude": -34.9
+  },
+  "Srinagar": {
+    "city": "Srinagar",
+    "country": "India",
+    "continent": "Asia",
+    "temperatureCelsius": 18.5,
+    "latitude": 34.0922,
+    "longitude": 74.8022
+  },
+  "Chennai": {
+    "city": "Chennai",
+    "country": "India",
+    "continent": "Asia",
+    "temperatureCelsius": 32.3,
+    "latitude": 13.0833,
+    "longitude": 80.2833
+  },
+  "Bangalore": {
+    "city": "Bangalore",
+    "country": "India",
+    "continent": "Asia",
+    "temperatureCelsius": 33.1,
+    "latitude": 12.9833,
+    "longitude": 77.5833
+  },
+  "Ahmedabad": {
+    "city": "Ahmedabad",
+    "country": "India",
+    "continent": "Asia",
+    "temperatureCelsius": 39.1,
+    "latitude": 23.0333,
+    "longitude": 72.6167
+  },
+  "Ulaanbaatar": {
+    "city": "Ulaanbaatar",
+    "country": "Mongolia",
+    "continent": "Asia",
+    "temperatureCelsius": 0.3,
+    "latitude": 47.9167,
+    "longitude": 106.9167
+  },
+  "Almaty": {
+    "city": "Almaty",
+    "country": "Kazakhstan",
+    "continent": "Asia",
+    "temperatureCelsius": 21.2,
+    "latitude": 43.25,
+    "longitude": 76.95
+  },
+  "Ganja": {
+    "city": "Ganja",
+    "country": "Azerbaijan",
+    "continent": "Asia",
+    "temperatureCelsius": 20.2,
+    "latitude": 40.6828,
+    "longitude": 46.3606
+  },
+  "Astana": {
+    "city": "Astana",
+    "country": "Kazakhstan",
+    "continent": "Asia",
+    "temperatureCelsius": 20.2,
+    "latitude": 51.1811,
+    "longitude": 71.4278
+  },
+  "Beijing": {
+    "city": "Beijing",
+    "country": "China",
+    "continent": "Asia",
+    "temperatureCelsius": 14.1,
+    "latitude": 39.9289,
+    "longitude": 116.3883
+  },
+  "Shanghai": {
+    "city": "Shanghai",
+    "country": "China",
+    "continent": "Asia",
+    "temperatureCelsius": 16.3,
+    "latitude": 31.005,
+    "longitude": 121.4086
+  },
+  "Hong Kong": {
+    "city": "Hong Kong",
+    "country": "Hong Kong",
+    "continent": "Asia",
+    "temperatureCelsius": 26.1,
+    "latitude": 22.283,
+    "longitude": 114.15
+  },
+  "Osaka": {
+    "city": "Osaka",
+    "country": "Japan",
+    "continent": "Asia",
+    "temperatureCelsius": 14.3,
+    "latitude": 34.6937,
+    "longitude": 135.5022
+  },
+  "Chengdu": {
+    "city": "Chengdu",
+    "country": "China",
+    "continent": "Asia",
+    "temperatureCelsius": 17.1,
+    "latitude": 30.6667,
+    "longitude": 104.0667
+  }
+}

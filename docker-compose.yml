@@ -228,7 +228,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-      - MAX_RECORDS=2000
+      - MAX_RECORDS=500
       - CHECK_INTERVAL=60
       - BATCH_DELETE_SIZE=3000
     restart: unless-stopped
