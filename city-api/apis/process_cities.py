@@ -19,14 +19,14 @@ def process_city(city_name):
         try:
             weather_api = WeatherAPI()
         except ValueError as e:
-            print(f"Failed to initialize WeatherAPI: {str(e)}")
+            # print(f"Failed to initialize WeatherAPI: {str(e)}")
             return {
                 "city": city_name,
                 "temperature": None,
                 "error": "Failed to initialize WeatherAPI"
             }
 
-        print(f"Fetching data for city: {city_name}")
+        # print(f"Fetching data for city: {city_name}")
         city_data = weather_api.fetch_city_data(city_name)
         
         if city_data is None:
@@ -41,7 +41,7 @@ def process_city(city_name):
             "temperature": city_data.get('temperatureCelsius')
         }
     except Exception as e:
-        print(f"Error processing {city_name}: {str(e)}")
+        # print(f"Error processing {city_name}: {str(e)}")
         return {
             "city": city_name,
             "temperature": None,
