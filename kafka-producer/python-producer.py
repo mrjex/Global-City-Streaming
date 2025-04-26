@@ -14,7 +14,6 @@ from shared.weather.api import WeatherAPI
 
 # Add project root to Python path
 sys.path.append("/app")
-import utils
 
 ##  External pipeline configurations  ##
 kafka_nodes = os.environ.get('KAFKA_SERVER', 'kafka:9092')

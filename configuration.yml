@@ -112,7 +112,7 @@ visualizations:
     equatorChart:
       displayActualTrend: true
       displayLinearTrend: false
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
