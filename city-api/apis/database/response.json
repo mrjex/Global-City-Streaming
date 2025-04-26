@@ -1,1 +1,79 @@
-[]
+[
+    {
+        "city": "Moscow",
+        "country": "Russia",
+        "continent": "Europe",
+        "temperatureCelsius": 2.2,
+        "latitude": 55.7522,
+        "longitude": 37.6156,
+        "timeZoneNotation": "Europe/Moscow",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 55.7522
+    },
+    {
+        "city": "Nairobi",
+        "country": "Kenya",
+        "continent": "Africa",
+        "temperatureCelsius": 20.3,
+        "latitude": -1.2833,
+        "longitude": 36.8167,
+        "timeZoneNotation": "Africa/Nairobi",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 1.2833
+    },
+    {
+        "city": "Addis Ababa",
+        "country": "Ethiopia",
+        "continent": "Africa",
+        "temperatureCelsius": 23.2,
+        "latitude": 9.0333,
+        "longitude": 38.7,
+        "timeZoneNotation": "Africa/Addis_Ababa",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 9.0333
+    },
+    {
+        "city": "Antananarivo",
+        "country": "Madagascar",
+        "continent": "Indian",
+        "temperatureCelsius": 22.2,
+        "latitude": -18.9167,
+        "longitude": 47.5167,
+        "timeZoneNotation": "Indian/Antananarivo",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 18.9167
+    },
+    {
+        "city": "Baghdad",
+        "country": "Iraq",
+        "continent": "Asia",
+        "temperatureCelsius": 22.3,
+        "latitude": 33.3386,
+        "longitude": 44.3939,
+        "timeZoneNotation": "Asia/Baghdad",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 33.3386
+    },
+    {
+        "city": "Ankara",
+        "country": "Turkey",
+        "continent": "Europe",
+        "temperatureCelsius": 0.0,
+        "latitude": 39.9272,
+        "longitude": 32.8644,
+        "timeZoneNotation": "Europe/Istanbul",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 39.9272
+    },
+    {
+        "city": "Damascus",
+        "country": "Syria",
+        "continent": "Asia",
+        "temperatureCelsius": 13.1,
+        "latitude": 33.5,
+        "longitude": 36.3,
+        "timeZoneNotation": "Asia/Damascus",
+        "timeZoneOffset": "UTC+3",
+        "equatorDistance": 33.5
+    }
+]

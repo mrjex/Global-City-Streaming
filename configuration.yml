@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
   enabled: true
   previousBatch:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - New York City
+  - Los Angeles
+  - Chicago
+  - Brooklyn
+  - Queens
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -110,10 +110,10 @@ services:
 visualizations:
   charts:
     equatorChart:
-      displayActualTrend: false
-      displayLinearTrend: true
-      displayLogarithmicTrend: true
+      displayActualTrend: true
+      displayLinearTrend: false
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
-    queryRequirement: UTC+12
+    queryRequirement: UTC+3

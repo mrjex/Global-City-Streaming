@@ -334,13 +334,13 @@ async def update_config(request: Request):
         
         # print(f"Current working directory: {os.getcwd()}")
         # print(f"Looking for script at: {script_path.absolute()}")
-        # print(f"Script exists: {script_path.exists()}")
+        print(f"CHART_LOG: Script exists: {script_path.exists()}")
         # print(f"Directory contents: {os.listdir('.')}")
         # print(f"city-api contents: {os.listdir('city-api')}")
         # print(f"File stats: {os.stat(script_path) if script_path.exists() else 'No stats'}")
         
         if script_path.exists():
-            # print("Executing equator chart script...")
+            print("CHART_LOG: Executing equator chart script...")
             try:
                 # Make script executable
                 # print("Setting executable permissions...")
@@ -350,28 +350,39 @@ async def update_config(request: Request):
                 # print("Running script...")
                 # Try with sh explicitly
                 result = subprocess.run(['/bin/sh', '/app/city-api/equatorChart.sh'], capture_output=True, text=True)
-                # print(f"Script stdout: {result.stdout}")
-                # print(f"Script stderr: {result.stderr}")
+                print(f"CHART_LOG: Script exit code: {result.returncode}")
+                print(f"CHART_LOG: Script stdout length: {len(result.stdout)}")
+                print(f"CHART_LOG: Script stderr length: {len(result.stderr)}")
+                
+                # Check if response.json was created
+                response_json_path = Path('/app/city-api/apis/database/response.json')
+                if response_json_path.exists():
+                    with open(response_json_path, 'r') as f:
+                        response_content = f.read()
+                    print(f"CHART_LOG: response.json length: {len(response_content)}")
+                    print(f"CHART_LOG: response.json content: {response_content[:100]}...")
+                else:
+                    print(f"CHART_LOG: response.json does not exist at {response_json_path}")
                 
                 # Extract figure JSON from output
                 output = result.stdout
                 if "FIGURE_JSON_START" in output and "FIGURE_JSON_END" in output:
                     json_str = output[output.find("FIGURE_JSON_START") + len("FIGURE_JSON_START"):output.find("FIGURE_JSON_END")].strip()
                     figure_json = json_str
-                    # print("Successfully captured figure JSON")
+                    print("CHART_LOG: Successfully captured figure JSON")
                 else:
-                    # print("Could not find figure JSON in output")
+                    print("CHART_LOG: Could not find figure JSON in output")
                     pass
                 
                 if result.returncode != 0:
-                    # print(f"Warning: equatorChart.sh exited with code {result.returncode}")
-                    # print(f"Script stderr: {result.stderr}")
+                    print(f"CHART_LOG: Warning: equatorChart.sh exited with code {result.returncode}")
+                    print(f"CHART_LOG: Script stderr: {result.stderr}")
                     pass
             except Exception as e:
-                # print(f"Error executing equator chart script: {str(e)}")
+                print(f"CHART_LOG: Error executing equator chart script: {str(e)}")
                 pass
         else:
-            # print(f"Warning: Script not found at {script_path}")
+            print(f"CHART_LOG: Warning: Script not found at {script_path}")
             pass
             
         return JSONResponse(content={
@@ -379,7 +390,7 @@ async def update_config(request: Request):
             "figure": figure_json
         })
     except Exception as e:
-        # print(f"Error updating configuration: {str(e)}")
+        print(f"CHART_LOG: Error updating configuration: {str(e)}")
         return JSONResponse(
             content={"error": "Failed to update configuration"},
             status_code=500
