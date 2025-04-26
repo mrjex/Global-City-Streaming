@@ -14,6 +14,7 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry: initialCountry }
   // UI state
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Direct event listening for maximum speed
   useEffect(() => {
@@ -65,30 +66,100 @@ const CityVideo: React.FC<CityVideoProps> = ({ selectedCountry: initialCountry }
     };
   }, []); // Empty dependency array - only run once
   
-  // Handle video loading state
+  // Handle video loading state with improved reliability
   useEffect(() => {
     if (!videoRef.current || !videoUrl) return;
     
-    const handleVideoLoaded = () => {
-      console.log("[CityVideo.tsx] Video loaded:", videoUrl);
+    // Clear any existing loading timer
+    if (loadingTimerRef.current) {
+      clearTimeout(loadingTimerRef.current);
+      loadingTimerRef.current = null;
+    }
+    
+    // Set a fallback timeout to hide the loading indicator after 8 seconds
+    // This ensures loading state won't get stuck indefinitely
+    loadingTimerRef.current = setTimeout(() => {
+      console.log("[CityVideo.tsx] Fallback timeout: hiding loading indicator");
       setIsLoading(false);
+    }, 8000);
+    
+    const handleVideoEvent = (event: Event) => {
+      console.log(`[CityVideo.tsx] Video event triggered: ${event.type} for ${videoUrl}`);
+      
+      // Only set loading to false if the video has actual data to play
+      if (videoRef.current && videoRef.current.readyState >= 3) {
+        console.log(`[CityVideo.tsx] Video ready (state: ${videoRef.current.readyState})`);
+        setIsLoading(false);
+        
+        // Clear the fallback timer
+        if (loadingTimerRef.current) {
+          clearTimeout(loadingTimerRef.current);
+          loadingTimerRef.current = null;
+        }
+      }
     };
     
-    const handleVideoError = () => {
-      console.error("[CityVideo.tsx] Video error:", videoUrl);
+    // Use multiple events for more reliable detection of video loading
+    const videoEvents = ['loadeddata', 'canplay', 'playing', 'loadedmetadata'];
+    videoEvents.forEach(eventName => {
+      videoRef.current?.addEventListener(eventName, handleVideoEvent);
+    });
+    
+    const handleVideoError = (error: Event) => {
+      console.error("[CityVideo.tsx] Video error:", videoUrl, error);
       setIsLoading(false);
+      
+      // Clear the fallback timer
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
     };
     
-    videoRef.current.addEventListener('loadeddata', handleVideoLoaded);
     videoRef.current.addEventListener('error', handleVideoError);
+    
+    // Add a periodic check to verify the video is actually playing
+    const checkInterval = setInterval(() => {
+      if (videoRef.current && !videoRef.current.paused && videoRef.current.readyState >= 3) {
+        console.log("[CityVideo.tsx] Video playing check: confirmed video is playing");
+        setIsLoading(false);
+        
+        // Clear the interval and fallback timer
+        clearInterval(checkInterval);
+        if (loadingTimerRef.current) {
+          clearTimeout(loadingTimerRef.current);
+          loadingTimerRef.current = null;
+        }
+      }
+    }, 500);
     
     return () => {
       if (videoRef.current) {
-        videoRef.current.removeEventListener('loadeddata', handleVideoLoaded);
+        // Remove all event listeners
+        videoEvents.forEach(eventName => {
+          videoRef.current?.removeEventListener(eventName, handleVideoEvent);
+        });
         videoRef.current.removeEventListener('error', handleVideoError);
+      }
+      
+      // Clear all timers
+      clearInterval(checkInterval);
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = null;
       }
     };
   }, [videoUrl]);
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
+    };
+  }, []);
   
   // Format description text
   const formatDescription = (text: string) => {
