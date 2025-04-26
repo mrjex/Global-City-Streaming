@@ -47,84 +47,90 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   // Listen for country selection events
   useEffect(() => {
     const handleCountrySelect = (event: any) => {
-      console.time("GlobeView-update");
-      const updateStartTime = performance.now();
-      console.log(`[PERF] GlobeView update triggered at ${new Date().toISOString()}`);
-      console.log("FETCHING DYNAMIC CITY DATA START [GlobeView.tsx]");
-      console.log('[GlobeView.tsx] Received countrySelected event with data:', event.detail);
-      
-      // Update selected country
-      if (event.detail.country) {
-        setSelectedCountry(event.detail.country);
-      }
-      
-      // Debug event structure
-      console.log('[GlobeView.tsx] Event coordinates structure:', {
-        hasCoordinates: !!event.detail.coordinates,
-        type: event.detail.coordinates ? typeof event.detail.coordinates : 'not present',
-        keys: event.detail.coordinates ? Object.keys(event.detail.coordinates) : []
-      });
-      
-      if (event.detail.coordinates) {
-        console.log('[GlobeView.tsx] Setting coordinates from event:', event.detail.coordinates);
-        setCityCoordinates(event.detail.coordinates);
-        // Force a re-render
-        setForceUpdate(prev => prev + 1);
-        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
-        lastRenderTimeRef.current = updateStartTime;
-      } else if (event.detail.data && event.detail.data.coordinates) {
-        // Try alternative location for coordinates
-        console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
-        setCityCoordinates(event.detail.data.coordinates);
-        setForceUpdate(prev => prev + 1);
-        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
-        lastRenderTimeRef.current = updateStartTime;
-      } else {
-        console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
-        // If no coordinates in the event, fetch them using the batch endpoint
-        fetchCityCoordinatesBatch();
-      }
+      // Add a small delay to control CityVideo processes the event first
+      setTimeout(() => {
+        console.time("GlobeView-update");
+        const updateStartTime = performance.now();
+        console.log(`[PERF] GlobeView update triggered at ${new Date().toISOString()}`);
+        console.log("FETCHING DYNAMIC CITY DATA START [GlobeView.tsx]");
+        console.log('[GlobeView.tsx] Received countrySelected event with data:', event.detail);
+        
+        // Update selected country
+        if (event.detail.country) {
+          setSelectedCountry(event.detail.country);
+        }
+        
+        // Debug event structure
+        console.log('[GlobeView.tsx] Event coordinates structure:', {
+          hasCoordinates: !!event.detail.coordinates,
+          type: event.detail.coordinates ? typeof event.detail.coordinates : 'not present',
+          keys: event.detail.coordinates ? Object.keys(event.detail.coordinates) : []
+        });
+        
+        if (event.detail.coordinates) {
+          console.log('[GlobeView.tsx] Setting coordinates from event:', event.detail.coordinates);
+          setCityCoordinates(event.detail.coordinates);
+          // Force a re-render
+          setForceUpdate(prev => prev + 1);
+          console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+          lastRenderTimeRef.current = updateStartTime;
+        } else if (event.detail.data && event.detail.data.coordinates) {
+          // Try alternative location for coordinates
+          console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
+          setCityCoordinates(event.detail.data.coordinates);
+          setForceUpdate(prev => prev + 1);
+          console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+          lastRenderTimeRef.current = updateStartTime;
+        } else {
+          console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
+          // If no coordinates in the event, fetch them using the batch endpoint
+          fetchCityCoordinatesBatch();
+        }
+      }, 50); // 50ms delay - short enough to be unnoticeable but enough to control event order
     };
 
     // Listen for initial country load events
     const handleInitialCountryLoad = (event: any) => {
-      console.time("GlobeView-initialLoad");
-      const updateStartTime = performance.now();
-      console.log(`[PERF] GlobeView initial load triggered at ${new Date().toISOString()}`);
-      console.log("FETCHING DYNAMIC CITY DATA START [GlobeView.tsx]");
-      console.log('[GlobeView.tsx] Received initialCountryLoaded event with data:', event.detail);
-      
-      // Update selected country
-      if (event.detail.country) {
-        setSelectedCountry(event.detail.country);
-      }
-      
-      // Debug event structure 
-      console.log('[GlobeView.tsx] Event coordinates structure:', {
-        hasCoordinates: !!event.detail.coordinates,
-        type: event.detail.coordinates ? typeof event.detail.coordinates : 'not present',
-        keys: event.detail.coordinates ? Object.keys(event.detail.coordinates) : []
-      });
-      
-      if (event.detail.coordinates) {
-        console.log('[GlobeView.tsx] Setting coordinates from event:', event.detail.coordinates);
-        setCityCoordinates(event.detail.coordinates);
-        // Force a re-render
-        setForceUpdate(prev => prev + 1);
-        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
-        lastRenderTimeRef.current = updateStartTime;
-      } else if (event.detail.data && event.detail.data.coordinates) {
-        // Try alternative location for coordinates
-        console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
-        setCityCoordinates(event.detail.data.coordinates);
-        setForceUpdate(prev => prev + 1);
-        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
-        lastRenderTimeRef.current = updateStartTime;
-      } else {
-        console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
-        // If no coordinates in the event, fetch them using the batch endpoint
-        fetchCityCoordinatesBatch();
-      }
+      // Add a small delay to ensure CityVideo processes the event first
+      setTimeout(() => {
+        console.time("GlobeView-initialLoad");
+        const updateStartTime = performance.now();
+        console.log(`[PERF] GlobeView initial load triggered at ${new Date().toISOString()}`);
+        console.log("FETCHING DYNAMIC CITY DATA START [GlobeView.tsx]");
+        console.log('[GlobeView.tsx] Received initialCountryLoaded event with data:', event.detail);
+        
+        // Update selected country
+        if (event.detail.country) {
+          setSelectedCountry(event.detail.country);
+        }
+        
+        // Debug event structure 
+        console.log('[GlobeView.tsx] Event coordinates structure:', {
+          hasCoordinates: !!event.detail.coordinates,
+          type: event.detail.coordinates ? typeof event.detail.coordinates : 'not present',
+          keys: event.detail.coordinates ? Object.keys(event.detail.coordinates) : []
+        });
+        
+        if (event.detail.coordinates) {
+          console.log('[GlobeView.tsx] Setting coordinates from event:', event.detail.coordinates);
+          setCityCoordinates(event.detail.coordinates);
+          // Force a re-render
+          setForceUpdate(prev => prev + 1);
+          console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+          lastRenderTimeRef.current = updateStartTime;
+        } else if (event.detail.data && event.detail.data.coordinates) {
+          // Try alternative location for coordinates
+          console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
+          setCityCoordinates(event.detail.data.coordinates);
+          setForceUpdate(prev => prev + 1);
+          console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+          lastRenderTimeRef.current = updateStartTime;
+        } else {
+          console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
+          // If no coordinates in the event, fetch them using the batch endpoint
+          fetchCityCoordinatesBatch();
+        }
+      }, 50); // 50ms delay - short enough to be unnoticeable but enough to ensure event order
     };
 
     window.addEventListener('countrySelected', handleCountrySelect);
