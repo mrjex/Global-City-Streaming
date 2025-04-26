@@ -13,17 +13,44 @@ interface GlobeViewProps {
   dynamicCities: string[];
 }
 
+// Scene management object to persist across renders
+interface SceneObjects {
+  scene?: THREE.Scene;
+  camera?: THREE.PerspectiveCamera;
+  renderer?: THREE.WebGLRenderer;
+  earth?: THREE.Mesh;
+  atmosphere?: THREE.Mesh;
+  markerGroup?: THREE.Group;
+  controls?: OrbitControls;
+  animationFrameId?: number;
+  markers: THREE.Mesh[];
+  initialized: boolean;
+  textures: {
+    earth?: THREE.Texture;
+    bump?: THREE.Texture;
+  };
+}
+
 const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
   const [cityCoordinates, setCityCoordinates] = useState<Record<string, { lat: number; lng: number }>>({});
-  const [renderKey, setRenderKey] = useState<number>(0);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const lastRenderTimeRef = useRef<number>(0);
+  const sceneRef = useRef<SceneObjects>({
+    markers: [],
+    initialized: false,
+    textures: {}
+  });
   
   // Listen for country selection events
   useEffect(() => {
     const handleCountrySelect = (event: any) => {
+      console.time("GlobeView-update");
+      const updateStartTime = performance.now();
+      console.log(`[PERF] GlobeView update triggered at ${new Date().toISOString()}`);
+      console.log("FETCHING DYNAMIC CITY DATA START [GlobeView.tsx]");
       console.log('[GlobeView.tsx] Received countrySelected event with data:', event.detail);
       
       // Update selected country
@@ -43,11 +70,15 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
         setCityCoordinates(event.detail.coordinates);
         // Force a re-render
         setForceUpdate(prev => prev + 1);
+        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+        lastRenderTimeRef.current = updateStartTime;
       } else if (event.detail.data && event.detail.data.coordinates) {
         // Try alternative location for coordinates
         console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
         setCityCoordinates(event.detail.data.coordinates);
         setForceUpdate(prev => prev + 1);
+        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+        lastRenderTimeRef.current = updateStartTime;
       } else {
         console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
         // If no coordinates in the event, fetch them using the batch endpoint
@@ -57,6 +88,10 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
 
     // Listen for initial country load events
     const handleInitialCountryLoad = (event: any) => {
+      console.time("GlobeView-initialLoad");
+      const updateStartTime = performance.now();
+      console.log(`[PERF] GlobeView initial load triggered at ${new Date().toISOString()}`);
+      console.log("FETCHING DYNAMIC CITY DATA START [GlobeView.tsx]");
       console.log('[GlobeView.tsx] Received initialCountryLoaded event with data:', event.detail);
       
       // Update selected country
@@ -76,11 +111,15 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
         setCityCoordinates(event.detail.coordinates);
         // Force a re-render
         setForceUpdate(prev => prev + 1);
+        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+        lastRenderTimeRef.current = updateStartTime;
       } else if (event.detail.data && event.detail.data.coordinates) {
         // Try alternative location for coordinates
         console.log('[GlobeView.tsx] Setting coordinates from event.detail.data:', event.detail.data.coordinates);
         setCityCoordinates(event.detail.data.coordinates);
         setForceUpdate(prev => prev + 1);
+        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+        lastRenderTimeRef.current = updateStartTime;
       } else {
         console.error('[GlobeView.tsx] No coordinates found in event:', event.detail);
         // If no coordinates in the event, fetch them using the batch endpoint
@@ -93,12 +132,18 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
 
     // Function to fetch city coordinates in batch
     const fetchCityCoordinatesBatch = async () => {
+      console.time("GlobeView-fetchBatch");
+      const fetchStartTime = performance.now();
+      console.log(`[PERF] GlobeView batch fetch started at ${new Date().toISOString()}`);
+      console.log("FETCHING DYNAMIC CITY DATA START [GlobeView.tsx]");
       console.log('[GlobeView.tsx] Fetching city coordinates using batch endpoint');
       
       // Get all cities that need coordinates
       const allCities = [...cities, ...dynamicCities];
       if (allCities.length === 0) {
         console.log('[GlobeView.tsx] No cities to fetch coordinates for');
+        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+        console.timeEnd("GlobeView-fetchBatch");
         return;
       }
       
@@ -128,11 +173,17 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
         if (data.coordinates) {
           setCityCoordinates(data.coordinates);
           setForceUpdate(prev => prev + 1);
+          console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+          lastRenderTimeRef.current = fetchStartTime;
         } else {
           console.error('[GlobeView.tsx] No coordinates in response:', data);
+          console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
         }
+        console.timeEnd("GlobeView-fetchBatch");
       } catch (error) {
         console.error('[GlobeView.tsx] Error fetching city coordinates:', error);
+        console.log("FETCHING DYNAMIC CITY DATA END [GlobeView.tsx]");
+        console.timeEnd("GlobeView-fetchBatch");
       }
     };
 
@@ -153,15 +204,6 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       window.removeEventListener('initialCountryLoaded', handleInitialCountryLoad);
     };
   }, [cities, dynamicCities, selectedCountry]);
-
-  // Update markers when cityCoordinates change
-  useEffect(() => {
-    if (Object.keys(cityCoordinates).length > 0) {
-      console.log('[GlobeView.tsx] City coordinates updated from events:', cityCoordinates);
-      // No need to call updateMarkers() as the main useEffect will handle marker creation
-      setRenderKey(prev => prev + 1); // Force re-render to update markers
-    }
-  }, [cityCoordinates, forceUpdate]);
   
   // Convert lat/lng to 3D coordinates
   const latLngToVector3 = (lat: number, lng: number, radius: number) => {
@@ -189,13 +231,18 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     return marker;
   };
   
-  // Setup scene, camera, renderer
+  // Initialize scene once
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || sceneRef.current.initialized) return;
+    
+    console.time("GlobeView-sceneInitialization");
+    const initStartTime = performance.now();
+    console.log(`[PERF] GlobeView initial scene setup started at ${new Date().toISOString()}`);
     
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a2a);
+    sceneRef.current.scene = scene;
     
     // Camera setup
     const camera = new THREE.PerspectiveCamera(
@@ -206,6 +253,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     );
     camera.position.z = 5;
     camera.position.y = 1.5;
+    sceneRef.current.camera = camera;
     
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -213,6 +261,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.shadowMap.enabled = false;
     containerRef.current.appendChild(renderer.domElement);
+    sceneRef.current.renderer = renderer;
     
     // Controls setup
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -222,6 +271,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     controls.enableZoom = false;
     controls.minDistance = 5;
     controls.maxDistance = 5;
+    sceneRef.current.controls = controls;
     
     // Earth setup
     const earthRadius = 3;
@@ -230,19 +280,25 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     
     // Debug texture loading
     console.log('Loading earth textures...');
+    console.time("GlobeView-textureLoading");
     
-    // Update texture paths to point to the images directory
+    // Load textures once and store them
     const earthTexture = textureLoader.load('/images/earth-texture.jpg', 
-      () => console.log('Earth texture loaded successfully'),
+      () => {
+        console.log('Earth texture loaded successfully');
+        console.timeEnd("GlobeView-textureLoading");
+      },
       undefined,
       (error) => console.error('Error loading earth texture:', error)
     );
+    sceneRef.current.textures.earth = earthTexture;
     
     const bumpMap = textureLoader.load('/images/earth-bump.jpg',
       () => console.log('Bump map loaded successfully'),
       undefined,
       (error) => console.error('Error loading bump map:', error)
     );
+    sceneRef.current.textures.bump = bumpMap;
     
     const earthMaterial = new THREE.MeshPhongMaterial({
       map: earthTexture,
@@ -253,6 +309,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
     scene.add(earth);
+    sceneRef.current.earth = earth;
     
     // Atmosphere setup
     const atmosphereGeometry = new THREE.SphereGeometry(earthRadius + 0.1, 128, 128);
@@ -264,6 +321,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     });
     const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
     scene.add(atmosphere);
+    sceneRef.current.atmosphere = atmosphere;
     
     // Lighting setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -273,41 +331,10 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
     
-    // Create city markers
-    const markers: THREE.Mesh[] = [];
+    // Create marker group
     const markerGroup = new THREE.Group();
     scene.add(markerGroup);
-    
-    // Debug city coordinates
-    console.log('Creating markers for cities:', { static: cities, dynamic: dynamicCities });
-    console.log('Available coordinates:', cityCoordinates);
-    
-    // First add static cities
-    for (const city of cities) {
-      if (cityCoordinates[city]) {
-        const { lat, lng } = cityCoordinates[city];
-        const position = latLngToVector3(lat, lng, earthRadius + 0.11);
-        const marker = createCityMarker(city, position, false);
-        markerGroup.add(marker);
-        markers.push(marker);
-      }
-    }
-    
-    // Then add dynamic cities with different height and color
-    for (const city of dynamicCities) {
-      if (cityCoordinates[city]) {
-        const { lat, lng } = cityCoordinates[city];
-        const position = latLngToVector3(lat, lng, earthRadius + 0.13); // Higher position for better visibility
-        const marker = createCityMarker(city, position, true);
-        
-        // Make dynamic markers slightly larger
-        marker.scale.set(1.2, 1.2, 1.2);
-        
-        // Add to scene
-        markerGroup.add(marker);
-        markers.push(marker);
-      }
-    }
+    sceneRef.current.markerGroup = markerGroup;
     
     // Raycaster for hover detection
     const raycaster = new THREE.Raycaster();
@@ -334,7 +361,7 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       
       raycaster.setFromCamera(mouse, camera);
       
-      const intersects = raycaster.intersectObjects(markers);
+      const intersects = raycaster.intersectObjects(sceneRef.current.markers);
       
       if (intersects.length > 0) {
         const city = intersects[0].object.userData.city;
@@ -348,15 +375,24 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
     
     // Animation loop
     const animate = () => {
-      requestAnimationFrame(animate);
+      const frameId = requestAnimationFrame(animate);
+      sceneRef.current.animationFrameId = frameId;
       
-      earth.rotation.y += 0.001;
-      atmosphere.rotation.y += 0.001;
-      markerGroup.rotation.y += 0.001;
+      if (sceneRef.current.earth) {
+        sceneRef.current.earth.rotation.y += 0.001;
+      }
+      
+      if (sceneRef.current.atmosphere) {
+        sceneRef.current.atmosphere.rotation.y += 0.001;
+      }
+      
+      if (sceneRef.current.markerGroup) {
+        sceneRef.current.markerGroup.rotation.y += 0.001;
+      }
       
       // Pulsate markers with different effects for static and dynamic
       const time = Date.now() * 0.001;
-      markers.forEach(marker => {
+      sceneRef.current.markers.forEach(marker => {
         if (marker.userData.city && dynamicCities.includes(marker.userData.city)) {
           // More pronounced pulsing for dynamic cities
           const scale = 1.2 + Math.sin(time * 3) * 0.3;
@@ -368,11 +404,24 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
         }
       });
       
-      controls.update();
-      renderer.render(scene, camera);
+      if (sceneRef.current.controls) {
+        sceneRef.current.controls.update();
+      }
+      
+      if (sceneRef.current.renderer && sceneRef.current.scene && sceneRef.current.camera) {
+        sceneRef.current.renderer.render(sceneRef.current.scene, sceneRef.current.camera);
+      }
     };
     
+    // Start animation loop
     animate();
+    
+    // Mark scene as initialized
+    sceneRef.current.initialized = true;
+    
+    const initEndTime = performance.now();
+    console.log(`[PERF] GlobeView scene initialization completed in ${initEndTime - initStartTime}ms`);
+    console.timeEnd("GlobeView-sceneInitialization");
     
     // Cleanup
     return () => {
@@ -380,10 +429,90 @@ const GlobeView: React.FC<GlobeViewProps> = ({ cities, dynamicCities }) => {
       if (containerRef.current) {
         containerRef.current.removeEventListener('mousemove', handleMouseMove);
       }
-      containerRef.current?.removeChild(renderer.domElement);
-      renderer.dispose();
+      
+      if (sceneRef.current.animationFrameId) {
+        cancelAnimationFrame(sceneRef.current.animationFrameId);
+      }
+      
+      if (sceneRef.current.renderer && containerRef.current) {
+        containerRef.current.removeChild(sceneRef.current.renderer.domElement);
+        sceneRef.current.renderer.dispose();
+      }
+      
+      // Clear all markers
+      if (sceneRef.current.markerGroup) {
+        while (sceneRef.current.markerGroup.children.length > 0) {
+          const child = sceneRef.current.markerGroup.children[0];
+          sceneRef.current.markerGroup.remove(child);
+        }
+      }
+      
+      sceneRef.current.markers = [];
+      sceneRef.current.initialized = false;
     };
-  }, [cities, dynamicCities, cityCoordinates, renderKey]);
+  }, []);
+  
+  // Update markers when cityCoordinates change
+  useEffect(() => {
+    if (!sceneRef.current.initialized || !sceneRef.current.markerGroup || Object.keys(cityCoordinates).length === 0) {
+      return;
+    }
+    
+    console.time("GlobeView-updateMarkers");
+    const updateStartTime = performance.now();
+    console.log(`[PERF] GlobeView marker update started at ${new Date().toISOString()}`);
+    
+    // Clear existing markers
+    sceneRef.current.markers.forEach(marker => {
+      sceneRef.current.markerGroup?.remove(marker);
+    });
+    sceneRef.current.markers = [];
+    
+    const earthRadius = 3;
+    
+    // Debug city coordinates
+    console.log('Updating markers for cities:', { static: cities, dynamic: dynamicCities });
+    console.log('Available coordinates:', cityCoordinates);
+    
+    // First add static cities
+    for (const city of cities) {
+      if (cityCoordinates[city]) {
+        const { lat, lng } = cityCoordinates[city];
+        const position = latLngToVector3(lat, lng, earthRadius + 0.11);
+        const marker = createCityMarker(city, position, false);
+        sceneRef.current.markerGroup.add(marker);
+        sceneRef.current.markers.push(marker);
+      }
+    }
+    
+    // Then add dynamic cities with different height and color
+    for (const city of dynamicCities) {
+      if (cityCoordinates[city]) {
+        const { lat, lng } = cityCoordinates[city];
+        const position = latLngToVector3(lat, lng, earthRadius + 0.13); // Higher position for better visibility
+        const marker = createCityMarker(city, position, true);
+        
+        // Make dynamic markers slightly larger
+        marker.scale.set(1.2, 1.2, 1.2);
+        
+        // Add to scene
+        sceneRef.current.markerGroup.add(marker);
+        sceneRef.current.markers.push(marker);
+      }
+    }
+    
+    const updateEndTime = performance.now();
+    console.log(`[PERF] GlobeView marker update completed in ${updateEndTime - updateStartTime}ms`);
+    console.timeEnd("GlobeView-updateMarkers");
+    
+    if (lastRenderTimeRef.current > 0) {
+      const totalUpdateTime = updateEndTime - lastRenderTimeRef.current;
+      console.log(`[PERF] GlobeView total update time: ${totalUpdateTime.toFixed(2)}ms`);
+      console.timeEnd("GlobeView-update");
+      console.timeEnd("GlobeView-initialLoad");
+      lastRenderTimeRef.current = 0;
+    }
+  }, [cities, dynamicCities, cityCoordinates, forceUpdate]);
   
   // Add new function to render the cities list
   const renderCitiesList = () => {

@@ -228,8 +228,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-      - MAX_RECORDS=500
-      - CHECK_INTERVAL=60
+      - MAX_RECORDS=200
+      - CHECK_INTERVAL=30
       - BATCH_DELETE_SIZE=3000
     restart: unless-stopped
     mem_limit: 4g

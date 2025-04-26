@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
+  - Madrid
+  - Madrid city
+  - Barcelona
+  - Barcelona City
+  - Valencia
   enabled: true
   previousBatch:
-  - Melbourne
-  - Sydney
-  - Brisbane
-  - Perth
-  - Adelaide
+  - Madrid
+  - Madrid city
+  - Barcelona
+  - Barcelona City
+  - Valencia
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -106,7 +106,7 @@ services:
     maxRetries: 5
     sampleDuration: 5
   kafkaProducer:
-    requestInterval: 0.01
+    requestInterval: 0.5
 visualizations:
   charts:
     equatorChart:

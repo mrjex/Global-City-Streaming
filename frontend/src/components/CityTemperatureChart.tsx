@@ -48,6 +48,11 @@ const CityTemperatureChart: React.FC = () => {
   const [cityData, setCityData] = useState<Record<string, CityTemperatureData>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [cityColors, setCityColors] = useState<Record<string, string>>({});
+  const chartRef = useRef<any>(null);
+  const renderTimesRef = useRef<{startTime: number, lastFetchTime: number}>({
+    startTime: 0,
+    lastFetchTime: 0
+  });
 
   // Function to maybe add variance to temperature
   const applyVariance = (temperature: number): number => {
@@ -61,6 +66,11 @@ const CityTemperatureChart: React.FC = () => {
   // Fetch temperature data for dynamic cities
   const fetchTemperatureData = async () => {
     try {
+      const fetchStartTime = performance.now();
+      renderTimesRef.current.lastFetchTime = fetchStartTime;
+      console.time("ChartView-fetchData");
+      console.log(`[PERF] CityTemperatureChart fetch started at ${new Date().toISOString()}`);
+      console.log("FETCHING DYNAMIC CITY DATA START [CityTemperatureChart.tsx]");
       const response = await fetch('/api/logs');
       const { logs } = await response.json();
 
@@ -69,9 +79,13 @@ const CityTemperatureChart: React.FC = () => {
       const cityEntries = logs.match(dynamicCityPattern);
       if (!cityEntries) {
         console.log('No dynamic city entries found in logs');
+        console.timeEnd("ChartView-fetchData");
+        const fetchEndTime = performance.now();
+        console.log(`[PERF] CityTemperatureChart fetch completed (no data) in ${fetchEndTime - fetchStartTime}ms`);
         return;
       }
 
+      console.time("ChartView-processData");
       // Process each dynamic city entry
       const latestCityData: Record<string, { temperature: number; timestamp: number }> = {};
       
@@ -97,7 +111,9 @@ const CityTemperatureChart: React.FC = () => {
           }
         }
       }
+      console.timeEnd("ChartView-processData");
 
+      console.time("ChartView-updateState");
       // Update chart data with the latest values
       setCityData(prevData => {
         const updatedData: Record<string, CityTemperatureData> = {};
@@ -123,6 +139,11 @@ const CityTemperatureChart: React.FC = () => {
           }
         });
 
+        console.log("FETCHING DYNAMIC CITY DATA END [CityTemperatureChart.tsx]");
+        console.timeEnd("ChartView-updateState");
+        const fetchEndTime = performance.now();
+        console.log(`[PERF] CityTemperatureChart data processing completed in ${fetchEndTime - fetchStartTime}ms`);
+        console.timeEnd("ChartView-fetchData");
         return updatedData;
       });
 
@@ -130,15 +151,32 @@ const CityTemperatureChart: React.FC = () => {
     } catch (error) {
       console.error('Error fetching temperature data:', error);
       setIsLoading(false);
+      console.timeEnd("ChartView-fetchData");
+      const fetchEndTime = performance.now();
+      console.log(`[PERF] CityTemperatureChart fetch failed in ${fetchEndTime - renderTimesRef.current.lastFetchTime}ms`);
     }
   };
 
   // Effect for fetching temperature data
   useEffect(() => {
+    renderTimesRef.current.startTime = performance.now();
+    console.log(`[PERF] CityTemperatureChart initial mount at ${new Date().toISOString()}`);
     fetchTemperatureData();
     const interval = setInterval(fetchTemperatureData, POLLING_INTERVAL);
     return () => clearInterval(interval);
   }, []);
+
+  // Monitor chart rendering
+  useEffect(() => {
+    if (chartRef.current) {
+      const renderEndTime = performance.now();
+      const lastFetchTime = renderTimesRef.current.lastFetchTime;
+      if (lastFetchTime > 0) {
+        const renderDuration = renderEndTime - lastFetchTime;
+        console.log(`[PERF] CityTemperatureChart render completed in ${renderDuration.toFixed(2)}ms`);
+      }
+    }
+  }, [cityData, isLoading]);
 
   // Chart rendering logic
   const getColorForCity = (city: string): string => {
@@ -230,7 +268,19 @@ const CityTemperatureChart: React.FC = () => {
           {isLoading ? (
             <div className="text-gray-500 italic text-center">Loading data...</div>
           ) : (
-            <Line data={chartData} options={chartOptions} />
+            <Line 
+              ref={chartRef}
+              data={chartData} 
+              options={chartOptions}
+              onAfterRender={(chart) => {
+                const renderEndTime = performance.now();
+                const lastFetchTime = renderTimesRef.current.lastFetchTime;
+                if (lastFetchTime > 0) {
+                  const renderDuration = renderEndTime - lastFetchTime;
+                  console.log(`[PERF] CityTemperatureChart onAfterRender: total time since fetch ${renderDuration.toFixed(2)}ms`);
+                }
+              }} 
+            />
           )}
         </div>
       </div>

@@ -2,18 +2,18 @@
 
 KAFKA PRODUCER METRICS:
 - Total Cities Processed: 89 (84 static + 5 dynamic)
-- Request Interval: 0.01 seconds
-- Messages per Second: 100.00 (89 cities / 0.89 seconds cycle)
+- Request Interval: 0.5 seconds
+- Messages per Second: 2.00 (89 cities / 44.50 seconds cycle)
 
 FLINK PROCESSOR METRICS:
 - Batch Size: 300 records
 - Batch Interval: 200ms
 - Maximum Theoretical Processing Rate: 1500.00 records/second
-- Actual Processing Rate: 100.00 records/second (limited by producer rate)
+- Actual Processing Rate: 2.00 records/second (limited by producer rate)
 - Sample Duration: 5 seconds
 - Max Retries: 5
 
 POSTGRES DATABASE:
-- Actual Insertion Rate: 100.00 records/second (matches input rate from Kafka)
+- Actual Insertion Rate: 2.00 records/second (matches input rate from Kafka)
 
 Note: All rates are theoretical maximums under ideal conditions. Actual rates may vary due to network latency, processing overhead, and system factors.
