@@ -1,6 +1,6 @@
 # 🏗️ Architecture Documentation V2
 
-As mentioned in [Development Process](), I developed this system throughout two intensive phases. The first one being in June 2024, and the second one in April 2025. This file describes the system's state as of April 2025, after my second development phase. If you wish to view the previous architectural state, navigate to [Architecture V1](README-ARCHITECTURE-V1.md)
+As mentioned in [Development Process](README-DEVELOPMENT-PROCESS.md), I developed this system throughout two intensive phases. The first one being in June 2024, and the second one in April 2025. This file describes the system's state as of April 2025, after my second development phase. If you wish to view the previous architectural state, navigate to [Architecture V1](README-ARCHITECTURE-V1.md)
 
 
 ## System Overview

@@ -1,6 +1,6 @@
 # 🏗️ Architecture Documentation V1
 
-As mentioned in [Development Process](), I developed this system throughout two intensive phases. The first one being in June 2024, and the second one in April 2025. This file describes the system's state as of June 2024, after my first development phase. If you wish to view the current architectural state, navigate to [Architecture V2](README-ARCHITECTURE-V2.md)
+As mentioned in [Development Process](README-DEVELOPMENT-PROCESS.md), I developed this system throughout two intensive phases. The first one being in June 2024, and the second one in April 2025. This file describes the system's state as of June 2024, after my first development phase. If you wish to view the current architectural state, navigate to [Architecture V2](README-ARCHITECTURE-V2.md)
 
 
 
@@ -12,11 +12,17 @@ As mentioned in [Development Process](), I developed this system throughout two 
 
 
 
+### Developer Endpoints
+
 ![architecture-2](readme-pictures/architecture/entire-architecture-2.PNG)
 
 
+### Data Production
+
 ![architecture-3](readme-pictures/architecture/entire-architecture-3.PNG)
 
+
+### Debug API
 
 ![architecture-4](readme-pictures/architecture/entire-architecture-4.PNG)
 

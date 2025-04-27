@@ -5,14 +5,17 @@ TODO
 
 ## Functional Requirements
 
-Text
+The system shall..
+
+The system must..
 
 
 
 ## Non-functional Requirements
 
-Text
+The system shall..
 
+The system must..
 
 
 
