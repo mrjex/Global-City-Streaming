@@ -1,0 +1,3 @@
+[submodule "city-api"]
+	path = city-api
+	url = https://github.com/mrjex/City-API-Global-City-Streaming.git
