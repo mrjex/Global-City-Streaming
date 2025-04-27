@@ -1,1 +1,0 @@
-Idea: The current Redis data from city-api/cache can be systematically cached in this repository, by caching everything at once or in batches. This approach would give developers more control over caching

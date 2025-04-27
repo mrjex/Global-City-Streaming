@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# chmod +x deploy.sh
+# Deploy on Digital Ocean Linux Droplet
 
 # Stop and remove existing containers
 echo "Stopping existing containers..."
