@@ -1,3 +1,6 @@
 [submodule "city-api"]
 	path = city-api
 	url = https://github.com/mrjex/City-API-Global-City-Streaming.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/mrjex/Frontend-Global-City-Streaming.git
