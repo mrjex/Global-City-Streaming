@@ -10,3 +10,12 @@
 [submodule "flink-processor"]
 	path = flink-processor
 	url = https://github.com/mrjex/Flink-Processor-Global-City-Streaming.git
+[submodule "redis"]
+	path = redis
+	url = https://github.com/mrjex/Redis-Global-City-Streaming.git
+[submodule "db-manager"]
+	path = db-manager
+	url = https://github.com/mrjex/Database-Manager-Global-City-Streaming.git
+[submodule "postgres"]
+	path = postgres
+	url = https://github.com/mrjex/Postgres-Global-City-Streaming.git
