@@ -7,9 +7,7 @@ networks:
 
 services:
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    image: joel030303/frontend:latest
     container_name: frontend
     ports:
       - "3001:3001"
@@ -100,8 +98,7 @@ services:
     cpu_quota: 200000
 
   kafka-producer:
-    build:
-      context: ./kafka-producer
+    image: joel030303/kafka-producer:latest
     container_name: kafka-producer
     ports:
       - "8000:8000"
@@ -133,9 +130,7 @@ services:
     cpu_quota: 400000
 
   flink-processor:
-    build:
-      context: ./flink-processor
-      dockerfile: Dockerfile
+    image: joel030303/flink-processor:latest
     container_name: flink-processor
     ports:
       - "8001:8001"
@@ -179,8 +174,7 @@ services:
         hard: 65536
 
   postgres:
-    build:
-      context: ./postgres
+    image: joel030303/postgres:latest
     container_name: postgres
     restart: unless-stopped
     environment:
@@ -213,9 +207,7 @@ services:
       start_period: 10s
 
   db-manager:
-    build:
-      context: .
-      dockerfile: db-manager/Dockerfile
+    image: joel030303/db-manager:latest
     container_name: db-manager
     networks:
       - app_network
@@ -238,9 +230,7 @@ services:
     cpu_quota: 200000
 
   city-api:
-    build:
-      context: .
-      dockerfile: city-api/Dockerfile
+    image: joel030303/city-api:latest
     container_name: city-api
     ports:
       - "8003:8003"
@@ -269,8 +259,7 @@ services:
         condition: service_healthy
 
   redis:
-    build:
-      context: ./redis
+    image: joel030303/redis:latest
     container_name: redis
     ports:
       - "6379:6379"

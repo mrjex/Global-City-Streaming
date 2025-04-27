@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - New York City
-  - Los Angeles
-  - Chicago
-  - Brooklyn
-  - Queens
+  - Lima
+  - Trujillo
+  - Arequipa
+  - Chiclayo
+  - Callao
   enabled: true
   previousBatch:
-  - New York City
-  - Los Angeles
-  - Chicago
-  - Brooklyn
-  - Queens
+  - Lima
+  - Trujillo
+  - Arequipa
+  - Chiclayo
+  - Callao
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -112,8 +112,8 @@ visualizations:
     equatorChart:
       displayActualTrend: true
       displayLinearTrend: false
-      displayLogarithmicTrend: true
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
-    queryRequirement: UTC+3
+    queryRequirement: UTC+1

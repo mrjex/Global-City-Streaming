@@ -4,8 +4,8 @@ FROM maven:3.8-openjdk-8 AS builder
 WORKDIR /build
 
 # Copy the pom.xml and src files
-COPY pom.xml .
-COPY src ./src
+COPY ./pom.xml .
+COPY ./src ./src
 
 # Build the application with the shade plugin to include all dependencies
 RUN mvn clean package
@@ -23,7 +23,7 @@ RUN mkdir -p /opt/flink/log && \
     chmod -R 777 /opt/flink/log
 
 # Copy the wait script
-COPY wait-for-it.sh /wait-for-it.sh
+COPY ./wait-for-it.sh /wait-for-it.sh
 RUN dos2unix /wait-for-it.sh && chmod +x /wait-for-it.sh
 
 # Create /mnt directory for logs (addresses the file write error)
