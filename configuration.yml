@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - "Asunci\xF3n"
-  - Ciudad del Este
-  - Luque
-  - "Capiat\xE1"
-  - San Lorenzo
+  - Karachi
+  - Lahore
+  - Faisalabad
+  - Rawalpindi
+  - Gujranwala
   enabled: true
   previousBatch:
-  - "Asunci\xF3n"
-  - Ciudad del Este
-  - Luque
-  - "Capiat\xE1"
-  - San Lorenzo
+  - Karachi
+  - Lahore
+  - Faisalabad
+  - Rawalpindi
+  - Gujranwala
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -112,8 +112,8 @@ visualizations:
     equatorChart:
       displayActualTrend: true
       displayLinearTrend: false
-      displayLogarithmicTrend: true
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
-    queryAttribute: timeZoneOffset
-    queryRequirement: UTC+1
+    queryAttribute: continent
+    queryRequirement: Europe
