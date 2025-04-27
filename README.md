@@ -54,7 +54,6 @@ This project is composed of several microservices, each maintained in its own re
 - [API Documentation](./docs/README-API.md) - API endpoints and usage
 - [Setup Guide](./docs/README-SETUP.md) - Installation and configuration
 - [Testing Guide](./docs/README-TESTING.md) - Testing procedures
-- [Future Updates](./docs/README-FUTURE.md) - Planned improvements
 
 ## 🚀 Quick Start
 ```bash
@@ -68,7 +67,7 @@ git clone --recursive https://github.com/mrjex/Global-City-Streaming.git
 ./stop.sh
 ```
 
-For detailed setup instructions, see our [Setup Guide](./docs/README-SETUP.md).
+For detailed setup instructions, see the [Setup Guide](./docs/README-SETUP.md).
 
 ## 📊 Features
 - Real-time temperature monitoring across global cities
@@ -78,14 +77,7 @@ For detailed setup instructions, see our [Setup Guide](./docs/README-SETUP.md).
 - Automated deployment and testing
 - Persistent data storage with Docker volumes
 
-## 🤝 Contributing
-Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-## 👨‍💻 Author
-Developed by Joel Mattsson, June 2024
 
 ---
-*For detailed documentation on specific aspects of the project, please refer to the documentation section above.*
+
+*Developed by Joel Mattsson*
