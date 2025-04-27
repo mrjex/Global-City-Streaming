@@ -47,7 +47,7 @@ This project is composed of several microservices, each maintained in its own re
 - [PostgreSQL Service](https://github.com/mrjex/Postgres-Global-City-Streaming) - Primary data storage
 
 ## 📚 Documentation
-- [Architecture Documentation](./docs/README-ARCHITECTURE.md) - System architecture and components
+- [Architecture Documentation](./docs/README-ARCHITECTURE-V2.md) - System architecture and components
 - [Development Process](./docs/README-DEVELOPMENT-PROCESS.md) - Development journey and decisions
 - [Charts & Visualization](./docs/README-CHARTS.md) - Data visualization details
 - [Equator Analysis](./docs/README-EQUATOR-ANALYSIS.md) - Temperature-equator correlation study

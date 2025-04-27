@@ -1,7 +1,8 @@
 # 📝 Development Process
 
 ## Project Timeline
-This project was developed in an intensive 2-week sprint (18th June to 2nd July 2024), focusing on practical knowledge of Big Data and data pipelines.
+
+The first version of the project was developed throughout June of 2024, and it was further developed and finalized in April 2025.
 
 ## Learning Objectives
 - Data aggregation and processing
@@ -80,7 +81,6 @@ The project includes several automation scripts:
 - Implemented PostgreSQL for primary storage
 - Added Redis for caching
 - Developed JSON-based storage for specific features
-- Currently manages 20,000+ database instances
 
 ### API Integration
 - Weather API integration

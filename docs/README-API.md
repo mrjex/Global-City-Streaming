@@ -97,6 +97,6 @@ debugApi:
 ```
 
 For more information about:
-- [Architecture Documentation](./README-ARCHITECTURE.md)
+- [Architecture Documentation](./README-ARCHITECTURE-V2.md)
 - [Development Process](./README-DEVELOPMENT-PROCESS.md)
 - [Charts Documentation](./README-CHARTS.md) 

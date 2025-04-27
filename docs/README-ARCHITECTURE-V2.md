@@ -1,4 +1,7 @@
-# 🏗️ Architecture Documentation
+# 🏗️ Architecture Documentation V2
+
+As mentioned in [Development Process](), I developed this system throughout two intensive phases. The first one being in June 2024, and the second one in April 2025. This file describes the system's state as of April 2025, after my second development phase. If you wish to view the previous architectural state, navigate to [Architecture V1](README-ARCHITECTURE-V1.md)
+
 
 ## System Overview
 The Global City Streaming project is a distributed system that processes and visualizes real-time weather data from cities worldwide. The system is built using a microservices architecture with the following key components:
@@ -48,18 +51,6 @@ The Global City Streaming project is a distributed system that processes and vis
   - Cache management
   - Query optimization
 
-## Data Flow
-```mermaid
-graph LR
-    A[City API] --> B[Kafka Producer]
-    B --> C[Kafka Topics]
-    C --> D[Flink Processor]
-    D --> E[Database Manager]
-    E --> F[PostgreSQL]
-    E --> G[Redis Cache]
-    H[Frontend] --> A
-    H --> G
-```
 
 ## Component Interactions
 
@@ -73,82 +64,7 @@ graph LR
 1. Frontend requests data
 2. Redis cache check
 3. PostgreSQL fallback if cache miss
-4. Real-time updates via WebSocket
 
-## Infrastructure
-
-### Containerization
-- Docker containers for each service
-- Docker Compose for local development
-- Kubernetes for production deployment
-
-### Database Architecture
-```mermaid
-graph TD
-    A[Application Layer] --> B[Cache Layer]
-    B --> C[Database Layer]
-    C --> D[PostgreSQL]
-    C --> E[Redis]
-```
-
-### Monitoring & Logging
-- Prometheus for metrics
-- Grafana for visualization
-- ELK Stack for log aggregation
-
-## Security Architecture
-
-### Authentication
-- JWT-based authentication
-- Role-based access control
-- API key management
-
-### Data Protection
-- TLS encryption
-- Data masking
-- Regular security audits
-
-## Scalability
-
-### Horizontal Scaling
-- Kubernetes auto-scaling
-- Load balancing
-- Service replication
-
-### Performance Optimization
-- Redis caching
-- Database indexing
-- Query optimization
-
-## Development Environment
-
-### Local Setup
-```bash
-# Clone repositories
-git clone --recursive https://github.com/joel0/Global-City-Streaming.git
-cd Global-City-Streaming
-
-# Start services
-docker-compose up -d
-```
-
-### Configuration Management
-- Environment-specific configs
-- Centralized configuration
-- Secret management
-
-## Future Architecture Considerations
-
-### Planned Improvements
-1. GraphQL API integration
-2. Event sourcing implementation
-3. Machine learning pipeline
-4. Enhanced caching strategy
-
-### Scalability Roadmap
-1. Microservices mesh
-2. Global distribution
-3. Enhanced monitoring
 
 For more information about:
 - [API Documentation](./README-API.md)
