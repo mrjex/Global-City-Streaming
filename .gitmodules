@@ -7,3 +7,6 @@
 [submodule "kafka-producer"]
 	path = kafka-producer
 	url = https://github.com/mrjex/Kafka-Producer-Global-City-Streaming.git
+[submodule "flink-processor"]
+	path = flink-processor
+	url = https://github.com/mrjex/Flink-Processor-Global-City-Streaming.git
