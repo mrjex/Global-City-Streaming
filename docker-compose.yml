@@ -192,9 +192,6 @@ services:
       - app_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
-    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
     mem_limit: 8g
     memswap_limit: 10g
     cpu_shares: 2048

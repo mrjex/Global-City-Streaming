@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Lima
-  - Trujillo
-  - Arequipa
-  - Chiclayo
-  - Callao
+  - "Asunci\xF3n"
+  - Ciudad del Este
+  - Luque
+  - "Capiat\xE1"
+  - San Lorenzo
   enabled: true
   previousBatch:
-  - Lima
-  - Trujillo
-  - Arequipa
-  - Chiclayo
-  - Callao
+  - "Asunci\xF3n"
+  - Ciudad del Este
+  - Luque
+  - "Capiat\xE1"
+  - San Lorenzo
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -112,7 +112,7 @@ visualizations:
     equatorChart:
       displayActualTrend: true
       displayLinearTrend: false
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
