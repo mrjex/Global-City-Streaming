@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 buildImages() {
     docker build -t joel030303/city-api:latest -f city-api/Dockerfile .
     docker build -t joel030303/db-manager:latest -f db-manager/Dockerfile .
