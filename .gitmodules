@@ -4,3 +4,6 @@
 [submodule "frontend"]
 	path = frontend
 	url = https://github.com/mrjex/Frontend-Global-City-Streaming.git
+[submodule "kafka-producer"]
+	path = kafka-producer
+	url = https://github.com/mrjex/Kafka-Producer-Global-City-Streaming.git

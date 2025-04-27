@@ -1,3 +1,0 @@
--- -- - EXECUTION SETTINGS - -- -- 
-
-API Request Intervals (seconds) = 3.5
