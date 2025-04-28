@@ -7,13 +7,33 @@
 ## 🎯 Overview
 This is the main repository for the Global City Streaming project, a comprehensive system for real-time temperature analysis across global cities using modern streaming architecture.
 
-**Demos:**
+
+## Demo
+
+### Videos
 
 ![countries-demo](docs/readme-videos/Global-City-Streaming-Countries.mp4)
 
 ![equator1-demo](docs/readme-videos/Global-City-Streaming-EquatorChart-1.mp4)
 
 ![equator2-demo](docs/readme-videos/Global-City-Streaming-EquatorChart-2.mp4)
+
+
+### Pictures
+
+
+![country-1](docs/readme-pictures/ui-demo/country-1.PNG)
+
+![globe-1](docs/readme-pictures/ui-demo/globe-1.PNG)
+
+![logs-1](docs/readme-pictures/ui-demo/logs-1.PNG)
+
+![equator-1](docs/readme-pictures/ui-demo/equator-1.PNG)
+
+![equator-2](docs/readme-pictures/ui-demo/equator-2.PNG)
+
+![chart-gallery](docs/readme-pictures/ui-demo/chart-gallery.PNG)
+
 
 
 ## 🏗 Technology Stack

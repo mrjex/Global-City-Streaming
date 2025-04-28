@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
   enabled: true
   previousBatch:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -110,9 +110,9 @@ services:
 visualizations:
   charts:
     equatorChart:
-      displayActualTrend: false
-      displayLinearTrend: true
-      displayLogarithmicTrend: true
+      displayActualTrend: true
+      displayLinearTrend: false
+      displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: timeZoneOffset
