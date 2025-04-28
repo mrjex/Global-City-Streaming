@@ -7,6 +7,19 @@
 ## 🎯 Overview
 This is the main repository for the Global City Streaming project, a comprehensive system for real-time temperature analysis across global cities using modern streaming architecture.
 
+[![Kafka](https://img.shields.io/badge/Kafka-Streaming-red)](https://kafka.apache.org/)
+[![Flink](https://img.shields.io/badge/Flink-Processing-blue)](https://flink.apache.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-lightblue)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)](https://www.docker.com/)
+[![Python](https://img.shields.io/badge/Python-3.8+-green)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-Frontend-61DAFB)](https://reactjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-Framework-000000)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Language-3178C6)](https://www.typescriptlang.org/)
+[![Redis](https://img.shields.io/badge/Redis-Cache-DC382D)](https://redis.io/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-API-412991)](https://openai.com/)
+
+
 
 ## Demo
 
@@ -35,28 +48,6 @@ This is the main repository for the Global City Streaming project, a comprehensi
 ![chart-gallery](docs/readme-pictures/ui-demo/chart-gallery.PNG)
 
 
-
-## 🏗 Technology Stack
-
-### Core Technologies
-[![Kafka](https://img.shields.io/badge/Kafka-Streaming-red)](https://kafka.apache.org/)
-[![Flink](https://img.shields.io/badge/Flink-Processing-blue)](https://flink.apache.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-lightblue)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)](https://www.docker.com/)
-[![Python](https://img.shields.io/badge/Python-3.8+-green)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/React-Frontend-61DAFB)](https://reactjs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-Framework-000000)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Language-3178C6)](https://www.typescriptlang.org/)
-[![Redis](https://img.shields.io/badge/Redis-Cache-DC382D)](https://redis.io/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-API-412991)](https://openai.com/)
-
-
-### Infrastructure
-- Confluent Inc
-- Bitnami
-- Docker Compose
-- Microservices Architecture
 
 ## 📦 Project Components
 This project is composed of several microservices, each maintained in its own repository:
