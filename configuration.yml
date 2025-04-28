@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Karachi
-  - Lahore
-  - Faisalabad
-  - Rawalpindi
-  - Gujranwala
+  - Greater London
+  - London
+  - Birmingham
+  - Leeds
+  - Tyneside
   enabled: true
   previousBatch:
-  - Karachi
-  - Lahore
-  - Faisalabad
-  - Rawalpindi
-  - Gujranwala
+  - Greater London
+  - London
+  - Birmingham
+  - Leeds
+  - Tyneside
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5

@@ -52,22 +52,26 @@ This project is composed of several microservices, each maintained in its own re
 - [Charts & Visualization](./docs/README-CHARTS.md) - Data visualization details
 - [Equator Analysis](./docs/README-EQUATOR-ANALYSIS.md) - Temperature-equator correlation study
 - [API Documentation](./docs/README-API.md) - API endpoints and usage
-- [Setup Guide](./docs/README-SETUP.md) - Installation and configuration
-- [Testing Guide](./docs/README-TESTING.md) - Testing procedures
+
 
 ## 🚀 Quick Start
+
 ```bash
 # Clone the repository with submodules
 git clone --recursive https://github.com/mrjex/Global-City-Streaming.git
 
-# Start the application
-./start.sh
-
-# Stop the application
-./stop.sh
 ```
 
-For detailed setup instructions, see the [Setup Guide](./docs/README-SETUP.md).
+Add a `.env` file at the root directory with the structure detailed in `.env.example` and add your custom API keys.
+
+
+```bash
+# Pull docker images and run the system
+./run.sh
+
+```
+
+
 
 ## 📊 Features
 - Real-time temperature monitoring across global cities
