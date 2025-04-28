@@ -7,6 +7,15 @@
 ## 🎯 Overview
 This is the main repository for the Global City Streaming project, a comprehensive system for real-time temperature analysis across global cities using modern streaming architecture.
 
+**Demos:**
+
+![countries-demo](docs/readme-videos/Global-City-Streaming-Countries.mp4)
+
+![equator1-demo](docs/readme-videos/Global-City-Streaming-EquatorChart-1.mp4)
+
+![equator2-demo](docs/readme-videos/Global-City-Streaming-EquatorChart-2.mp4)
+
+
 ## 🏗 Technology Stack
 
 ### Core Technologies
@@ -21,8 +30,7 @@ This is the main repository for the Global City Streaming project, a comprehensi
 [![TypeScript](https://img.shields.io/badge/TypeScript-Language-3178C6)](https://www.typescriptlang.org/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D)](https://redis.io/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-API-412991)](https://openai.com/)
-[![Terraform](https://img.shields.io/badge/Terraform-Infrastructure-7B42BC)](https://www.terraform.io/)
-[![DigitalOcean](https://img.shields.io/badge/DigitalOcean-Cloud-0080FF)](https://www.digitalocean.com/)
+
 
 ### Infrastructure
 - Confluent Inc

@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Greater London
-  - London
-  - Birmingham
-  - Leeds
-  - Tyneside
+  - Tokyo
+  - Yokohama
+  - Osaka
+  - Nagoya
+  - Fukuoka
   enabled: true
   previousBatch:
-  - Greater London
-  - London
-  - Birmingham
-  - Leeds
-  - Tyneside
+  - Tokyo
+  - Yokohama
+  - Osaka
+  - Nagoya
+  - Fukuoka
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -110,10 +110,10 @@ services:
 visualizations:
   charts:
     equatorChart:
-      displayActualTrend: true
-      displayLinearTrend: false
-      displayLogarithmicTrend: false
+      displayActualTrend: false
+      displayLinearTrend: true
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
-    queryAttribute: continent
-    queryRequirement: Europe
+    queryAttribute: timeZoneOffset
+    queryRequirement: UTC+3
