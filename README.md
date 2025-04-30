@@ -97,7 +97,6 @@ Add a `.env` file at the root directory with the structure detailed in `.env.exa
 - Advanced data visualization with multiple chart types
 - Equator distance temperature analysis
 - Scalable microservices architecture
-- Automated deployment and testing
 - Persistent data storage with Docker volumes
 
 
