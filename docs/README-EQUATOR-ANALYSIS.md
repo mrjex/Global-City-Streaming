@@ -42,7 +42,18 @@ The relationship between temperature and equator distance follows a logarithmic 
 ![equator-distance-analysis](../docs/readme-pictures/equator/equator-distance-solution-analysis.JPG)
 
 #### Experimentation Phase
-Series of tests in Geogebra to determine optimal formula:
+
+I then proceeded with using the **Geogebra** software tool for playing around slopes and formulas. The objective was to:
+
+1. Determine the structure of the function, such as:
+  - Logarithm with base 10, 2 or e?
+  - Products for defining the X-shift, Y-shift and amplitude
+
+2. Optimize the function for the project's particular use case:
+  - Adjust constants and variables to make the function intersect the X-axis when **X=90** and the Y-axis when **Y=yMax**
+
+
+The pictures below demonstrate the process I went through as I came up with the formula:
 
 1. X0 Value Calculation:
 ![calculate-x0-value](../docs/readme-pictures/equator-maths/calculate-x-0-value.PNG)
@@ -67,8 +78,9 @@ Experimental results:
 Test marker validation:
 ![test-marker](../docs/readme-pictures/equator-maths/test-marker.PNG)
 
-### Final Formula
-**y = 15 * loge(-0.5x + 45) + 5**
+### Final Hypothesis Formula
+
+**Y = 15 * loge(-0.5X + 45) + 5** *where X is a city's distance to the equator and Y is its expected temperature*
 
 #### Paper Analysis
 Original derivation:
