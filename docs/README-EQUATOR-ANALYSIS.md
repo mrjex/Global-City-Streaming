@@ -3,7 +3,8 @@
 ## Hypothesis
 > The closer to the equator a city is, the higher the average temperature is
 
-This project explores and validates this hypothesis through data analysis and mathematical modeling.
+In essence, this project explores and validates this hypothesis through data analysis and mathematical modeling. Below, the formula which I came up with for plotting a logarithmic trend for the expected temperature, making it adjustable to a fixed value as the maximal Y-value. I had a hypothesis that the closer to the equator that a geopgraphical location is, the hotter the temperature generally is. But I didn't assume this trend to be linear, but rather have a similar curvature as `general learning or progression curves`, in the sense when an individual starts with a pursuit of becoming great at something, that person experience significant and visible progression in the beginning, but that apparent progress wears off over time, and instead of improving 10% per week as one did in the beginning, only a 0.1% improvement is `actualized`. Furthermore, in the context of that particular project, I inituitively made the assumption that cities closer to the north and south poles of Earth (the ones furthest away from the equator) are colder, but they aren't `that much colder`. For instance, Sweden, which is close to the north pole is `undoutebly` colder than Spain, and the difference in temperature isn't of the expected magnitude. Hence, I concluded that a linear relationship between a geographical location's distance to the equator (X) and it's temperature (Y) shouldn't be expressed as a linear relationship.
+
 
 ## Geographic Basis
 ![lat-long-earth](../docs/readme-pictures/equator/1.%20latitude-longitude-earth.gif)
