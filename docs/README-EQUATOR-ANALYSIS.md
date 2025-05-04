@@ -3,7 +3,7 @@
 ## Hypothesis
 > The closer to the equator a city is, the higher the average temperature is
 
-In essence, this project explores and validates this hypothesis through data analysis and mathematical modeling. Below, the formula which I came up with for plotting a logarithmic trend for the expected temperature, making it adjustable to a fixed value as the maximal Y-value. I had a hypothesis that the closer to the equator that a geopgraphical location is, the hotter the temperature generally is. But I didn't assume this trend to be linear, but rather have a similar curvature as `general learning or progression curves`, in the sense when an individual starts with a pursuit of becoming great at something, that person experience significant and visible progression in the beginning, but that apparent progress wears off over time, and instead of improving 10% per week as one did in the beginning, only a 0.1% improvement is `actualized`. Furthermore, in the context of that particular project, I inituitively made the assumption that cities closer to the north and south poles of Earth (the ones furthest away from the equator) are colder, but they aren't `that much colder`. For instance, Sweden, which is close to the north pole is `undoutebly` colder than Spain, and the difference in temperature isn't of the expected magnitude. Hence, I concluded that a linear relationship between a geographical location's distance to the equator (X) and it's temperature (Y) shouldn't be expressed as a linear relationship.
+In essence, this project explores and validates this hypothesis through data analysis and mathematical modeling. Below, the formula which I came up with for plotting a logarithmic trend for the expected temperature, making it adjustable to a fixed value as the maximal Y-value. I had a hypothesis that the closer to the equator that a geographical location is, the hotter the temperature generally is. But I didn't assume this trend to be linear, but rather have a similar curvature as typical skill acquisition or growth curves—in the sense that when an individual begins the pursuit of mastering a skill, they experience rapid and noticeable progress early on, but that apparent progress slows over time, and instead of improving 10% per week as they did initially, only a 0.1% improvement is actually achieved. Furthermore, in the context of that particular project, I intuitively made the assumption that cities closer to the north and south poles of Earth (the ones furthest away from the equator) are colder, but they aren't drastically colder. For instance, Sweden, which is close to the north pole, is undeniably colder than Spain, but the difference in temperature isn't of the expected magnitude. Hence, I concluded that a geographical location's distance to the equator (X) and its temperature (Y) shouldn't be expressed as a linear relationship
 
 
 ## Geographic Basis
@@ -13,6 +13,17 @@ Key concepts:
 - Equator is at latitude 0°
 - Total latitude range: -90° to 90°
 - Distance to equator = absolute value of latitude
+
+As a result, the mathemtical function to be derived should have the following properties:
+- **X:** Ranges between 0 and 90
+- **X=90:** The logarithmic function's value should equate to 0 (furthest distance from equator yields lowest temperature)
+- **X=0:** The function should obtain its maximal value (cities at the equator should theoretically obtain the highest temperature)
+- **Function Input:** Takes one input variable **yMax** (the highest city temperature or Y-value), such that the function **F(X)** always satisfies the conditions below:
+  - **F(0) = yMax**
+  - **F(90) = 0**
+- **Function Curvature:** As the function peaks at *X=0*, it should then logarithmically decrease until it hits 0. This trend should be slowly decreasing in the beginning and gradually obtain a more intense declining slope. In other words, *as X increases, the declining slope rate also increases*
+
+
 
 ## Mathematical Analysis
 
