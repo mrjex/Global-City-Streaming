@@ -1,8 +1,11 @@
 
 
-provideToken() {
+setEnvironmentVariables() {
     TOKEN_VALUE=${1}
+    SSH_FINGERPRINT=${2}
+
     export TF_VAR_do_token=${TOKEN_VALUE}
+    export TF_VAR_ssh_fingerprint=${SSH_FINGERPRINT}
 }
 
 
@@ -26,3 +29,6 @@ initializeAndApply() {
     terraform plan
     terraform apply
 }
+
+
+# doctl compute ssh-key list

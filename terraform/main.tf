@@ -11,10 +11,10 @@ provider "digitalocean" {
   token = var.do_token
 }
 
-
 resource "digitalocean_droplet" "app_server" {
-  name   = "global-city-droplet"
-  region = "nyc3" # or your preferred region
-  size   = "s-1vcpu-1gb"
+  name   = "ubuntu-droplet-1"
+  region = "fra1"
+  size   = "s-1vcpu-2gb"
   image  = "ubuntu-22-04-x64"
+  ssh_keys = [var.ssh_fingerprint]
 }
