@@ -2,10 +2,6 @@
 
 > Real-time global temperature analysis through modern streaming architecture
 
-![project-logo-3](docs/readme-pictures/global/global-feature-logo-3.png)
-
-## 🎯 Overview
-This is the main repository for the Global City Streaming project, a comprehensive system for real-time temperature analysis across global cities using modern streaming architecture.
 
 [![Kafka](https://img.shields.io/badge/Kafka-Streaming-red)](https://kafka.apache.org/)
 [![Flink](https://img.shields.io/badge/Flink-Processing-blue)](https://flink.apache.org/)
@@ -18,7 +14,14 @@ This is the main repository for the Global City Streaming project, a comprehensi
 [![TypeScript](https://img.shields.io/badge/TypeScript-Language-3178C6)](https://www.typescriptlang.org/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D)](https://redis.io/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-API-412991)](https://openai.com/)
+[![Terraform](https://img.shields.io/badge/Terraform-IaC-623CE4)](https://www.terraform.io/)
+[![DigitalOcean](https://img.shields.io/badge/DigitalOcean-Cloud-0080FF)](https://www.digitalocean.com/)
 
+
+![project-logo-3](docs/readme-pictures/global/global-feature-logo-3.png)
+
+## 🎯 Overview
+This is the main repository for the Global City Streaming project, a comprehensive system for real-time temperature analysis across global cities using modern streaming architecture.
 
 
 ## Demo
