@@ -3,7 +3,8 @@
 ## Hypothesis
 > The closer to the equator a city is, the higher the average temperature is
 
-This project explores and validates this hypothesis through data analysis and mathematical modeling.
+In essence, this project explores and validates this hypothesis through data analysis and mathematical modeling. Below, the formula which I came up with for plotting a logarithmic trend for the expected temperature, making it adjustable to a fixed value as the maximal Y-value. I had a hypothesis that the closer to the equator that a geographical location is, the hotter the temperature generally is. But I didn't assume this trend to be linear, but rather have a similar curvature as typical skill acquisition or growth curves—in the sense that when an individual begins the pursuit of mastering a skill, they experience rapid and noticeable progress early on, but that apparent progress slows over time, and instead of improving 10% per week as they did initially, only a 0.1% improvement is actually achieved. Furthermore, in the context of that particular project, I intuitively made the assumption that cities closer to the north and south poles of Earth (the ones furthest away from the equator) are colder, but they aren't drastically colder. For instance, Sweden, which is close to the north pole, is undeniably colder than Spain, but the difference in temperature isn't of the expected magnitude. Hence, I concluded that a geographical location's distance to the equator (X) and its temperature (Y) shouldn't be expressed as a linear relationship
+
 
 ## Geographic Basis
 ![lat-long-earth](../docs/readme-pictures/equator/1.%20latitude-longitude-earth.gif)
@@ -12,6 +13,17 @@ Key concepts:
 - Equator is at latitude 0°
 - Total latitude range: -90° to 90°
 - Distance to equator = absolute value of latitude
+
+As a result, the mathemtical function to be derived should have the following properties:
+- **X:** Ranges between 0 and 90
+- **X=90:** The logarithmic function's value should equate to 0 (furthest distance from equator yields lowest temperature)
+- **X=0:** The function should obtain its maximal value (cities at the equator should theoretically obtain the highest temperature)
+- **Function Input:** Takes one input variable **yMax** (the highest city temperature or Y-value), such that the function **F(X)** always satisfies the conditions below:
+  - **F(0) = yMax**
+  - **F(90) = 0**
+- **Function Curvature:** As the function peaks at *X=0*, it should then logarithmically decrease until it hits 0. This trend should be slowly decreasing in the beginning and gradually obtain a more intense declining slope. In other words, *as X increases, the declining slope rate also increases*
+
+
 
 ## Mathematical Analysis
 
@@ -30,7 +42,18 @@ The relationship between temperature and equator distance follows a logarithmic 
 ![equator-distance-analysis](../docs/readme-pictures/equator/equator-distance-solution-analysis.JPG)
 
 #### Experimentation Phase
-Series of tests in Geogebra to determine optimal formula:
+
+I then proceeded with using the **Geogebra** software tool for playing around slopes and formulas. The objective was to:
+
+1. Determine the structure of the function, such as:
+  - Logarithm with base 10, 2 or e?
+  - Products for defining the X-shift, Y-shift and amplitude
+
+2. Optimize the function for the project's particular use case:
+  - Adjust constants and variables to make the function intersect the X-axis when **X=90** and the Y-axis when **Y=yMax**
+
+
+The pictures below demonstrate the process I went through as I came up with the formula:
 
 1. X0 Value Calculation:
 ![calculate-x0-value](../docs/readme-pictures/equator-maths/calculate-x-0-value.PNG)
@@ -55,8 +78,9 @@ Experimental results:
 Test marker validation:
 ![test-marker](../docs/readme-pictures/equator-maths/test-marker.PNG)
 
-### Final Formula
-**y = 15 * loge(-0.5x + 45) + 5**
+### Final Hypothesis Formula
+
+**Y = 15 * loge(-0.5X + 45) + 5** *where X is a city's distance to the equator and Y is its expected temperature*
 
 #### Paper Analysis
 Original derivation:
