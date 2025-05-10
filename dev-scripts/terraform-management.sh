@@ -1,3 +1,7 @@
+##  TERRAFORM MANAGEMENT  ##
+#
+#   - This script takes two arguments: The access token from Digital Ocean and the fingerprint of the SSH key
+
 
 
 setEnvironmentVariables() {
@@ -8,27 +12,25 @@ setEnvironmentVariables() {
     export TF_VAR_ssh_fingerprint=${SSH_FINGERPRINT}
 }
 
-
-
-
-## STEPS
-
-# Find the Droplet ID
-# doctl compute droplet list
-
-# Import the Droplet into Terraform
-# terraform import digitalocean_droplet.app_server <droplet_id>
-
-
-
 initializeAndApply() {
-
-    cd ../terraform
-
     terraform init
     terraform plan
     terraform apply
 }
 
 
-# doctl compute ssh-key list
+destroyInfrastructure() {
+    terraform destroy
+}
+
+
+
+##  MAIN  ##
+
+
+setEnvironmentVariables ${1} ${2}
+
+cd ../terraform
+initializeAndApply
+
+# destroyInfrastructure
