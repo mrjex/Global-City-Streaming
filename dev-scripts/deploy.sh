@@ -3,11 +3,9 @@
 
 # Deploy on Digital Ocean Linux Droplet
 
-
 connectSSH() {
-    ssh root@161.35.24.231
+    ssh root@209.97.176.90
 }
-
 
 # Stop and remove existing containers
 echo "Stopping existing containers..."
