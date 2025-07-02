@@ -219,7 +219,7 @@ services:
       - POSTGRES_DB=postgres
       - MAX_RECORDS=500
       - CHECK_INTERVAL=30
-      - BATCH_DELETE_SIZE=1000
+      - BATCH_DELETE_SIZE=3000
     restart: unless-stopped
     mem_limit: 4g
     memswap_limit: 5g

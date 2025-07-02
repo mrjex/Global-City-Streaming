@@ -85,13 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Stockholm
-  - Gothenburg
-  - "Malm\xF6"
-  - Uppsala
-  - "V\xE4ster\xE5s"
+  - Madrid
+  - Madrid city
+  - Barcelona
+  - Barcelona City
+  - Valencia
   enabled: true
-  previousBatch: []
+  previousBatch:
+  - Madrid
+  - Madrid city
+  - Barcelona
+  - Barcelona City
+  - Valencia
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -107,7 +112,7 @@ visualizations:
     equatorChart:
       displayActualTrend: false
       displayLinearTrend: true
-      displayLogarithmicTrend: false
+      displayLogarithmicTrend: true
       pngOutput: false
   queryConfig:
     queryAttribute: continent
