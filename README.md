@@ -20,7 +20,7 @@
 
 ![project-logo-3](docs/readme-pictures/global/global-feature-logo-3.png)
 
-## 🎯 Overview
+## Overview
 This is the main repository for the Global City Streaming project, a comprehensive system for real-time temperature analysis across global cities using modern streaming architecture.
 
 
@@ -52,7 +52,7 @@ This is the main repository for the Global City Streaming project, a comprehensi
 
 
 
-## 📦 Project Components
+## Project Components
 This project is composed of several microservices, each maintained in its own repository:
 
 ### Frontend & API
@@ -68,7 +68,7 @@ This project is composed of several microservices, each maintained in its own re
 - [Database Manager](https://github.com/mrjex/Database-Manager-Global-City-Streaming) - Database management service
 - [PostgreSQL Service](https://github.com/mrjex/Postgres-Global-City-Streaming) - Primary data storage
 
-## 📚 Documentation
+## Documentation
 - [Architecture Documentation](./docs/README-ARCHITECTURE-V2.md) - System architecture and components
 - [Development Process](./docs/README-DEVELOPMENT-PROCESS.md) - Development journey and decisions
 - [Charts & Visualization](./docs/README-CHARTS.md) - Data visualization details
@@ -76,7 +76,7 @@ This project is composed of several microservices, each maintained in its own re
 - [API Documentation](./docs/README-API.md) - API endpoints and usage
 
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Clone the repository with submodules
@@ -92,15 +92,6 @@ Add a `.env` file at the root directory with the structure detailed in `.env.exa
 ./run.sh
 
 ```
-
-
-
-## 📊 Features
-- Real-time temperature monitoring across global cities
-- Advanced data visualization with multiple chart types
-- Equator distance temperature analysis
-- Scalable microservices architecture
-- Persistent data storage with Docker volumes
 
 
 ---
