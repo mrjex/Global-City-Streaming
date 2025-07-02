@@ -85,18 +85,13 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
+  - Stockholm
+  - Gothenburg
+  - "Malm\xF6"
+  - Uppsala
+  - "V\xE4ster\xE5s"
   enabled: true
-  previousBatch:
-  - Tokyo
-  - Yokohama
-  - Osaka
-  - Nagoya
-  - Fukuoka
+  previousBatch: []
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
@@ -110,10 +105,10 @@ services:
 visualizations:
   charts:
     equatorChart:
-      displayActualTrend: true
-      displayLinearTrend: false
+      displayActualTrend: false
+      displayLinearTrend: true
       displayLogarithmicTrend: false
       pngOutput: false
   queryConfig:
     queryAttribute: continent
-    queryRequirement: Asia
+    queryRequirement: Europe

@@ -261,7 +261,6 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-      - ./dev-endpoints/static-cities-data/static-cities.json:/data/static-cities.json:ro
     environment:
       - LOAD_STATIC_CITIES=${LOAD_STATIC_CITIES:-false}
     command: --appendonly yes --save 60 1
