@@ -261,8 +261,10 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+      - ./dev-scripts:/static-data:ro
     environment:
       - LOAD_STATIC_CITIES=${LOAD_STATIC_CITIES:-false}
+      - STATIC_CITIES_PATH=/static-data/static-cities.json
     command: --appendonly yes --save 60 1
     networks:
       - app_network
