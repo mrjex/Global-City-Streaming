@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Toronto
-  - Lower Mainland
-  - Metro Vancouver Regional District
-  - Montreal
-  - National Capital Region
+  - Auckland
+  - Christchurch
+  - Wellington
+  - Hamilton
+  - Tauranga
   enabled: true
   previousBatch:
-  - Toronto
-  - Lower Mainland
-  - Metro Vancouver Regional District
-  - Montreal
-  - National Capital Region
+  - Auckland
+  - Christchurch
+  - Wellington
+  - Hamilton
+  - Tauranga
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
