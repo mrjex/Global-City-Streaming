@@ -85,18 +85,18 @@ cities:
 - Chengdu
 dynamicCities:
   current:
-  - Auckland
-  - Christchurch
-  - Wellington
-  - Hamilton
-  - Tauranga
+  - Randstad
+  - Amsterdam
+  - Rotterdam
+  - The Hague
+  - The Hague
   enabled: true
   previousBatch:
-  - Auckland
-  - Christchurch
-  - Wellington
-  - Hamilton
-  - Tauranga
+  - Randstad
+  - Amsterdam
+  - Rotterdam
+  - The Hague
+  - The Hague
 services:
   cityApi:
     numberOfCitiesForSelectedCountry: 5
